@@ -1,12 +1,12 @@
 ﻿#pragma once
-#include <memory>
+#include "Object.h"
 
 class GameEntity;
 
-class Component
+class Component : public Object
 {
 public:
-	virtual ~Component() = default;
+	~Component() override = default;
 	virtual void Update(float DeltaTime);
 
 	GameEntity* GetOwningEntity() const;

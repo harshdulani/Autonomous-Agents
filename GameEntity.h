@@ -4,6 +4,8 @@
 #include <cassert>
 #include <SFML/Graphics/Transformable.hpp>
 
+#include "Object.h"
+
 namespace sf
 {
 	class Drawable;
@@ -16,17 +18,13 @@ namespace sf
 	class RenderWindow;
 }
 
-class GameEntity : public sf::Transformable
+class GameEntity : public Object, public sf::Transformable
 {
 	friend class ObjectManager;
 public:
 	~GameEntity() override = default;
 	virtual void Update(float DeltaTime);
 	virtual void Render(const sf::RenderWindow* Window) const;
-
-	virtual void Kill();
-
-	bool IsDeleteDeferred() const;
 
 	template<typename T>
 	std::weak_ptr<T> AddComponent();
@@ -44,9 +42,6 @@ private:
 	//@todo: ownership moved to ObjectMgr
 	std::vector<std::shared_ptr<Component>> Components;
 	std::vector<std::shared_ptr<sf::Drawable>> Drawables;
-	
-	//@todo: move up to Object
-	bool bDeleteDeferred = false;
 };
 
 template<typename T>
