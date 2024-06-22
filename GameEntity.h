@@ -3,15 +3,15 @@
 #include <vector>
 #include <cassert>
 #include <SFML/Graphics/Transformable.hpp>
-
 #include "Object.h"
+#include "System.h"
+#include "ObjectManager.h"
+#include "Component.h"
 
 namespace sf
 {
 	class Drawable;
 }
-
-class Component;
 
 namespace sf
 {
@@ -26,6 +26,8 @@ public:
 	virtual void Update(float DeltaTime);
 	virtual void Render(const sf::RenderWindow* Window) const;
 
+	void Kill() override;
+	
 	template<typename T>
 	std::weak_ptr<T> AddComponent();
 
@@ -38,22 +40,22 @@ public:
 	template<typename T>
 	std::weak_ptr<T> GetDrawable();
 
+	std::weak_ptr<GameEntity> GetWeakSelf();
+	std::vector<std::weak_ptr<Component>>* GetComponentList();
+
 private:
 	//@todo: ownership moved to ObjectMgr
-	std::vector<std::shared_ptr<Component>> Components;
+	std::vector<std::weak_ptr<Component>> Components;
 	std::vector<std::shared_ptr<sf::Drawable>> Drawables;
 };
 
 template<typename T>
 std::weak_ptr<T> GameEntity::AddComponent()
 {
-	assert((std::is_base_of<Component, T>::value && "Type mismatch while creating component"));
-
-	std::shared_ptr<T> Component = std::make_shared<T>();
-
-	Component->SetOwningEntity(this);
-	Components.push_back(Component);
-	return Component;
+	std::weak_ptr<T> WeakCmp = System::GetInstance()->GetObjectMgr()->CreateComponent<T>(this);
+	
+	Components.push_back(WeakCmp);
+	return WeakCmp;
 }
 
 template<typename T>

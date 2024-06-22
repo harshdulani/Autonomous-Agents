@@ -24,11 +24,10 @@ void PhysicsComponent::SetAngularVelocity(float InVel)
 
 void PhysicsComponent::Update(float DeltaTime)
 {
-	//auto Entity = GetOwningEntity().lock();
-	auto Entity = GetOwningEntity();
+	auto Entity = GetOwningEntity().lock();
 	if (!Entity)
 		return;
-	if (Entity->IsDeleteDeferred())
+	if (Entity->IsPendingKill())
 		return;
 
 	Entity->setPosition(Entity->getPosition() + Velocity * DeltaTime);

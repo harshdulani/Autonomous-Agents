@@ -2,10 +2,10 @@
 
 void Object::Kill()
 {
-	bDeleteDeferred = true;
+	bPendingKill = true;
 }
 
-bool Object::IsDeleteDeferred() const { return bDeleteDeferred; }
+bool Object::IsPendingKill() const { return bPendingKill; }
 
 // check memory addresses to confirm if they are the same instance or not
 bool Object::operator==(const Object& rhs) const

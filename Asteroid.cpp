@@ -17,8 +17,8 @@ void Asteroid::InitAsteroid(float Radius, sf::Color Color)
 	constexpr int MaxPoly = 8;
 
 	float polyCount = static_cast<float>(Math::GetRandInt(MinPoly, MaxPoly));
-	
-	auto Shape = std::make_shared<sf::ConvexShape>(polyCount);
+
+	const auto Shape = std::make_shared<sf::ConvexShape>(static_cast<int>(polyCount));
 
 	for (int i = 0; i < polyCount; ++i)
 	{

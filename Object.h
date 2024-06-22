@@ -8,13 +8,13 @@ public:
 	virtual ~Object() = default;
 	virtual void Kill();
 
-	bool IsDeleteDeferred() const;
+	bool IsPendingKill() const;
 	bool operator==(const Object& rhs) const;
 	
 private:
 	int GetObjectIndex() const;
 	void SetObjectIndex(int Index);
-	bool bDeleteDeferred = false;
+	bool bPendingKill = false;
 
 	int ObjectIndex = -1;
 };

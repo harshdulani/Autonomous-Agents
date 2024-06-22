@@ -1,4 +1,6 @@
 ﻿#include "ObjectManager.h"
+#include "Object.h"
+#include <algorithm>
 #include "Component.h"
 #include "Game.h"
 #include "GameEntity.h"
@@ -12,12 +14,16 @@ void ObjectManager::UpdateAllObjects(float DeltaTime)
 		Entity->Update(DeltaTime);
 		WrapEntity(Entity.get());
 
-		for (auto& Component : Entity->Components)
+		auto comps = Entity->GetComponentList();
+		for (auto &compItem : *comps)
 		{
-			if (Component.get())
+			auto comp = compItem.lock();
+			if (comp->IsPendingKill())
 			{
-				Component->Update(DeltaTime);
+				// GC will take care of me
+				continue;
 			}
+			comp->Update(DeltaTime);
 		}
 	}
 }
@@ -45,10 +51,15 @@ void ObjectManager::RenderAllObjects(sf::RenderWindow* Window) const
 	}
 }
 
-void ObjectManager::SetWindowVals(float X, float Y)
+std::weak_ptr<GameEntity> ObjectManager::GetWeakPtr(GameEntity* RawPtr)
 {
-	WindowWidth = X;
-	WindowHeight = Y;
+	if (!RawPtr)
+	{
+		return {};
+	}
+	auto Obj = static_cast<Object*>(RawPtr);
+
+	return std::static_pointer_cast<GameEntity>(GetObjectByIndex(Obj->GetObjectIndex()).lock());
 }
 
 void ObjectManager::AddToObjectList(std::shared_ptr<Object> NewObject)
@@ -113,3 +124,9 @@ void ObjectManager::WrapEntity(GameEntity* Entity) const
 }
 
 bool ObjectManager::CanCreateObject() const { return Entities.size() < MaxEntities; }
+
+void ObjectManager::SetWindowVals(float X, float Y)
+{
+	WindowWidth = X;
+	WindowHeight = Y;
+}
