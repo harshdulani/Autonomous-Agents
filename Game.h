@@ -3,36 +3,43 @@
 #include "TriConcave.h"
 #include "SFML/Graphics.hpp"
 
+class GameEntity;
+
 class Game
 {
 public:
 	Game();
 	
-	void Update();
-	void Render();
+	void Update(float DeltaTime);
+	void Render() const;
 	void PollEvents();
+	void UpdateInput();
 
 	bool IsWindowOpen() const;
-	int GetWindowWidth() const;
-	int GetWindowHeight() const;
+	float GetWindowWidth() const;
+	float GetWindowHeight() const;
+
+	sf::Vector2f GetMousePosition() const;
 
 private:
-	void InitVariables();
-	void InitWindow();
+	void Init();
 	void InitEnemies();
+	void InitPlayer();
+	void InitAsteroids();
+	void WrapEntity(GameEntity* Entity) const;
 	
 public:
 
 private:
-	std::unique_ptr<sf::RenderWindow> Window;
+	std::vector<std::shared_ptr<GameEntity>> Entities;
+	
+	std::shared_ptr<sf::RenderWindow> Window;
 	sf::VideoMode VideoMode;
 	sf::Event Event;
+	sf::Vector2f MousePos;
 
-	int Height = 480;
-	int Width = 640;
-
-	TriConcave Enemy;
-	TriConcave Player;
+	float Width = 800.f;
+	float Height = 600.f;
 
 	// static colors
 	static sf::Color Red;

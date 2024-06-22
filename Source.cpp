@@ -4,17 +4,17 @@
 int main()
 {
 	const auto SystemInst = std::make_unique<System>();
-	if (const auto Game = SystemInst->GetGame())
+	const auto Game = SystemInst->GetGame();
+	if (!Game)
+		return 1;
+
+	sf::Clock DeltaClock;
+	while (Game->IsWindowOpen())
 	{
-		while (Game->IsWindowOpen())
-		{
-			// poll events
-			Game->PollEvents();
-			// Update
-			Game->Update();
-			// Render
-			Game->Render();
-		}
+		// Update
+		Game->Update(DeltaClock.restart().asSeconds());
+		// Render
+		Game->Render();
 	}
 
 	return 0;
