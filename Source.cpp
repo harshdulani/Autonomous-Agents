@@ -9,12 +9,12 @@ int main()
 		return 1;
 
 	sf::Clock DeltaClock;
-	while (Game->IsWindowOpen())
+	while (SystemInst->IsWindowOpen())
 	{
 		// Update
-		Game->Update(DeltaClock.restart().asSeconds());
+		SystemInst->Update(DeltaClock.restart().asSeconds());
 		// Render
-		Game->Render();
+		SystemInst->Render();
 	}
 
 	return 0;

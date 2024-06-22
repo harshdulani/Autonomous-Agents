@@ -18,8 +18,7 @@ namespace sf
 
 class GameEntity : public sf::Transformable
 {
-	//@todo: friend class ObjectMgr
-	friend class Game;
+	friend class ObjectManager;
 public:
 	~GameEntity() override = default;
 	virtual void Update(float DeltaTime);
