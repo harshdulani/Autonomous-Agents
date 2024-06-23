@@ -5,12 +5,35 @@
 #include "Game.h"
 #include "GameEntity.h"
 #include "Math.h"
+#include "PrimitiveComponent.h"
+#include "Event.h"
+
+ObjectManager::ObjectManager()
+{
+	Objects.reserve(MaxObjects);
+	
+	eventHandle_levelEnd_ = System::GetInstance()->Event_LevelEnd.Subscribe(BindSubscriber(&ObjectManager::CleanUpOldObjects, this)); 
+}
+
+ObjectManager::~ObjectManager()
+{
+	Objects.clear();
+
+	System::GetInstance()->Event_LevelEnd.Unsubscribe(eventHandle_levelEnd_);
+}
 
 void ObjectManager::UpdateAllObjects(float DeltaTime)
 {
+	ResolveUpdateDirty();
 	// update Entities, Components & Drawables (separately bc drawables not [yet] integrated as objects)
-	for (auto& Entity : Entities)
+	for (auto& Item : UpdateEntities)
 	{
+		auto Entity = Item.lock();
+		if (Entity == nullptr || Entity->IsPendingKill() || !Entity->GetActive())
+		{
+			//if waiting to die or is inactive, we don't need to do anything
+			continue;
+		}
 		Entity->Update(DeltaTime);
 		WrapEntity(Entity.get());
 
@@ -18,7 +41,7 @@ void ObjectManager::UpdateAllObjects(float DeltaTime)
 		for (auto &compItem : *comps)
 		{
 			auto comp = compItem.lock();
-			if (comp->IsPendingKill())
+			if (comp->IsPendingKill() || !comp->IsEnabled())
 			{
 				// GC will take care of me
 				continue;
@@ -26,14 +49,33 @@ void ObjectManager::UpdateAllObjects(float DeltaTime)
 			comp->Update(DeltaTime);
 		}
 	}
+	CollectGarbage();
 }
 
 void ObjectManager::RenderAllObjects(sf::RenderWindow* Window) const
 {
 	// draw entities
-	for (const auto& Entity : Entities)
+	for (const auto& Item : RenderEntities)
 	{
+		auto Entity = Item.lock();
+		if (Entity == nullptr || Entity->IsPendingKill() || !Entity->GetActive())
+		{
+			//if waiting to die or is inactive, we don't need to do anything
+			continue;
+		}
 		Entity->Render(Window);
+		std::vector<std::weak_ptr<PrimitiveComponent>> Comps;
+		Entity->GetComponentsOfType<PrimitiveComponent>(Comps);
+		for (auto& CompItem : Comps)
+		{
+			auto comp = CompItem.lock();
+			if (comp->IsPendingKill())
+			{
+				// GC will take care of me
+				continue;
+			}
+			comp->Render();
+		}
 		for (auto& Drawer : Entity->Drawables)
 		{
 			auto entityTransformed = sf::Transform::Identity * Entity->getTransform();
@@ -49,6 +91,108 @@ void ObjectManager::RenderAllObjects(sf::RenderWindow* Window) const
 			}
 		}
 	}
+}
+
+void ObjectManager::CleanUpOldObjects()
+{
+	Objects.clear();
+	UpdateEntities.clear();
+	RenderEntities.clear();
+}
+
+void ObjectManager::DestroyObject(Object* Obj)
+{
+	// delete entity from entity lists	
+	for (auto it = UpdateEntities.begin(); it != UpdateEntities.end(); ++it)
+	{
+		if ((*it).lock()->GetObjectIndex() == Obj->GetObjectIndex())
+		{
+			System::GetInstance()->Event_EntityDestroyed.Invoke(*it);
+			UpdateEntities.erase(it);
+			break;
+		}
+	}
+	for (auto it = RenderEntities.begin(); it != RenderEntities.end(); ++it)
+	{
+		if ((*it).lock()->GetObjectIndex() == Obj->GetObjectIndex())
+		{
+			RenderEntities.erase(it);
+			break;
+		}
+	}
+	RemoveObjectAtIndex(Obj->GetObjectIndex());
+}
+
+void ObjectManager::CollectGarbage()
+{
+	for(int i = 0; i < Objects.size(); i++)
+	{
+		if (!Objects[i]->IsPendingKill())
+		{
+			continue;
+		}
+
+		//if waiting to die
+		DestroyObject(Objects[i].get());
+
+		// the object at the end of the list was brought at this index by destroy()
+		// it also needs to be indexed
+		i--;
+	}
+}
+
+void ObjectManager::SetRenderDirty(bool status)
+{
+	bResolveRenderDirty = status;
+}
+
+void ObjectManager::SetUpdateDirty(bool status)
+{
+	bResolveUpdateDirty = status;
+}
+
+void ObjectManager::ResolveRenderDirty()
+{
+	if (!bResolveRenderDirty)
+	{
+		return;
+	}
+	for (auto it = RenderEntities.begin(); it != RenderEntities.end(); ++it)
+	{
+		if (auto entity = (*it).lock())
+		{
+			if (!entity->IsPendingKill() && entity->IsRenderDirty())
+			{
+				entity->SetRenderDirty(false);
+				it = RenderEntities.erase(it);
+
+				RenderEntities.insert(entity);
+			}
+		}
+	}
+	SetRenderDirty(false);
+}
+
+void ObjectManager::ResolveUpdateDirty()
+{
+	if (!bResolveUpdateDirty)
+	{
+		return;
+	}
+	for (auto it = UpdateEntities.begin(); it != UpdateEntities.end(); ++it)
+	{
+		if (auto entity = (*it).lock())
+		{
+			if (!entity->IsPendingKill() && entity->IsUpdateDirty())
+			{
+				entity->SetUpdateDirty(false);
+				it = UpdateEntities.erase(it);
+
+				UpdateEntities.insert(entity);
+			}
+		}
+	}
+	SetUpdateDirty(false);
 }
 
 std::weak_ptr<GameEntity> ObjectManager::GetWeakPtr(GameEntity* RawPtr)
@@ -123,10 +267,23 @@ void ObjectManager::WrapEntity(GameEntity* Entity) const
 	}
 }
 
-bool ObjectManager::CanCreateObject() const { return Entities.size() < MaxEntities; }
+bool ObjectManager::CanCreateObject() const { return Objects.size() < MaxObjects; }
 
 void ObjectManager::SetWindowVals(float X, float Y)
 {
 	WindowWidth = X;
 	WindowHeight = Y;
+}
+
+bool UpdatePriorityComparator::operator()(std::weak_ptr<GameEntity> x,
+										  std::weak_ptr<GameEntity> y) const
+{
+	return x.lock()->GetUpdatePriority() < y.lock()->GetUpdatePriority();
+}
+
+bool RenderPriorityComparator::operator()(std::weak_ptr<GameEntity> x,
+										  std::weak_ptr<GameEntity> y) const
+{
+	return x.lock()->GetRenderPriority() < y.lock()->GetRenderPriority();
+
 }

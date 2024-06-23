@@ -12,10 +12,6 @@ sf::Color Game::Green{0, 204, 153};
 sf::Color Game::Blue{69, 204, 255};
 sf::Color Game::Yellow{255, 204, 69};
 
-Game::Game()
-{
-	InitAsteroids();
-}
 
 void Game::InitEnemies()
 {
@@ -42,6 +38,7 @@ void Game::InitAsteroids()
 			{Math::GetRandFloat(0, System::GetInstance()->GetWindowWidth()),
 			 Math::GetRandFloat(0, System::GetInstance()->GetWindowHeight())
 			});
+
 		if (auto Roid = WeakRoid.lock())
 		{
 			//@todo: randomise (between) colors
@@ -83,3 +80,8 @@ void Game::UpdateInput(sf::RenderWindow* Window)
 }
 
 sf::Vector2f Game::GetMousePosition() const { return MousePos; }
+
+void Game::StartGame()
+{
+	InitAsteroids();
+}

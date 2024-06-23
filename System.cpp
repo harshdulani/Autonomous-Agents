@@ -26,12 +26,13 @@ void System::Initialize()
 
 	ObjectMgrInst = std::make_shared<ObjectManager>();
 	ObjectMgrInst->SetWindowVals(GetWindowWidth(), GetWindowHeight());
-	GameInst = std::make_shared<Game>();
+
+	GameInst.StartGame();
 }
 
 void System::Update(float DeltaTime)
 {
-	GameInst->UpdateWindowData(Window.get());
+	GameInst.UpdateWindowData(Window.get());
 	
 	ObjectMgrInst->UpdateAllObjects(DeltaTime);	
 }
@@ -45,10 +46,8 @@ void System::Render() const
 	Window->display();
 }
 
-Game* System::GetGame() const { return GameInst.get(); }
 ObjectManager* System::GetObjectMgr() const { return ObjectMgrInst.get(); }
 
 bool System::IsWindowOpen() const { return Window->isOpen(); }
-
 float System::GetWindowWidth() const { return WindowWidth; }
 float System::GetWindowHeight() const { return WindowHeight; }

@@ -10,6 +10,9 @@ class Component : public Object
 public:
 	virtual void Update(float DeltaTime);
 
+	void SetEnabled(bool bStatus);
+	bool IsEnabled() const;
+	
 	std::weak_ptr<GameEntity> GetOwningEntity() const;
 	void SetOwningEntity(std::weak_ptr<GameEntity> InEntity);
 
@@ -18,4 +21,5 @@ protected:
 	
 private:
 	std::weak_ptr<GameEntity> OwningEntity;
+	bool bEnabled = true;
 };

@@ -3,18 +3,14 @@
 
 int main()
 {
-	const auto SystemInst = std::make_unique<System>();
-	const auto Game = SystemInst->GetGame();
-	if (!Game)
-		return 1;
-
+	System SystemInst;	
 	sf::Clock DeltaClock;
-	while (SystemInst->IsWindowOpen())
+	while (SystemInst.IsWindowOpen())
 	{
 		// Update
-		SystemInst->Update(DeltaClock.restart().asSeconds());
+		SystemInst.Update(DeltaClock.restart().asSeconds());
 		// Render
-		SystemInst->Render();
+		SystemInst.Render();
 	}
 
 	return 0;

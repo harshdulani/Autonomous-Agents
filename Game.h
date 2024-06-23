@@ -5,15 +5,15 @@ class GameEntity;
 
 class Game
 {
-public:
-	Game();
-	
+public:	
 	void UpdateWindowData(sf::RenderWindow* Window);
 	void PollEvents(sf::RenderWindow* Window);
 	void UpdateInput(sf::RenderWindow* Window);
 
 	sf::Vector2f GetMousePosition() const;
 
+	void StartGame();
+	
 private:
 	void InitEnemies();
 	void InitPlayer();

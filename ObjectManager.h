@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <cassert>
 #include <memory>
+#include <set>
 #include <vector>
 #include <SFML/System/Vector2.hpp>
 #include "Component.h"
@@ -13,12 +14,29 @@ namespace sf
 	class RenderWindow;
 }
 
+struct UpdatePriorityComparator
+{
+public:
+	bool operator() (std::weak_ptr<GameEntity> x, std::weak_ptr<GameEntity> y) const;
+};
+struct RenderPriorityComparator
+{
+public:
+	bool operator() (std::weak_ptr<GameEntity> x, std::weak_ptr<GameEntity> y) const;
+};
+
 class ObjectManager
 {
 	friend class GameEntity;
 public:
+	ObjectManager();
+	~ObjectManager();
+
 	void UpdateAllObjects(float DeltaTime);
 	void RenderAllObjects(sf::RenderWindow* Window) const;
+	
+	void CleanUpOldObjects();
+	void DestroyObject(Object* Obj);
 
 	void SetWindowVals(float X, float Y);
 	
@@ -31,6 +49,14 @@ public:
 	std::weak_ptr<GameEntity> GetWeakPtr(GameEntity* RawPtr);
 	
 private:
+	void CollectGarbage();
+
+	void SetRenderDirty(bool status);
+	void SetUpdateDirty(bool status);
+
+	void ResolveUpdateDirty();
+	void ResolveRenderDirty();
+	
 	void AddToObjectList(std::shared_ptr<Object> NewObject);
 
 	static void SetObjectIndex(const std::shared_ptr<Object>& Shared, int Index);
@@ -47,21 +73,22 @@ private:
 	
 public:
 private:
-	std::vector<std::shared_ptr<GameEntity>> Entities;
-
 	// Array of pointers to all Objects
 	std::vector<std::shared_ptr<Object>> Objects;
-
-	/* Priority Queues
-	// Array of pointers to all Entities
-	std::multiset<std::weak_ptr<GameEntity>, update_priority_comparator> updateEntities_;
-	std::multiset<std::weak_ptr<GameEntity>, render_priority_comparator> renderEntities_;
-	*/
 	
-	int MaxEntities = 10000;
+	//  Priority Array of pointers to all Entities
+	std::multiset<std::weak_ptr<GameEntity>, UpdatePriorityComparator> UpdateEntities;
+	std::multiset<std::weak_ptr<GameEntity>, RenderPriorityComparator> RenderEntities;
+		
+	int MaxObjects = 10000;
 	
 	float WindowWidth = 0;
 	float WindowHeight = 0;
+
+	bool bResolveRenderDirty = false;
+	bool bResolveUpdateDirty = false;
+	
+	uint32_t eventHandle_levelEnd_ = 0;
 };
 
 template<typename T> std::weak_ptr<T> ObjectManager::CreateObject()
@@ -85,13 +112,11 @@ template<typename T> std::weak_ptr<T> ObjectManager::CreateGameEntity(const sf::
 	
 	Casted->setPosition(Pos);
 
-	//@todo: replace with below
-	Entities.push_back(Casted);
 	//add to update & render priority lists
-	//UpdateEntities.insert(newEntity);
-	//RenderEntities.insert(newEntity);
+	UpdateEntities.insert(NewEntity);
+	RenderEntities.insert(NewEntity);
 
-	//System::GetInstance()->Event_EntityCreated.Invoke(newEntity);
+	System::GetInstance()->Event_EntityCreated.Invoke(NewEntity);
 	
 	return std::weak_ptr<T>(NewEntity);
 }

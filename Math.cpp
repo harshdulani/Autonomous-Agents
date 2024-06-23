@@ -72,18 +72,10 @@ float Math::DotProduct(const sf::Vector2f& a, const sf::Vector2f& b)
 
 sf::Vector2f Math::GetForwardVector(const float angle_rads)
 {
-	sf::Vector2f forward_vector;
-	forward_vector.x = std::cos(angle_rads);
-	forward_vector.y = std::sin(angle_rads);
-
-	return forward_vector;
+	return {std::cos(angle_rads), std::sin(angle_rads)};
 }
 
 sf::Vector2f Math::GetRightVector(float angle_rads)
 {
-	sf::Vector2f right_vector;
-	right_vector.x = -std::sin(angle_rads);
-	right_vector.y = std::cos(angle_rads);
-
-	return right_vector;
+	return {-std::sin(angle_rads), std::cos(angle_rads)};
 }
