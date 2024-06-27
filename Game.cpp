@@ -1,9 +1,9 @@
-#include <iostream>
 #include "Game.h"
 #include "Asteroid.h"
-#include "Component.h"
+#include "GridBackground.h"
 #include "Math.h"
 #include "ObjectManager.h"
+#include "PlayerShip.h"
 #include "System.h"
 
 //init static colors
@@ -12,6 +12,13 @@ sf::Color Game::Green{0, 204, 153};
 sf::Color Game::Blue{69, 204, 255};
 sf::Color Game::Yellow{255, 204, 69};
 
+void Game::StartGame()
+{
+	System::GetInstance()->GetObjectMgr()->CreateGameEntity<GridBackground>({});
+	
+	SpawnPlayer();
+	SpawnAsteroids();
+}
 
 void Game::InitEnemies()
 {
@@ -25,13 +32,46 @@ void Game::InitEnemies()
 	};
 }
 
-void Game::InitPlayer()
+void Game::SpawnPlayer()
 {
+	int oldLives = -1;
+	if (auto player = Player.lock())
+	{
+		oldLives = player->GetLivesLeft();
+	}
+	DeletePlayer();
+	Player = System::GetInstance()->GetObjectMgr()->CreateGameEntity<PlayerShip>(
+		{System::GetInstance()->GetWindowWidth() / 2, System::GetInstance()->GetWindowHeight() / 2});
+
+	if (std::shared_ptr<PlayerShip> player = Player.lock())
+	{
+		player->CreateCollider(15.0f);
+		player->InitialiseComponents();
+		if (oldLives == -1)
+		{
+			player->SetTotalLives(3);
+			player->ResetLives();
+		}
+		else
+		{
+			// survival mode type lives, dont reset to 0 on level change
+			//player->SetLives(oldLives);
+		}
+	}
 }
 
-void Game::InitAsteroids()
+void Game::DeletePlayer()
 {
-	int NumAsteroids = Math::GetRandInt(3, 10);
+	if (auto player = Player.lock())
+	{
+		player->Kill();
+	}
+	Player.reset();
+}
+
+void Game::SpawnAsteroids()
+{
+	int NumAsteroids = Math::GetRandInt(3, 6);
 	for (int i = 0; i < NumAsteroids; ++i)
 	{
 		auto WeakRoid = System::GetInstance()->GetObjectMgr()->CreateGameEntity<Asteroid>(
@@ -47,32 +87,6 @@ void Game::InitAsteroids()
 	}
 }
 
-void Game::UpdateWindowData(sf::RenderWindow* Window)
-{
-	// poll exit game events
-	PollEvents(Window);
-	// update mouse vals
-	UpdateInput(Window);
-}
-
-void Game::PollEvents(sf::RenderWindow* Window)
-{
-	while (Window->pollEvent(Event))
-	{
-		switch (Event.type)
-		{
-			case sf::Event::Closed:
-				Window->close();
-				break;
-			case sf::Event::KeyPressed:
-				if (Event.type == sf::Event::Closed || Event.KeyPressed == sf::Keyboard::Escape)
-					Window->close();
-				break;
-			default: ;
-		}
-	}
-}
-
 void Game::UpdateInput(sf::RenderWindow* Window)
 {
 	MousePos = Window->mapPixelToCoords(sf::Mouse::getPosition(*Window));
@@ -80,8 +94,3 @@ void Game::UpdateInput(sf::RenderWindow* Window)
 }
 
 sf::Vector2f Game::GetMousePosition() const { return MousePos; }
-
-void Game::StartGame()
-{
-	InitAsteroids();
-}

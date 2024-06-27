@@ -18,6 +18,18 @@ float Math::GetRandFloat(float Min, float Max)
 	return Dist(Rnd);
 }
 
+float Math::RemapUnclamped(float iMin, float iMax, float oMin, float oMax, float t)
+{
+	float v = InverseLerpUnclamped(iMin, iMax, t);
+	return LerpUnclamped(oMin, oMax, v);
+}
+
+float Math::RemapClamped(float iMin, float iMax, float oMin, float oMax, float t)
+{
+	float v = InverseLerpClamped(iMin, iMax, t);
+	return LerpClamped(oMin, oMax, v);
+}
+
 float Math::WrapModulo(float value, float max)
 {
 	while (value > max)
@@ -49,15 +61,16 @@ float Math::RadsToDegs(const float rads)
 	return rads * (180.0f / PI);
 }
 
-sf::Vector2f Math::ZeroVector() { return {};}
-sf::Vector2f Math::UpVector() { return {0.f, 1.f};}
-sf::Vector2f Math::RightVector() { return {1.f, 0.f};}
+sf::Vector2f Math::ZeroVector() { return {}; }
+sf::Vector2f Math::UpVector() { return {0.f, 1.f}; }
+sf::Vector2f Math::RightVector() { return {1.f, 0.f}; }
 
 sf::Vector2f Math::Normalize(const sf::Vector2f& in)
 {
 	float magnitude = std::sqrt(in.x * in.x + in.y * in.y);
-	
-	if (magnitude == 0) {
+
+	if (magnitude == 0)
+	{
 		// Handle the zero vector case
 		return {0.0f, 0.0f};
 	}
@@ -72,10 +85,40 @@ float Math::DotProduct(const sf::Vector2f& a, const sf::Vector2f& b)
 
 sf::Vector2f Math::GetForwardVector(const float angle_rads)
 {
-	return {std::cos(angle_rads), std::sin(angle_rads)};
+	return {std::sin(angle_rads), -std::cos(angle_rads)};	
 }
 
 sf::Vector2f Math::GetRightVector(float angle_rads)
 {
-	return {-std::sin(angle_rads), std::cos(angle_rads)};
+	return {std::cos(angle_rads), std::sin(angle_rads)};
+}
+
+sf::Vector2f Math::LerpVector(sf::Vector2f From, sf::Vector2f To, float Alpha)
+{
+	return {LerpUnclamped(From.x,
+						  To.x,
+						  Alpha),
+			LerpUnclamped(From.y,
+						  To.y,
+						  Alpha)};
+}
+
+float Math::GetVectorMagnitude(sf::Vector2f Vec)
+{
+	return sqrtf(Vec.x * Vec.x + Vec.y * Vec.y); 
+}
+
+float Math::GetVectorSqrMagnitude(sf::Vector2f Vec)
+{
+	return Vec.x * Vec.x + Vec.y * Vec.y; 
+}
+
+sf::Vector2f Math::LimitVector(sf::Vector2f vec, float limit)
+{
+	if (GetVectorMagnitude(vec) > limit)
+	{
+		vec = Normalize(vec);
+		vec = vec * limit;
+	}
+	return vec;
 }

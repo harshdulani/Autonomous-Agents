@@ -7,6 +7,7 @@
 #include "Math.h"
 #include "PrimitiveComponent.h"
 #include "Event.h"
+#include "SceneComponent.h"
 
 ObjectManager::ObjectManager()
 {
@@ -34,6 +35,9 @@ void ObjectManager::UpdateAllObjects(float DeltaTime)
 			//if waiting to die or is inactive, we don't need to do anything
 			continue;
 		}
+		bool isPositionDirty = Entity->GetAndClearDirtyPosition();
+		bool isRotationDirty = Entity->GetAndClearDirtyAngle();
+
 		Entity->Update(DeltaTime);
 		WrapEntity(Entity.get());
 
@@ -46,14 +50,22 @@ void ObjectManager::UpdateAllObjects(float DeltaTime)
 				// GC will take care of me
 				continue;
 			}
+			if(auto scene = std::dynamic_pointer_cast<SceneComponent>(comp))
+			{
+				// resolve dirty transforms of components
+				if (isPositionDirty || isRotationDirty)
+				{
+					scene->RecalculatePosition();
+				}
+			}
 			comp->Update(DeltaTime);
 		}
 	}
 	CollectGarbage();
 }
 
-void ObjectManager::RenderAllObjects(sf::RenderWindow* Window) const
-{
+void ObjectManager::RenderAllObjects(sf::RenderWindow& Window) const
+{	
 	// draw entities
 	for (const auto& Item : RenderEntities)
 	{
@@ -64,8 +76,11 @@ void ObjectManager::RenderAllObjects(sf::RenderWindow* Window) const
 			continue;
 		}
 		Entity->Render(Window);
+		
 		std::vector<std::weak_ptr<PrimitiveComponent>> Comps;
 		Entity->GetComponentsOfType<PrimitiveComponent>(Comps);
+		
+		auto entityTransformed = Entity->getTransform();
 		for (auto& CompItem : Comps)
 		{
 			auto comp = CompItem.lock();
@@ -74,11 +89,12 @@ void ObjectManager::RenderAllObjects(sf::RenderWindow* Window) const
 				// GC will take care of me
 				continue;
 			}
-			comp->Render();
+			sf::RenderStates states;
+			states.transform = entityTransformed * comp->getTransform();
+			comp->Render(Window, states);
 		}
 		for (auto& Drawer : Entity->Drawables)
 		{
-			auto entityTransformed = sf::Transform::Identity * Entity->getTransform();
 			if (Drawer.get())
 			{
 				sf::RenderStates states;
@@ -87,7 +103,7 @@ void ObjectManager::RenderAllObjects(sf::RenderWindow* Window) const
 				{
 					states.transform *= Transformer->getTransform();
 				}
-				Window->draw(*Drawer, states);
+				Window.draw(*Drawer, states);
 			}
 		}
 	}
@@ -125,7 +141,7 @@ void ObjectManager::DestroyObject(Object* Obj)
 
 void ObjectManager::CollectGarbage()
 {
-	for(int i = 0; i < Objects.size(); i++)
+	for(size_t i = 0; i < Objects.size(); i++)
 	{
 		if (!Objects[i]->IsPendingKill())
 		{

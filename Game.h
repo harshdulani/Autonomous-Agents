@@ -1,13 +1,13 @@
 #pragma once
 #include "SFML/Graphics.hpp"
 
+class ObjectManager;
+class PlayerShip;
 class GameEntity;
 
 class Game
 {
-public:	
-	void UpdateWindowData(sf::RenderWindow* Window);
-	void PollEvents(sf::RenderWindow* Window);
+public:
 	void UpdateInput(sf::RenderWindow* Window);
 
 	sf::Vector2f GetMousePosition() const;
@@ -16,15 +16,17 @@ public:
 	
 private:
 	void InitEnemies();
-	void InitPlayer();
-	void InitAsteroids();
+	void SpawnPlayer();
+	void DeletePlayer();
+	void SpawnAsteroids();
 	
 public:
 
 private:
-	sf::Event Event;
 	sf::Vector2f MousePos;
 
+	std::weak_ptr<PlayerShip> Player;
+	
 	// static colors
 	static sf::Color Red;
 	static sf::Color Green;

@@ -3,6 +3,7 @@
 #include <SFML/Window/VideoMode.hpp>
 #include "Event.h"
 #include "Game.h"
+#include "TimerManager.h"
 
 namespace sf
 {
@@ -26,12 +27,15 @@ public:
 	static System* GetInstance();
 
 	void Initialize();
+	void PollWindowEvents();	
 	void Update(float DeltaTime);
-	void Render() const;
+	void Render();
+	void Terminate();
 
+	Game& GetGame();
 	ObjectManager* GetObjectMgr() const;
-	/*
 	TimerManager* GetTimerManager() const;
+	/*
 	ScreenShaker* GetScreenShaker() const;
 	FSMManager* GetFSMManager() const;
 	UIManager* GetUIManager() const;
@@ -39,21 +43,25 @@ public:
 	std::weak_ptr<GroupAttackingPolicy> GetGroupAttackingPolicy() const;
 	*/
 	bool IsWindowOpen() const;
+	bool IsWindowClosePending() const;
 	float GetWindowWidth() const;
 	float GetWindowHeight() const;
+	void CloseWindow();
 
 private:
 	static System* Singleton;
 
 	Game GameInst;
-	std::shared_ptr<sf::RenderWindow> Window;
-	std::shared_ptr<ObjectManager> ObjectMgrInst;
+	sf::RenderWindow Window;
+	std::shared_ptr<ObjectManager> ObjectMgr;
+	std::shared_ptr<TimerManager> TimerMgr;
 	/*
-	std::shared_ptr<TimerManager> timerManager_;
 	std::shared_ptr<FSMManager> fsmManager_;
 	std::shared_ptr<UIManager> uiManager_;
 	std::shared_ptr<ParticleSystemManager> particleSysMgr_;
 	*/
+
+	bool bPendingWindowClose = false;
 	
 	sf::VideoMode VideoMode;
 	float WindowWidth = 800.f;

@@ -1,6 +1,7 @@
 ﻿#include "PhysicsComponent.h"
 
 #include "GameEntity.h"
+#include "Math.h"
 
 sf::Vector2f PhysicsComponent::GetVelocity() const { return Velocity; }
 
@@ -30,6 +31,8 @@ void PhysicsComponent::Update(float DeltaTime)
 	if (Entity->IsPendingKill())
 		return;
 
-	Entity->setPosition(Entity->getPosition() + Velocity * DeltaTime);
-	Entity->setRotation(Entity->getRotation() + AngularVelocity * DeltaTime);
+	if(Math::GetVectorSqrMagnitude(Velocity) > 0)
+		Entity->SetPosition(Entity->GetPosition() + Velocity * DeltaTime);
+	if(AngularVelocity > 0 || AngularVelocity < 0)
+		Entity->SetRotation(Entity->GetRotation() + AngularVelocity * DeltaTime);
 }

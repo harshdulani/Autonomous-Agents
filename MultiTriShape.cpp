@@ -1,10 +1,10 @@
-﻿#include "TriConcave.h"
+﻿#include "MultiTriShape.h"
 #include <SFML/Graphics/RenderTarget.hpp>
 
-void TriConcave::SetTris(const std::vector<sf::Vector2f>& InTris, const sf::Color Color)
+void MultiTriShape::SetTris(const std::vector<sf::Vector2f>& InTris, const sf::Color Color)
 {
 	Tris.clear();
-	for (int i = 0; i < InTris.size(); ++i)
+	for (size_t i = 0; i < InTris.size(); ++i)
 	{
 		if (i + 2 < InTris.size())
 		{
@@ -18,7 +18,7 @@ void TriConcave::SetTris(const std::vector<sf::Vector2f>& InTris, const sf::Colo
 	}
 }
 
-void TriConcave::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void MultiTriShape::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	states.transform *= getTransform();
 

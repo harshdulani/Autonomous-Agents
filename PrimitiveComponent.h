@@ -1,8 +1,15 @@
 ﻿#pragma once
-#include "Component.h"
+#include <SFML/Graphics/RenderStates.hpp>
 
-class PrimitiveComponent : public Component
+#include "SceneComponent.h"
+
+namespace sf
+{
+	class RenderWindow;
+}
+
+class PrimitiveComponent : public SceneComponent
 {
 public:
-	virtual void Render();
+	virtual void Render(sf::RenderWindow& Window, sf::RenderStates States);
 };

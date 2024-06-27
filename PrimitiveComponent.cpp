@@ -1,3 +1,3 @@
 ﻿#include "PrimitiveComponent.h"
 
-void PrimitiveComponent::Render() { }
+void PrimitiveComponent::Render(sf::RenderWindow& Window, sf::RenderStates States) { }

@@ -5,6 +5,8 @@
 
 void Asteroid::InitAsteroid(float Radius, sf::Color Color)
 {
+	CreateCollider(Radius);
+	
 	auto PhysicComponent = AddComponent<PhysicsComponent>();
 	if(auto Physics = PhysicComponent.lock())
 	{
@@ -13,14 +15,14 @@ void Asteroid::InitAsteroid(float Radius, sf::Color Color)
 			Math::GetRandFloat(-SpeedRand, SpeedRand));
 		Physics->SetAngularVelocity(Math::GetRandFloat(-180.f, 180.f));
 	}
-	constexpr int MinPoly = 5;
+	constexpr int MinPoly = 6;
 	constexpr int MaxPoly = 8;
 
 	float polyCount = static_cast<float>(Math::GetRandInt(MinPoly, MaxPoly));
 
 	const auto Shape = std::make_shared<sf::ConvexShape>(static_cast<int>(polyCount));
 
-	for (int i = 0; i < polyCount; ++i)
+	for (int i = 0; i < static_cast<int>(polyCount); ++i)
 	{
 		float angle = static_cast<float>(i) / polyCount * 2 * Math::PI;
 		float X = cos(angle);

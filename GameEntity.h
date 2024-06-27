@@ -20,29 +20,34 @@ namespace sf
 	class RenderWindow;
 }
 
-class GameEntity : public Object, public sf::Transformable
+class GameEntity : public Object, private sf::Transformable
 {
 	friend class ObjectManager;
-
+// Core
 public:
-	~GameEntity() override = default;
+	~GameEntity() override;
 	virtual void Update(float DeltaTime);
-	virtual void Render(const sf::RenderWindow* Window) const;
-
+	virtual void Render(sf::RenderWindow& Window) const;
+	virtual void OnCollision(std::weak_ptr<GameEntity> other);
 	void Kill() override;
 
 	void SetActive(bool bStatus);
 	bool GetActive() const;
 
-	void SetRenderPriority(int p);
-	int GetRenderPriority() const;
+protected:
+	GameEntity() = default;
 
-	void SetUpdatePriority(int p);
-	int GetUpdatePriority() const;
+private:
+	bool bHasColliders = false;
+	bool bActive = true;
+// End core
 
-	sf::Vector2f GetForwardVector() const;
-	sf::Vector2f GetRightVector() const;
+// Components
+public:
+	void CreateCollider(float Radius);
 
+	std::vector<std::weak_ptr<Component>>* GetComponentList();
+	
 	/// <summary>
 	/// Creates component of type T and attaches it to entity
 	/// </summary>
@@ -58,41 +63,74 @@ public:
 
 	template<typename T> std::weak_ptr<T> GetDrawableOfType();
 
-	std::vector<std::weak_ptr<Component>>* GetComponentList();
+	void DestroyAllDrawables();
 
-protected:
-	GameEntity() = default;
-	
-	template<typename T>
-	void DestroyComponentOfType();
+	void DestroyDrawable(const std::weak_ptr<sf::Drawable>& Drawable);
 
-	template<typename T>
-	void DestroyAllComponentsOfType();
+	template<typename T> void DestroyComponentOfType();
+
+	template<typename T> void DestroyAllComponentsOfType();
 
 	std::weak_ptr<GameEntity> GetWeakSelf();
 
 private:
 	template<typename T>
-	void DestroyComponentsOfTypeInternal_(const bool onlyOne);
+	void DestroyComponentsOfTypeInternal_(bool onlyOne);
+	
+	std::vector<std::weak_ptr<Component>> Components;
+	std::vector<std::shared_ptr<sf::Drawable>> Drawables;
+// End Components
 
+// Render and Update Priority
+public:
+	void SetRenderPriority(int p);
+	int GetRenderPriority() const;
+
+	void SetUpdatePriority(int p);
+	int GetUpdatePriority() const;
+
+private:
 	bool IsRenderDirty() const;
 	void SetRenderDirty(bool Cond);
 	bool IsUpdateDirty() const;
 	void SetUpdateDirty(bool Cond);
-
-	std::vector<std::weak_ptr<Component>> Components;
-	std::vector<std::shared_ptr<sf::Drawable>> Drawables;
-
-	bool bHasColliders = false;
 
 	int UpdatePriority = 0;
 	int RenderPriority = 0;
 	bool bRenderDirty = false;
 	bool bUpdateDirty = false;
 
-	bool bActive = true;
+// End Render and Update Priority
+
+// Transform Wrapper
+public:
+	sf::Transform GetTransform() const;
+
+	sf::Vector2f GetOrigin() const;
+	void SetOrigin(float X, float Y);
+	
+	sf::Vector2f GetPosition() const;
+	float GetRotation() const;
+	sf::Vector2f GetScale() const;
+
+	void SetPosition(const sf::Vector2f& NewPos);
+	void SetRotation(float NewAngle);
+	void SetScale(const sf::Vector2f& NewScale);
+	
+	sf::Vector2f GetForwardVector() const;
+	sf::Vector2f GetRightVector() const;
+	
+private:
+	bool GetAndClearDirtyPosition();
+	bool GetAndClearDirtyAngle();
+
+private:
+	bool bPositionDirty = true;
+	bool bRotationDirty = true;
+// End Transform Wrapper
 };
 
+// Component Template definitions
 template<typename T>
 std::weak_ptr<T> GameEntity::AddComponent()
 {
@@ -182,13 +220,6 @@ template<typename T>
 void GameEntity::AddToDrawables(std::shared_ptr<T> InDraw)
 {
 	assert((std::is_base_of<sf::Drawable, T>::value && "Type is not a drawable type"));
-	for (auto& Drawable : Drawables)
-	{
-		if (InDraw.get() == Drawable.get())
-		{
-			return;
-		}
-	}
 	Drawables.push_back(InDraw);
 }
 
@@ -209,3 +240,4 @@ std::weak_ptr<T> GameEntity::GetDrawableOfType()
 	}
 	return std::weak_ptr<T>();
 }
+//End Component Template definitions

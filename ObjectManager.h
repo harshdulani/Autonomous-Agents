@@ -33,7 +33,7 @@ public:
 	~ObjectManager();
 
 	void UpdateAllObjects(float DeltaTime);
-	void RenderAllObjects(sf::RenderWindow* Window) const;
+	void RenderAllObjects(sf::RenderWindow& Window) const;
 	
 	void CleanUpOldObjects();
 	void DestroyObject(Object* Obj);
