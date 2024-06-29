@@ -2,12 +2,18 @@
 #include <string>
 #include <SFML/System/Vector2.hpp>
 
+namespace sf
+{
+	class Color;
+}
+
 class Debug
 {
 public:
 	static void Print(const std::string& msg);
 	static void Print(const sf::Vector2f& Vec);
 	static std::string GetString(const sf::Vector2f& Vec);
+	static std::string GetString(const sf::Color& Col);
 	
 	static void PrintNumberAsBitset(int32_t num);
 	static std::string GetNumberAsBitset(int32_t num);

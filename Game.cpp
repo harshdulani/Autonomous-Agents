@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Asteroid.h"
+#include "Background.h"
 #include "ImplicitGrid.h"
 #include "Math.h"
 #include "ObjectManager.h"
@@ -12,6 +13,7 @@ sf::Color Game::Green{0, 204, 153};
 sf::Color Game::Blue{69, 204, 255};
 sf::Color Game::Yellow{255, 204, 69};
 
+
 void Game::InitLevel(int levelNum)
 {
 	CreateCollisionSystem();
@@ -22,6 +24,8 @@ void Game::InitLevel(int levelNum)
 	SpawnPlayer();
 	SpawnAsteroids(levelNum);
 
+	SpawnBackgrounds();
+	
 	if (!uiFont_.loadFromFile("RecursiveSansLnrSt-Med.ttf"))
 	{
 		// error...
@@ -97,6 +101,27 @@ void Game::DeletePlayer()
 		player->Kill();
 	}
 	player_.reset();
+}
+
+void Game::SpawnBackgrounds() const
+{
+	auto foreground = System::GetInstance()->GetObjectMgr()->CreateGameEntity<Background>({});
+	auto background =  System::GetInstance()->GetObjectMgr()->CreateGameEntity<Background>({});
+
+	if (auto fg = foreground.lock())
+	{
+		// near stars
+		fg->Initialise(player_, System::GetInstance()->GetWindowWidth(), System::GetInstance()->GetWindowHeight(), 156, 0.15f);
+		fg->SetRenderPriority(-99);
+	}
+
+	if (auto bg = background.lock())
+	{
+		// far stars
+		bg->Initialise(player_, System::GetInstance()->GetWindowWidth(), System::GetInstance()->GetWindowHeight(), 64, 0.05f);
+		bg->SetRenderPriority(-100);
+	}
+	
 }
 
 void Game::SpawnAsteroids(int numAsteroids)

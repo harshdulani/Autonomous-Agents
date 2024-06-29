@@ -1,6 +1,7 @@
 ﻿#include "Debug.h"
 #include <bitset>
 #include <iostream>
+#include <SFML/Graphics/Color.hpp>
 
 void Debug::Print(const std::string& msg)
 {
@@ -21,6 +22,22 @@ std::string Debug::GetString(const sf::Vector2f& Vec)
 	out += std::to_string(Vec.y);
 	out += ")\n";
 	return out;	
+}
+
+std::string Debug::GetString(const sf::Color& Col)
+{
+	std::string out;
+	out += "(";
+	out += std::to_string(Col.r);
+	out += ", ";
+	out += std::to_string(Col.g);
+	out += ", ";
+	out += std::to_string(Col.b);
+	out += ", ";
+	out += std::to_string(Col.a);
+	out += ", ";
+	out += ")\n";
+	return out;
 }
 
 void Debug::PrintNumberAsBitset(int32_t num)

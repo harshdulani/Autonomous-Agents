@@ -159,6 +159,7 @@
     <ClCompile Include="APoolable.cpp" />
     <ClCompile Include="AShootingStrategy.cpp" />
     <ClCompile Include="Asteroid.cpp" />
+    <ClCompile Include="Background.cpp" />
     <ClCompile Include="BaseVehicle.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Collider.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="APoolable.h" />
     <ClInclude Include="AShootingStrategy.h" />
     <ClInclude Include="Asteroid.h" />
+    <ClInclude Include="Background.h" />
     <ClInclude Include="BaseVehicle.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Collider.h" />

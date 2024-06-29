@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <random>
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Vector2.hpp>
 
 class Math
@@ -12,7 +13,7 @@ public:
 
 	static float DegToRads(float degs);
 	static float RadsToDegs(float rads);
-
+	
 	// Vector2f helpers
 	static sf::Vector2f Normalize(const sf::Vector2f& in);
 	static float DotProduct(const sf::Vector2f& a, const sf::Vector2f& b);
@@ -38,13 +39,14 @@ public:
 	template<typename T> static T InverseLerpUnclamped(T from, T to, float value);
 	template<typename T> static T InverseLerpClamped(T from, T to, float value);
 
-	template <typename T> static int Sign(T val) { return (T(0) < val) - (val < T(0)); }
-
 	static float RemapUnclamped(float iMin, float iMax, float oMin, float oMax, float t);
 	static float RemapClamped(float iMin, float iMax, float oMin, float oMax, float t);
 
-	template<typename T>
-	static T ClampValue(T value, T min, T max);
+	template<typename T> static T ClampValue(T value, T min, T max);
+	
+	static sf::Color LerpColor(const sf::Color& from, const sf::Color& to, float t);
+	
+	template <typename T> static int Sign(T val) { return (T(0) < val) - (val < T(0)); }
 
 private:
 	static std::random_device Rnd;

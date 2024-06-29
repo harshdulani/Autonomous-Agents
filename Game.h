@@ -36,6 +36,8 @@ private:
 	void SpawnPlayer();
 	void DeletePlayer();	
 
+	void SpawnBackgrounds() const;
+
 	static sf::Vector2f CreateRandomPosition();
 
 public:

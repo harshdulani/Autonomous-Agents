@@ -122,3 +122,20 @@ sf::Vector2f Math::LimitVector(sf::Vector2f vec, float limit)
 	}
 	return vec;
 }
+
+sf::Color Math::LerpColor(const sf::Color& from, const sf::Color& to, float t)
+{
+	if (from == to)
+		return from;
+	if (t == 0.f)
+		return from;
+	if (t == 1.f)
+		return to;
+
+	return {
+		LerpClamped(from.r, to.r, t),
+		LerpClamped(from.g, to.g, t),
+		LerpClamped(from.b, to.b, t),
+		LerpClamped(from.a, to.a, t),
+	};
+}
