@@ -106,16 +106,15 @@ void Bullet::OnCollision(std::weak_ptr<GameEntity> other)
 std::weak_ptr<sf::RectangleShape> Bullet::InitSquareShape(float Size)
 {
 	sf::Vector2f Size2f(Size, Size);
-	auto Square = std::make_shared<sf::RectangleShape>(Size2f);
+	auto Square = CreateDrawable<sf::RectangleShape>(Size2f);
 	Size2f = Size2f * 0.5f;
 	SetOrigin(Size * 0.5f, Size * 0.5f);
-	AddToDrawables(Square);
 	return Square;
 }
 
 std::weak_ptr<MultiTriShape> Bullet::InitialiseSpikeShape(sf::Color RenderColor)
 {
-	auto Spike = std::make_shared<MultiTriShape>();
+	auto weakSpike = CreateDrawable<MultiTriShape>();
 	SetOrigin(15.f, 15.f);
 	std::vector<sf::Vector2f> Tris = {{15.f, 0.f},
 							{30.f, 30.f},
@@ -124,15 +123,19 @@ std::weak_ptr<MultiTriShape> Bullet::InitialiseSpikeShape(sf::Color RenderColor)
 							{15.f, 30.f},
 							{7.5f, 10.f},
 	};
-	Spike->SetTris(Tris, RenderColor);
-	AddToDrawables(Spike);
-	return Spike;
+	if (auto Spike = weakSpike.lock())
+	{
+		Spike->SetTris(Tris, RenderColor);
+	}
+	return weakSpike;
 }
 
 std::weak_ptr<sf::CircleShape> Bullet::InitialiseCircleShape(float Radius)
 {
-	auto Circle = std::make_shared<sf::CircleShape>(Radius, 24);
-	Circle->setOrigin(Radius / 2, Radius / 2);
-	AddToDrawables(Circle);
-	return Circle;
+	auto weakCircle = CreateDrawable<sf::CircleShape>(Radius, 24);
+	if (auto Circle = weakCircle.lock())
+	{
+		Circle->setOrigin(Radius * 0.5f, Radius * 0.5f);
+	}
+	return weakCircle;
 }

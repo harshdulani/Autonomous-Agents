@@ -6,13 +6,10 @@
 
 class ImplicitGrid : public GameEntity
 {
-	//for raycast, circlecast
-	friend class Helpers;
 public:
 	~ImplicitGrid() override;
 
 	void Update(float deltaTime) override;
-	void Render(sf::RenderWindow& Window) const override;
 
 	void SetDebugGridVisibility(bool val);
 	void SetDebugTextVisibility(bool val);
@@ -51,6 +48,7 @@ private:
 
 	void Add32ObjectCollection();
 	void Remove32ObjectCollection();
+	void GenerateDebugGrid();
 
 	std::vector<std::weak_ptr<GameEntity>> GetGridCellOccupiers(int x, int y);
 
@@ -104,17 +102,21 @@ private:
 	//debug
 	bool bCollisionPairsVisibility_ = false;
 	int collisionPairsCount_ = 0;
-	sf::Text collisionPairsText_;
+
 	sf::Font font_;
 
+	// making these a weak ptr because we want to toggle these using numpad
+	// else would just leave these empty and have functions to Create<these>Drawables()
+	std::weak_ptr<sf::Text> collisionPairsText_;
+	std::weak_ptr<sf::VertexArray> debugGrid_;
+
 	bool bDebugGridVisibility_ = false;
-	sf::VertexArray debugGrid_;
 	sf::Color renderColor_;
 	
 	//event handles
-	uint32_t eventHandle_EntityCreated_;
-	uint32_t eventHandle_EntityDestroyed_;
-	uint32_t eventHandle_LevelEnd_;
+	uint32_t eventHandle_EntityCreated_ = 0;
+	uint32_t eventHandle_EntityDestroyed_ = 0;
+	uint32_t eventHandle_LevelEnd_ = 0;
 
 	struct FVector2
 	{

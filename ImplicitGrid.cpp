@@ -8,20 +8,6 @@
 
 #include "Math.h"
 
-void ImplicitGrid::Render(sf::RenderWindow& Window) const
-{
-	GameEntity::Render(Window);
-
-	if (bDebugGridVisibility_)
-	{
-		Window.draw(debugGrid_);		
-	}
-	if (bCollisionPairsVisibility_)
-	{
-		Window.draw(collisionPairsText_);
-	}
-}
-
 ImplicitGrid::~ImplicitGrid()
 {
 	System::GetInstance()->Event_EntityCreated.Unsubscribe(eventHandle_EntityCreated_);
@@ -58,10 +44,14 @@ void ImplicitGrid::InitDebugText()
 	{
 		// error...
 	}
-	
-	collisionPairsText_.setCharacterSize(8);
-	collisionPairsText_.setStyle(sf::Text::Regular);
-	collisionPairsText_.setFont(font_);
+
+	collisionPairsText_ = CreateDrawable<sf::Text>();
+	if (auto debugText = collisionPairsText_.lock())
+	{
+		debugText->setCharacterSize(8);
+		debugText->setStyle(sf::Text::Regular);
+		debugText->setFont(font_);
+	}
 }
 
 void ImplicitGrid::Update(const float deltaTime)
@@ -317,6 +307,30 @@ void ImplicitGrid::Remove32ObjectCollection()
 	numOfObjectCollections_ = numOfObjectCollections_ - 1;
 }
 
+void ImplicitGrid::GenerateDebugGrid()
+{
+	if (auto grid = debugGrid_.lock())
+	{
+		grid->clear();
+
+		float gridWidthF = static_cast<float>(gridWidth_);
+		float gridHeightF = static_cast<float>(gridHeight_);
+		auto intervalX = gridWidthF / static_cast<float>(GetGridCellSizeX());
+		auto intervalY = gridHeightF / static_cast<float>(GetGridCellSizeY());
+	
+		for (int i = 1; i < gridCellCountX_; ++i)
+		{
+			grid->append(sf::Vertex(sf::Vector2f(intervalX * i, 0.f), renderColor_));
+			grid->append(sf::Vertex(sf::Vector2f(intervalX * i, gridHeightF), renderColor_));
+		}
+		for (int i = 1; i < gridCellCountY_; ++i)
+		{
+			grid->append(sf::Vertex(sf::Vector2f(0.f, intervalY * i), renderColor_));
+			grid->append(sf::Vertex(sf::Vector2f(gridWidthF, intervalY * i), renderColor_));
+		}
+	}
+}
+
 void ImplicitGrid::RefreshGrid()
 {
 	gridCellCountX_ = gridWidth_ / GetGridCellSizeX();
@@ -351,24 +365,10 @@ void ImplicitGrid::RefreshGrid()
 	rebalanceGridSize(globalColumnCollections_, gridCellCountX_);
 	rebalanceGridSize(globalRowCollections_, gridCellCountY_);
 
-	debugGrid_.clear();
-	debugGrid_ = sf::VertexArray(sf::Lines, (gridCellCountX_ + gridCellCountY_) * 2);
+	if (debugGrid_.expired())
+		debugGrid_ = CreateDrawable<sf::VertexArray>(sf::Lines, (gridCellCountX_ + gridCellCountY_) * 2);
 
-	float gridWidthF = static_cast<float>(gridWidth_);
-	float gridHeightF = static_cast<float>(gridHeight_);
-	auto intervalX = gridWidthF / static_cast<float>(GetGridCellSizeX());
-	auto intervalY = gridHeightF / static_cast<float>(GetGridCellSizeY());
-	
-	for (int i = 1; i < gridCellCountX_; ++i)
-	{
-		debugGrid_.append(sf::Vertex(sf::Vector2f(intervalX * i, 0.f), renderColor_));
-		debugGrid_.append(sf::Vertex(sf::Vector2f(intervalX * i, gridHeightF), renderColor_));
-	}
-	for (int i = 1; i < gridCellCountY_; ++i)
-	{
-		debugGrid_.append(sf::Vertex(sf::Vector2f(0.f, intervalY * i), renderColor_));
-		debugGrid_.append(sf::Vertex(sf::Vector2f(gridWidthF, intervalY * i), renderColor_));
-	}
+	GenerateDebugGrid();
 }
 
 void ImplicitGrid::CheckDebugInput()
@@ -389,6 +389,8 @@ void ImplicitGrid::CheckDebugInput()
 	{
 		SetGridCellSizeX(GetGridCellSizeX() - gridSizeChanger_);
 	}
+
+	// debug Grid visibility
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Period))
 	{
 		SetDebugGridVisibility(!bDebugGridVisibility_);
@@ -509,12 +511,18 @@ int ImplicitGrid::GetBitIndex(const int32_t& mask)
 
 void ImplicitGrid::SetDebugGridVisibility(bool val)
 {
-	bDebugGridVisibility_ = val;
+	if (val)
+		GenerateDebugGrid();
+	else if (auto grid = debugGrid_.lock())
+		grid->clear();	
 }
 
 void ImplicitGrid::SetDebugTextVisibility(bool val)
 {
-	bCollisionPairsVisibility_ = val;
+	if (val)
+		UpdateCollisionPairCount();
+	else if (auto text = collisionPairsText_.lock())
+		text->setString("");
 }
 
 /// <summary>
@@ -546,7 +554,8 @@ void ImplicitGrid::RemoveObjectAtIndex(int32_t index)
 
 void ImplicitGrid::UpdateCollisionPairCount()
 {
-	collisionPairsText_.setString("CollisionPairs: " + std::to_string(collisionPairsCount_));
+	if (auto text = collisionPairsText_.lock())
+		text->setString("CollisionPairs: " + std::to_string(collisionPairsCount_));
 }
 
 float ImplicitGrid::FVectorDistance(const sf::Vector2f& a, const sf::Vector2f& b)

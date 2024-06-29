@@ -27,10 +27,12 @@ public:
 
 protected:
 	void UpdateTransform(float DeltaTime);
-
+	bool LoseALife() override;
+	
 private:
 	void SetControlInput();
 
+private:
 	float AccelerationControl = 0.f;
 	float RotationControl = 0.f;
 

@@ -25,7 +25,6 @@ void Asteroid::OnCollision(std::weak_ptr<GameEntity> other)
 			}
 		}
 
-		// first frame asteroid hit because collider worldPos are not recalculated yet
 		AsteroidHit();
 	}
 }
@@ -48,22 +47,23 @@ void Asteroid::InitAsteroid(float radius, sf::Color color, float angularMomentum
 
 	float polyCount = static_cast<float>(Math::GetRandInt(MinPoly, MaxPoly));
 
-	const auto Shape = std::make_shared<sf::ConvexShape>(static_cast<int>(polyCount));
+	auto weakShape = CreateDrawable<sf::ConvexShape>(static_cast<size_t>(polyCount));
 
-	for (int i = 0; i < static_cast<int>(polyCount); ++i)
+	if (auto Shape = weakShape.lock())
 	{
-		float angle = static_cast<float>(i) / polyCount * 2 * Math::PI;
-		float X = cos(angle);
-		float Y = sin(angle);
-		Shape->setPoint(i, sf::Vector2f(X, Y) * (radius));
+		for (int i = 0; i < static_cast<int>(polyCount); ++i)
+		{
+			float angle = static_cast<float>(i) / polyCount * 2 * Math::PI;
+			float X = cos(angle);
+			float Y = sin(angle);
+			Shape->setPoint(i, sf::Vector2f(X, Y) * (radius));
+		}
+		Shape->setFillColor(color);
+		color = sf::Color::White;
+		color.a = 55;
+		Shape->setOutlineColor(color);
+		Shape->setOutlineThickness(2.5f);
 	}
-	Shape->setFillColor(color);
-	color = sf::Color::White;
-	color.a = 55;
-	Shape->setOutlineColor(color);
-	Shape->setOutlineThickness(2.5f);
-	
-	AddToDrawables(Shape);
 }
 
 void Asteroid::AsteroidHit()
@@ -89,8 +89,8 @@ void Asteroid::AsteroidHit()
 	DestroyAllComponentsOfType<Collider>();
 }
 
-int Asteroid::GetSize() const { return size_; }
-
 void Asteroid::SpawnExplosion(int oldSize)
 {
 }
+
+int Asteroid::GetSize() const { return size_; }

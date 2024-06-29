@@ -43,7 +43,7 @@ private:
 	bool bActive = true;
 // End core
 
-// Components
+// Components & Drawables
 public:
 	void CreateCollider(float Radius);
 
@@ -54,33 +54,32 @@ public:
 	/// </summary>
 	/// <typeparam name="T">T must be a Component/ must inherit from Component class</typeparam>
 	/// <returns>Weak_ptr to newly created Component</returns>
-	template<typename T> std::weak_ptr<T> AddComponent();
+	template<typename T>	std::weak_ptr<T> AddComponent();
+	
+	template<typename T>	std::weak_ptr<T> GetComponentOfType();
 
-	template<typename T> std::weak_ptr<T> GetComponentOfType();
+	template<typename T>	void GetComponentsOfType(std::vector<std::weak_ptr<T>>& outResult);
 
-	template<typename T> void GetComponentsOfType(std::vector<std::weak_ptr<T>>& outResult);
+	template<typename T>	void DestroyComponentOfType();
 
-	template<typename T> void AddToDrawables(std::shared_ptr<T> InDraw);
-
-	template<typename T> std::weak_ptr<T> GetDrawableOfType();
-
+	template<typename T>	void DestroyAllComponentsOfType();
+	
+	template<typename T, class... Types>	std::weak_ptr<T> CreateDrawable(Types... args);
+	
+	template<typename T>	std::weak_ptr<T> GetDrawableOfType();
+	
 	void DestroyAllDrawables();
 
 	void DestroyDrawable(const std::weak_ptr<sf::Drawable>& Drawable);
 
-	template<typename T> void DestroyComponentOfType();
-
-	template<typename T> void DestroyAllComponentsOfType();
-
 	std::weak_ptr<GameEntity> GetWeakSelf();
 
 private:
-	template<typename T>
-	void DestroyComponentsOfTypeInternal_(bool onlyOne);
+	template<typename T>	void DestroyComponentsOfTypeInternal_(bool onlyOne);
 	
 	std::vector<std::weak_ptr<Component>> Components;
 	std::vector<std::shared_ptr<sf::Drawable>> Drawables;
-// End Components
+// End Components & Drawables
 
 // Render and Update Priority
 public:
@@ -143,7 +142,7 @@ std::weak_ptr<T> GameEntity::AddComponent()
 
 template<typename T> std::weak_ptr<T> GameEntity::GetComponentOfType()
 {
-	assert((std::is_base_of<Component, T>::value && "Type is not a component type"));
+	static_assert((std::is_base_of<Component, T>::value && "Type is not a component type"));
 
 	for (auto& Component : Components)
 	{
@@ -161,7 +160,7 @@ template<typename T> std::weak_ptr<T> GameEntity::GetComponentOfType()
 template<typename T>
 void GameEntity::GetComponentsOfType(std::vector<std::weak_ptr<T>>& outResult)
 {
-	assert((std::is_base_of<Component, T>::value && "Type is not a component type"));
+	static_assert((std::is_base_of<Component, T>::value && "Type is not a component type"));
 
 	for (auto& comp : Components)
 	{
@@ -194,7 +193,7 @@ inline void GameEntity::DestroyAllComponentsOfType()
 template<typename T>
 inline void GameEntity::DestroyComponentsOfTypeInternal_(const bool onlyOne)
 {
-	assert((std::is_base_of<Component, T>::value && "Type mismatch while destroying object"));
+	static_assert((std::is_base_of<Component, T>::value && "Type mismatch while destroying object"));
 
 	int i = 0;
 	for (auto& comp : Components)
@@ -217,17 +216,18 @@ inline void GameEntity::DestroyComponentsOfTypeInternal_(const bool onlyOne)
 	}
 }
 
-template<typename T>
-void GameEntity::AddToDrawables(std::shared_ptr<T> InDraw)
+template<typename T, typename ... Types> std::weak_ptr<T> GameEntity::CreateDrawable(Types... args)
 {
-	assert((std::is_base_of<sf::Drawable, T>::value && "Type is not a drawable type"));
-	Drawables.push_back(InDraw);
+	static_assert((std::is_base_of<sf::Drawable, T>::value && "Type is not a drawable type"));
+	std::shared_ptr<T> Drawable = std::make_shared<T>(args...);
+	Drawables.push_back(Drawable);
+	return Drawable;
 }
 
 template<typename T>
 std::weak_ptr<T> GameEntity::GetDrawableOfType()
 {
-	assert((std::is_base_of<sf::Drawable, T>::value && "Type is not a drawable type"));
+	static_assert((std::is_base_of<sf::Drawable, T>::value && "Type is not a drawable type"));
 
 	for (auto& Drawable : Drawables)
 	{

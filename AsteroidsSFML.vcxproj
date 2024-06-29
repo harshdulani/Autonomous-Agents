@@ -167,6 +167,7 @@
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameEntity.cpp" />
+    <ClCompile Include="GameHUD.cpp" />
     <ClCompile Include="ImplicitGrid.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
@@ -195,6 +196,7 @@
     <ClInclude Include="Event.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameEntity.h" />
+    <ClInclude Include="GameHUD.h" />
     <ClInclude Include="ImplicitGrid.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="ObjectManager.h" />

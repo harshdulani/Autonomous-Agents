@@ -27,7 +27,7 @@ ShootingComponent::~ShootingComponent()
 void ShootingComponent::Update(const float DeltaTime)
 {
 	SwitchShootStrategy();
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
 		if (CanShoot())
 		{

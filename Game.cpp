@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Asteroid.h"
 #include "Background.h"
+#include "GameHUD.h"
 #include "ImplicitGrid.h"
 #include "Math.h"
 #include "ObjectManager.h"
@@ -26,16 +27,7 @@ void Game::InitLevel(int levelNum)
 
 	SpawnBackgrounds();
 	
-	if (!uiFont_.loadFromFile("RecursiveSansLnrSt-Med.ttf"))
-	{
-		// error...
-	}
-
-	livesText_.setString("Lives: " + std::to_string(player_.lock()->GetLivesLeft()));
-	livesText_.setPosition(25.f, 25.f);
-
-	scoreText_.setString("Score: 0");
-	scoreText_.setPosition(System::GetInstance()->GetWindowWidth() - scoreText_.getLocalBounds().getSize().x - 25.f, 25.f);
+	SpawnHUD();
 }
 
 void Game::CreateCollisionSystem()
@@ -124,6 +116,16 @@ void Game::SpawnBackgrounds() const
 	
 }
 
+void Game::SpawnHUD()
+{
+	auto gameHUD = System::GetInstance()->GetObjectMgr()->CreateGameEntity<GameHUD>({});
+	if (auto hud = gameHUD.lock())
+	{
+		hud->InitGameHUD();
+		hud->SetRenderPriority(100);
+	}
+}
+
 void Game::SpawnAsteroids(int numAsteroids)
 {
 	for (int i = 0; i < numAsteroids; i++)
@@ -166,7 +168,7 @@ int Game::GetAsteroidsAliveCount() const
 void Game::UpdateScore(const int oldSize)
 {
 	score += 5 * oldSize;
-	scoreText_.setString("Score: " + std::to_string(score));
+	Event_ScoreUpdate.Invoke(score);
 }
 
 void Game::ResetScore()
@@ -201,9 +203,4 @@ bool Game::IsGameOver() const
 		return (player->GetLivesLeft() <= 0 && explosionCount == 0);
 	}
 	return true;
-}
-
-void Game::UpdateLivesRemaining(const int lives)
-{
-	livesText_.setString(std::string("Lives: ") + std::to_string(lives));
 }

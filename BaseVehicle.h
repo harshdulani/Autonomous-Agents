@@ -16,28 +16,28 @@ public:
 
 	void InitVehicle();
 	
-	void SetTotalLives(int count);
-	int GetTotalLives() const { return TotalLives; }
-
-	//Reset all ship values
-	void Reset();
-
 	// reset ship lives
 	void ResetLives();
 
 	// Returns number of lives left
 	int GetLivesLeft() const;
-
-	// Returns if ship survived after losing a life
-	bool LoseALife();
-
-	bool GetIsInCollisionCooldown() const { return bCollisionCooldown; }
+	
+	void SetTotalLives(int count);
+	int GetTotalLives() const { return TotalLives; }
 	
 protected:
 	TimerManager* GetTimerManager() const;
 
 	PhysicsComponent* GetPhysicsComponent() const;
+	
+	//Reset all ship values
+	void Reset();
 
+	// Returns if ship survived after losing a life
+	virtual bool LoseALife();
+	
+	bool GetIsInCollisionCooldown() const { return bCollisionCooldown; }
+	
 	void SetAllCollidersStatus(bool bEnabled);
 	void ResetCollisionCooldown();
 

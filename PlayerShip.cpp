@@ -25,6 +25,9 @@ void PlayerShip::Update(float DeltaTime)
 void PlayerShip::InitialiseComponents()
 {
 	InitVehicle();
+
+	System::GetInstance()->GetGame().Event_LivesUpdate.Invoke(GetLivesLeft());
+	
 	/*
 	//Particle system
 	auto particleSys = System::GetInstance()->GetParticleSystemManager()->CreateNewParticleSystem(this);
@@ -57,21 +60,23 @@ void PlayerShip::InitialiseComponents()
 
 	// Appearance
 	SetOrigin(15.f, 15.f);	
-	auto MultiTris = std::make_shared<MultiTriShape>();
-	std::vector<sf::Vector2f> Tris = {
-		{0.f, 20.f},
-		{12.5f, 0.f},
-		{10.f, 20.f},
-		{17.5f, 0.f},
-		{30.f, 20.f},
-		{20.f, 20.f},
-		{0.f, 20.f},
-		{30.f, 20.f},
-		{15.f, 30.f}
-	};
-	MultiTris->SetTris(Tris, {69, 204, 255});
-	MultiTris->setScale(1.f, 1.f);
-	AddToDrawables(MultiTris);
+	auto MultiTris = CreateDrawable<MultiTriShape>();
+	if (auto shape = MultiTris.lock())
+	{
+		std::vector<sf::Vector2f> Tris = {
+			{0.f, 20.f},
+			{12.5f, 0.f},
+			{10.f, 20.f},
+			{17.5f, 0.f},
+			{30.f, 20.f},
+			{20.f, 20.f},
+			{0.f, 20.f},
+			{30.f, 20.f},
+			{15.f, 30.f}
+		};
+		shape->SetTris(Tris, {69, 204, 255});
+		shape->setScale(1.f, 1.f);
+	}
 }
 
 void PlayerShip::OnCollision(std::weak_ptr<GameEntity> WeakOther)
@@ -101,7 +106,7 @@ void PlayerShip::OnCollision(std::weak_ptr<GameEntity> WeakOther)
 			GetTimerManager()->ResetTimer(CollisionTimerHandle);
 			SetAllCollidersStatus(false);
 
-			//System::GetInstance()->GetGame().UpdateLivesRemaining(LivesRemaining);
+			System::GetInstance()->GetGame().Event_LivesUpdate.Invoke(LivesRemaining);
 			//System::GetInstance()->GetScreenShaker()->CreateImpulse(0.35f, 5.0f, 25.0f);
 			return;
 		}
@@ -161,6 +166,12 @@ void PlayerShip::UpdateTransform(const float DeltaTime)
 	sf::Vector2f idealVelocity = NewForward * (AccelerationControl * MaxSpeed);
 	sf::Vector2f newVelocity = Math::LerpVector(Physics->GetVelocity(), idealVelocity, TweenVelocity);
 	Physics->SetVelocity(newVelocity);
+}
+
+bool PlayerShip::LoseALife()
+{
+	System::GetInstance()->GetGame().Event_LivesUpdate.Invoke(GetLivesLeft());
+	return BaseVehicle::LoseALife();
 }
 
 bool PlayerShip::IsCollisionAllowed() const

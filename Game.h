@@ -1,4 +1,5 @@
 #pragma once
+#include "Event.h"
 #include "SFML/Graphics.hpp"
 
 class ImplicitGrid;
@@ -18,8 +19,6 @@ public:
 	bool IsLevelComplete() const;
 	bool IsGameOver() const;
 
-	// For GameOver checking
-	void UpdateLivesRemaining(int lives);
 	// score
 	void UpdateScore(int oldSize);
 	void ResetScore();
@@ -37,18 +36,17 @@ private:
 	void DeletePlayer();	
 
 	void SpawnBackgrounds() const;
+	void SpawnHUD();
 
 	static sf::Vector2f CreateRandomPosition();
 
 public:
+	Event<int> Event_ScoreUpdate;
+	Event<int> Event_LivesUpdate;
 
 private:
 	std::weak_ptr<PlayerShip> player_;
 	std::weak_ptr<ImplicitGrid> collisionGrid_;
-
-	sf::Text scoreText_;
-	sf::Text livesText_;
-	sf::Font uiFont_;
 	
 	bool hasSpawnedBots_ = false;
 

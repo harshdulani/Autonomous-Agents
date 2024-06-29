@@ -41,11 +41,9 @@ public:
 
 	void SetWindowVals(float X, float Y);
 	
-	template<typename T>
-	std::weak_ptr<T> CreateObject();
+	template<typename T>	std::weak_ptr<T> CreateObject();
 	
-	template<typename T>
-	std::weak_ptr<T> CreateGameEntity(const sf::Vector2f& Pos);
+	template<typename T>	std::weak_ptr<T> CreateGameEntity(const sf::Vector2f& Pos);
 
 	std::weak_ptr<GameEntity> GetWeakPtr(GameEntity* RawPtr);
 	
@@ -69,8 +67,7 @@ private:
 
 	bool CanCreateObject() const;
 	
-	template<typename T>
-	std::weak_ptr<T> CreateComponent(GameEntity* OwningEntity);
+	template<typename T>	std::weak_ptr<T> CreateComponent(GameEntity* OwningEntity);
 	
 public:
 private:
@@ -95,7 +92,7 @@ private:
 template<typename T> std::weak_ptr<T> ObjectManager::CreateObject()
 {
 	assert((CanCreateObject() && "Pool full, can't manage any more objects"));
-	assert((std::is_base_of<Object, T>::value && "Type mismatch while creating object"));
+	static_assert((std::is_base_of<Object, T>::value && "Type mismatch while creating object"));
 	
 	auto newObject = std::make_shared<T>();
 	
@@ -106,7 +103,7 @@ template<typename T> std::weak_ptr<T> ObjectManager::CreateObject()
 
 template<typename T> std::weak_ptr<T> ObjectManager::CreateGameEntity(const sf::Vector2f& Pos)
 {
-	assert((std::is_base_of<GameEntity, T>::value && "Type mismatch while creating GameEntity"));
+	static_assert((std::is_base_of<GameEntity, T>::value && "Type mismatch while creating GameEntity"));
 
 	std::weak_ptr<T> NewEntity = CreateObject<T>();
 	const std::shared_ptr<GameEntity> Casted = std::static_pointer_cast<GameEntity>(NewEntity.lock());
@@ -124,7 +121,7 @@ template<typename T> std::weak_ptr<T> ObjectManager::CreateGameEntity(const sf::
 
 template<typename T> std::weak_ptr<T> ObjectManager::CreateComponent(GameEntity* OwningEntity)
 {
-	assert((std::is_base_of<Component, T>::value && "Type mismatch while creating Component"));
+	static_assert((std::is_base_of<Component, T>::value && "Type mismatch while creating Component"));
 	
 	std::weak_ptr<T> WeakCmp = CreateObject<T>();
 	
