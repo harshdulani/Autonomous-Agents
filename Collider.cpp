@@ -1,6 +1,5 @@
 ﻿#include "Collider.h"
 #include <SFML/Graphics/RenderWindow.hpp>
-
 #include "Math.h"
 
 void Collider::Render(sf::RenderWindow& Window, sf::RenderStates States)

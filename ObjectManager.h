@@ -6,6 +6,7 @@
 #include <SFML/System/Vector2.hpp>
 #include "Component.h"
 #include "GameEntity.h"
+#include "SceneComponent.h"
 
 class Game;
 
@@ -110,7 +111,7 @@ template<typename T> std::weak_ptr<T> ObjectManager::CreateGameEntity(const sf::
 	std::weak_ptr<T> NewEntity = CreateObject<T>();
 	const std::shared_ptr<GameEntity> Casted = std::static_pointer_cast<GameEntity>(NewEntity.lock());
 	
-	Casted->setPosition(Pos);
+	Casted->SetPosition(Pos);
 
 	//add to update & render priority lists
 	UpdateEntities.insert(NewEntity);
@@ -132,5 +133,10 @@ template<typename T> std::weak_ptr<T> ObjectManager::CreateComponent(GameEntity*
 
 	std::shared_ptr<Component> casted = std::static_pointer_cast<Component>(WeakCmp.lock());
 	casted->SetOwningEntity(entity);
+	
+	if(auto scene = std::dynamic_pointer_cast<SceneComponent>(casted))
+	{
+		scene->setWorldPosition(entity->GetPosition());
+	}
 	return WeakCmp;
 }

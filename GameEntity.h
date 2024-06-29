@@ -33,6 +33,7 @@ public:
 
 	void SetActive(bool bStatus);
 	bool GetActive() const;
+	bool HasColliders() const;
 
 protected:
 	GameEntity() = default;
@@ -146,9 +147,9 @@ template<typename T> std::weak_ptr<T> GameEntity::GetComponentOfType()
 
 	for (auto& Component : Components)
 	{
-		//if (auto shared = Component)
+		if (auto shared = Component.lock())
 		{
-			if (std::shared_ptr<T> CompPtr = std::dynamic_pointer_cast<T>(Component))
+			if (std::shared_ptr<T> CompPtr = std::dynamic_pointer_cast<T>(shared))
 			{
 				return std::weak_ptr<T>(CompPtr);
 			}
@@ -199,7 +200,7 @@ inline void GameEntity::DestroyComponentsOfTypeInternal_(const bool onlyOne)
 	for (auto& comp : Components)
 	{
 		auto component = comp.lock();
-		if (dynamic_cast<T*>(component.get()))
+		if (std::dynamic_pointer_cast<T>(component))
 		{
 			System::GetInstance()->GetObjectMgr()->DestroyObject(component.get());
 			Components.erase(Components.begin() + i);

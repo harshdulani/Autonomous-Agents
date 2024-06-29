@@ -38,7 +38,6 @@ public:
 	/*
 	ScreenShaker* GetScreenShaker() const;
 	FSMManager* GetFSMManager() const;
-	UIManager* GetUIManager() const;
 	ParticleSystemManager* GetParticleSystemManager() const;
 	std::weak_ptr<GroupAttackingPolicy> GetGroupAttackingPolicy() const;
 	*/
@@ -57,11 +56,13 @@ private:
 	std::shared_ptr<TimerManager> TimerMgr;
 	/*
 	std::shared_ptr<FSMManager> fsmManager_;
-	std::shared_ptr<UIManager> uiManager_;
 	std::shared_ptr<ParticleSystemManager> particleSysMgr_;
 	*/
 
 	bool bPendingWindowClose = false;
+
+	// this is here bc we will be creating a fsm for the game states and they will change levels
+	int currentLevel = 1;
 	
 	sf::VideoMode VideoMode;
 	float WindowWidth = 800.f;

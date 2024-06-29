@@ -27,6 +27,7 @@ public:
 	static sf::Vector2f ZeroVector();
 	static sf::Vector2f UpVector();    
 	static sf::Vector2f RightVector();
+	// End Vector2f helpers
 	
 	static int GetRandInt(int Min, int Max);	
 	static float GetRandFloat(float Min, float Max);

@@ -10,6 +10,7 @@ public:
 	static std::string GetString(const sf::Vector2f& Vec);
 	
 	static void PrintNumberAsBitset(int32_t num);
+	static std::string GetNumberAsBitset(int32_t num);
 
 	template<typename T>
 	static const std::string& GetTypename(T object)

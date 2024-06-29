@@ -27,3 +27,8 @@ void Debug::PrintNumberAsBitset(int32_t num)
 {
 	std::cout << std::bitset<32>(num).to_string() << "\n";
 }
+
+std::string Debug::GetNumberAsBitset(int32_t num)
+{
+	return std::bitset<32>(num).to_string();
+}

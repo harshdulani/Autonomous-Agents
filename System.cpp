@@ -29,10 +29,13 @@ void System::Initialize()
 	TimerMgr = std::make_shared<TimerManager>();
 	/*
 		fsmManager_ = make_shared<FSMManager>();
-		uiManager_ = make_shared<UIManager>();
 		particleSysMgr_ = make_shared<ParticleSystemManager>();
 	*/
-	GameInst.StartGame();
+	GameInst.InitLevel(currentLevel);
+	Event_LevelStart.Invoke();
+
+	if (currentLevel == 1)
+		GameInst.ResetScore();
 }
 
 void System::PollWindowEvents()
@@ -77,7 +80,6 @@ void System::Terminate()
 	TimerMgr.reset();
 	/*
 	fsmManager_.reset();
-	uiManager_.reset();
 	particleSysMgr_.reset();
 	*/
 }

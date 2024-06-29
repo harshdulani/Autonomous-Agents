@@ -40,6 +40,9 @@ void GameEntity::SetActive(bool bStatus)
 }
 
 bool GameEntity::GetActive() const { return bActive; }
+
+bool GameEntity::HasColliders() const { return bHasColliders; }
+
 // End Core
 
 // Components

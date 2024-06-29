@@ -142,7 +142,7 @@ void PlayerShip::SetControlInput()
 
 void PlayerShip::UpdateTransform(const float DeltaTime)
 {
-	constexpr float RateOfRotation = 96.0f;
+	constexpr float RateOfRotation = 360.f * 0.35f;
 	constexpr float MaxSpeed = 150.0f;
 	constexpr float TweenVelocity = 0.05f;
 
