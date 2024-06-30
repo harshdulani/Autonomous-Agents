@@ -33,7 +33,7 @@ private:
 
 	TimerManager* TimerMgr = nullptr;
 
-	int ShootTimerHandle = -1;
+	uint32_t ShootTimerHandle = 0;
 	bool bShootCooldown = false;
 };
 

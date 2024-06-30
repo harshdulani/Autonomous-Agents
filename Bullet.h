@@ -43,7 +43,7 @@ private:
 
 	//lifetime
 	TimerManager* TimerManager;
-	int LifeTimerHandle = -1;
+	uint32_t LifeTimerHandle = 0;
 
 	//sine wave attack
 	float WaveAmplitude = 0.f;

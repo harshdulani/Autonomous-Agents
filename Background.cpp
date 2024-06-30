@@ -43,18 +43,21 @@ void Background::Update(const float deltaTime)
 	}
 	TryRefreshTwinkler(dimVal);
 
-	auto velocity = -ship_.lock()->GetComponentOfType<PhysicsComponent>().lock()->GetVelocity();
-	// positions
-	for (int i = 0; i < starCount_; ++i)
+	if (auto ship = ship_.lock())
 	{
-		stars_[i].position.x += velocity.x * parallaxSpeed_ * deltaTime;
-		stars_[i].position.y += velocity.y * parallaxSpeed_ * deltaTime;
-		stars_[i].position.x = Math::WrapModulo(stars_[i].position.x,
-												0.f,
-												cameraWidth_);
-		stars_[i].position.y = Math::WrapModulo(stars_[i].position.y,
-												0.f,
-												cameraHeight_);
+		auto velocity = -ship->GetPhysicsComponent()->GetVelocity();
+		// positions
+		for (int i = 0; i < starCount_; ++i)
+		{
+			stars_[i].position.x += velocity.x * parallaxSpeed_ * deltaTime;
+			stars_[i].position.y += velocity.y * parallaxSpeed_ * deltaTime;
+			stars_[i].position.x = Math::WrapModulo(stars_[i].position.x,
+													0.f,
+													cameraWidth_);
+			stars_[i].position.y = Math::WrapModulo(stars_[i].position.y,
+													0.f,
+													cameraHeight_);
+		}
 	}
 }
 

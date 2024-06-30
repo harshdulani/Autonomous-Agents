@@ -95,7 +95,7 @@ void ObjectManager::RenderAllObjects(sf::RenderWindow& Window) const
 		}
 		for (auto& Drawer : Entity->Drawables)
 		{
-			if (Drawer.get())
+			if (Drawer.use_count())
 			{
 				sf::RenderStates states;
 				states.transform = entityTransformed;

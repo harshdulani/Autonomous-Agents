@@ -2,6 +2,7 @@
 #include "Event.h"
 #include "SFML/Graphics.hpp"
 
+class GroupAttackingPolicy;
 class ImplicitGrid;
 class ObjectManager;
 class PlayerShip;
@@ -22,6 +23,9 @@ public:
 	// score
 	void UpdateScore(int oldSize);
 	void ResetScore();
+
+	std::weak_ptr<ImplicitGrid> GetCollisionSystem() const;
+	std::weak_ptr<GroupAttackingPolicy> GetGroupAttackingPolicy() const;
 
 private:
 	void CreateCollisionSystem();
@@ -47,7 +51,8 @@ public:
 private:
 	std::weak_ptr<PlayerShip> player_;
 	std::weak_ptr<ImplicitGrid> collisionGrid_;
-	
+	std::weak_ptr<GroupAttackingPolicy> groupAttackingPolicy_;
+
 	bool hasSpawnedBots_ = false;
 
 	// For level complete checking

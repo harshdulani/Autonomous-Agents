@@ -4,8 +4,9 @@
 #include <memory>
 #include <vector>
 
-class ImplicitGrid : public GameEntity
+class ImplicitGrid final : public GameEntity
 {
+	friend class Physics;
 public:
 	~ImplicitGrid() override;
 

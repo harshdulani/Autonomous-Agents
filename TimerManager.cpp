@@ -9,9 +9,9 @@ TimerManager::~TimerManager()
 	TimerList.clear();
 }
 
-int TimerManager::LastTimerHandle = 0;
+uint32_t TimerManager::LastTimerHandle = 1;
 
-void TimerManager::Kill(int TimerHandle)
+void TimerManager::Kill(uint32_t TimerHandle)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -20,7 +20,7 @@ void TimerManager::Kill(int TimerHandle)
 	}
 }
 
-void TimerManager::Play(int TimerHandle)
+void TimerManager::Play(uint32_t TimerHandle)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -28,7 +28,7 @@ void TimerManager::Play(int TimerHandle)
 	}
 }
 
-void TimerManager::Pause(int TimerHandle)
+void TimerManager::Pause(uint32_t TimerHandle)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -36,7 +36,7 @@ void TimerManager::Pause(int TimerHandle)
 	}
 }
 
-void TimerManager::Stop(int TimerHandle)
+void TimerManager::Stop(uint32_t TimerHandle)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -44,7 +44,7 @@ void TimerManager::Stop(int TimerHandle)
 	}
 }
 
-void TimerManager::SetTimerEnd(int TimerHandle, float Duration)
+void TimerManager::SetTimerEnd(uint32_t TimerHandle, float Duration)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -52,7 +52,7 @@ void TimerManager::SetTimerEnd(int TimerHandle, float Duration)
 	}
 }
 
-void TimerManager::ResetTimer(int TimerHandle, float NewDuration /*= -1.0f*/)
+void TimerManager::ResetTimer(uint32_t TimerHandle, float NewDuration /*= -1.0f*/)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -60,7 +60,7 @@ void TimerManager::ResetTimer(int TimerHandle, float NewDuration /*= -1.0f*/)
 	}
 }
 
-void TimerManager::SetOnStart(int TimerHandle, const std::function<void()>& call)
+void TimerManager::SetOnStart(uint32_t TimerHandle, const std::function<void()>& call)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -68,7 +68,7 @@ void TimerManager::SetOnStart(int TimerHandle, const std::function<void()>& call
 	}
 }
 
-void TimerManager::SetOnComplete(int TimerHandle, const std::function<void()>& call)
+void TimerManager::SetOnComplete(uint32_t TimerHandle, const std::function<void()>& call)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -76,7 +76,7 @@ void TimerManager::SetOnComplete(int TimerHandle, const std::function<void()>& c
 	}
 }
 
-void TimerManager::SetOnUpdate(int TimerHandle, const std::function<void()>& call)
+void TimerManager::SetOnUpdate(uint32_t TimerHandle, const std::function<void()>& call)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -84,7 +84,7 @@ void TimerManager::SetOnUpdate(int TimerHandle, const std::function<void()>& cal
 	}
 }
 
-void TimerManager::ClearOnStart(int TimerHandle)
+void TimerManager::ClearOnStart(uint32_t TimerHandle)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -92,7 +92,7 @@ void TimerManager::ClearOnStart(int TimerHandle)
 	}
 }
 
-void TimerManager::ClearOnComplete(int TimerHandle)
+void TimerManager::ClearOnComplete(uint32_t TimerHandle)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -100,7 +100,7 @@ void TimerManager::ClearOnComplete(int TimerHandle)
 	}
 }
 
-void TimerManager::ClearOnUpdate(int TimerHandle)
+void TimerManager::ClearOnUpdate(uint32_t TimerHandle)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -108,7 +108,7 @@ void TimerManager::ClearOnUpdate(int TimerHandle)
 	}
 }
 
-void TimerManager::SetKillOnComplete(int TimerHandle, bool ShouldKillOnComplete)
+void TimerManager::SetKillOnComplete(uint32_t TimerHandle, bool ShouldKillOnComplete)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -116,7 +116,7 @@ void TimerManager::SetKillOnComplete(int TimerHandle, bool ShouldKillOnComplete)
 	}
 }
 
-bool TimerManager::IsTimerRunning(const int TimerHandle)
+bool TimerManager::IsTimerRunning(const uint32_t TimerHandle)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -125,7 +125,7 @@ bool TimerManager::IsTimerRunning(const int TimerHandle)
 	return false;
 }
 
-float TimerManager::GetTimeSinceSpawn(int TimerHandle)
+float TimerManager::GetTimeSinceSpawn(uint32_t TimerHandle)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -134,7 +134,7 @@ float TimerManager::GetTimeSinceSpawn(int TimerHandle)
 	return -1.0f;
 }
 
-float TimerManager::GetValueDone(int TimerHandle)
+float TimerManager::GetValueDone(uint32_t TimerHandle)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
@@ -144,7 +144,7 @@ float TimerManager::GetValueDone(int TimerHandle)
 }
 
 
-Timer* TimerManager::FindTimer(int TimerHandle)
+Timer* TimerManager::FindTimer(uint32_t TimerHandle)
 {
 	for (auto& timer : TimerList)
 	{
@@ -154,7 +154,7 @@ Timer* TimerManager::FindTimer(int TimerHandle)
 	return nullptr;
 }
 
-int TimerManager::GetNewTimer()
+uint32_t TimerManager::GetNewTimer()
 {
 	Timer newTimer;
 	newTimer.Handle = LastTimerHandle;

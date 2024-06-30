@@ -1,6 +1,8 @@
 #include "Game.h"
 #include "Asteroid.h"
 #include "Background.h"
+#include "Collider.h"
+#include "EnemyShip.h"
 #include "GameHUD.h"
 #include "ImplicitGrid.h"
 #include "Math.h"
@@ -17,13 +19,17 @@ sf::Color Game::Yellow{255, 204, 69};
 
 void Game::InitLevel(int levelNum)
 {
-	CreateCollisionSystem();
+	SetAsteroidsDestroyed(0);
 	totalAsteroids_ = 0;
 	hasSpawnedBots_ = false;
 	levelNum_ = levelNum;
+	
+	CreateCollisionSystem();
+	groupAttackingPolicy_ = System::GetInstance()->GetObjectMgr()->CreateObject<GroupAttackingPolicy>();
 
 	SpawnPlayer();
 	SpawnAsteroids(levelNum);
+	SpawnBots(3);
 
 	SpawnBackgrounds();
 	
@@ -47,15 +53,77 @@ void Game::CreateCollisionSystem()
 
 void Game::SpawnBots(int SpawnCount)
 {
-	return;
-	std::vector<sf::Vector2f> Verts{
-			{10.f, 30.f},
-			{0.f, 15.f},
-			{15.f, 0.f},
-			{30.f, 15.f},
-			{20.f, 30.f},
-			{15.f, 0.f},
-		};
+	while (SpawnCount--)
+	{
+		float Width = System::GetInstance()->GetWindowWidth();
+		float Height = System::GetInstance()->GetWindowHeight();
+
+		float x = 0.f;
+		float y = 0.f;
+
+		float random = Math::GetRandFloat(0.f, 1.f);
+		if (random > 0.75f)
+		{
+			//left wall
+			x = Math::GetRandFloat(0.f, 25.f);
+			y = Math::GetRandFloat(Height * 0.1f, Height * 0.9f);
+		}
+		else if (random > 0.5f)
+		{
+			//top wall
+			x = Math::GetRandFloat(Width * 0.1f, Width * 0.9f);
+			y = Height - Math::GetRandFloat(0.f, 25.f);
+		}
+		else if (random > 0.25f)
+		{
+			//right wall
+			x = Width - Math::GetRandFloat(0.f,25.f);
+			y = Math::GetRandFloat(Height * 0.1f, Height * 0.9f);
+		}
+		else //if (random > 0.f)
+		{
+			//bottom wall
+			x = Math::GetRandFloat(Width * 0.1f, Width * 0.9f);
+			y = -Height + Math::GetRandFloat(0.f,25.f);
+		}
+
+		std::weak_ptr<EnemyShip> bot;
+		bot = System::GetInstance()->GetObjectMgr()->CreateGameEntity<EnemyShip>({x, y});
+/*
+		if (Math::GetRandFloat(0.f,1.f) > 0.5f)
+		{
+			bot = objectManager_->CreateGameEntity<KamikazeShip>(XMVectorSet(x, y, 0.0f, 0.0f));
+		}
+		else
+		{
+			bot = objectManager_->CreateGameEntity<EnemyShip>(XMVectorSet(x, y, 0.0f, 0.0f));
+		}
+*/
+		if (auto autobot = bot.lock())
+		{
+			autobot->SetTotalLives(2);
+			autobot->ResetLives();
+
+			autobot->SetTarget(player_);
+			autobot->InitialisePerception(100.f);
+			auto weakCollider = autobot->GetComponentOfType<Collider>();
+			if (auto coll = weakCollider.lock())
+			{
+				coll->SetColliderVisible(false);
+			}
+			autobot->InitObstacleAvoidance(70.f, 25.f);
+			autobot->InitThrusterParticles();
+			autobot->InitialiseHealthIndicator(20.f);
+/*
+			if (auto kamikaze = std::dynamic_pointer_cast<KamikazeShip>(autobot))
+			{
+				kamikaze->InitialiseExplosion(75.f, 3.f);
+			}
+*/
+			autobot->InitialiseChaseFSM(200.f, 175.f);
+			autobot->InitialiseAutoShootFSM();
+		}
+	}
 }
 
 void Game::SpawnPlayer()
@@ -204,3 +272,6 @@ bool Game::IsGameOver() const
 	}
 	return true;
 }
+
+std::weak_ptr<ImplicitGrid> Game::GetCollisionSystem() const { return collisionGrid_; }
+std::weak_ptr<GroupAttackingPolicy> Game::GetGroupAttackingPolicy() const { return groupAttackingPolicy_; }

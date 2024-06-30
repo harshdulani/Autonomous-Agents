@@ -15,7 +15,7 @@ BaseVehicle::BaseVehicle()
 
 	CollisionTimerHandle = TimerManager->GetNewTimer();
 	GetTimerManager()->SetTimerEnd(CollisionTimerHandle, 1);
-	GetTimerManager()->SetOnComplete(CollisionTimerHandle, std::bind(&BaseVehicle::ResetCollisionCooldown, this));
+	GetTimerManager()->SetOnComplete(CollisionTimerHandle, [this] { ResetCollisionCooldown(); });
 	GetTimerManager()->SetKillOnComplete(CollisionTimerHandle, false);
 }
 

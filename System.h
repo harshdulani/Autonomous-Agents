@@ -3,7 +3,10 @@
 #include <SFML/Window/VideoMode.hpp>
 #include "Event.h"
 #include "Game.h"
+#include "GroupAttackingPolicy.h"
 #include "TimerManager.h"
+
+class FSMManager;
 
 namespace sf
 {
@@ -35,11 +38,10 @@ public:
 	Game& GetGame();
 	ObjectManager* GetObjectMgr() const;
 	TimerManager* GetTimerManager() const;
+	FSMManager* GetFSMManager() const;
 	/*
 	ScreenShaker* GetScreenShaker() const;
-	FSMManager* GetFSMManager() const;
 	ParticleSystemManager* GetParticleSystemManager() const;
-	std::weak_ptr<GroupAttackingPolicy> GetGroupAttackingPolicy() const;
 	*/
 	bool IsWindowOpen() const;
 	bool IsWindowClosePending() const;
@@ -54,8 +56,8 @@ private:
 	sf::RenderWindow Window;
 	std::shared_ptr<ObjectManager> ObjectMgr;
 	std::shared_ptr<TimerManager> TimerMgr;
+	std::shared_ptr<FSMManager> FSMMgr;
 	/*
-	std::shared_ptr<FSMManager> fsmManager_;
 	std::shared_ptr<ParticleSystemManager> particleSysMgr_;
 	*/
 

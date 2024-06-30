@@ -51,7 +51,7 @@ void PlayerShip::InitialiseComponents()
 		.SetParticleScale(5.f)
 		.SetParticleLifeTime(0.15f, 0.45f)
 		.SetColorOverLifeTime(Helpers::GetColorFromRGB(255, 155, 0), 0);
-*/
+	*/
 	//Shooting
 	ShootingComp = AddComponent<ShootingComponent>();
 	auto Shooter = ShootingComp.lock();

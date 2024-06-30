@@ -1,4 +1,5 @@
 ﻿#include "System.h"
+#include "FSMManager.h"
 #include "Game.h"
 #include "ObjectManager.h"
 
@@ -27,8 +28,8 @@ void System::Initialize()
 	ObjectMgr = std::make_shared<ObjectManager>();
 	ObjectMgr->SetWindowVals(GetWindowWidth(), GetWindowHeight());
 	TimerMgr = std::make_shared<TimerManager>();
+	FSMMgr = std::make_shared<FSMManager>();
 	/*
-		fsmManager_ = make_shared<FSMManager>();
 		particleSysMgr_ = make_shared<ParticleSystemManager>();
 	*/
 	GameInst.InitLevel(currentLevel);
@@ -63,6 +64,7 @@ void System::Update(float DeltaTime)
 	TimerMgr->UpdateTimers(DeltaTime);
 
 	ObjectMgr->UpdateAllObjects(DeltaTime);
+	FSMMgr->UpdateFSMs(DeltaTime);
 }
 
 void System::Render()
@@ -78,8 +80,8 @@ void System::Terminate()
 {
 	ObjectMgr.reset();
 	TimerMgr.reset();
+	FSMMgr.reset();
 	/*
-	fsmManager_.reset();
 	particleSysMgr_.reset();
 	*/
 }
@@ -91,6 +93,8 @@ void System::CloseWindow()
 
 ObjectManager* System::GetObjectMgr() const { return ObjectMgr.get(); }
 TimerManager* System::GetTimerManager() const { return TimerMgr.get(); }
+FSMManager* System::GetFSMManager() const { return FSMMgr.get(); }
+
 Game& System::GetGame() { return GameInst; }
 
 bool System::IsWindowOpen() const { return Window.isOpen(); }

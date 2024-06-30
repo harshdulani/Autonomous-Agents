@@ -27,6 +27,8 @@ ShootingComponent::~ShootingComponent()
 void ShootingComponent::Update(const float DeltaTime)
 {
 	SwitchShootStrategy();
+	if (!bPlayer)
+		return;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
 		if (CanShoot())
@@ -40,6 +42,9 @@ void ShootingComponent::Render(sf::RenderWindow& Window, sf::RenderStates States
 {
 	PrimitiveComponent::Render(Window, States);
 
+	if (!bPlayer)
+		return;
+	
 	auto DirVector = GetForwardVector();
 	auto Pos = getWorldPosition();
 

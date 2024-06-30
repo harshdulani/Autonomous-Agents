@@ -83,9 +83,10 @@ private:
 
 // Render and Update Priority
 public:
+	// Lower values get updated first, Higher later
 	void SetRenderPriority(int p);
 	int GetRenderPriority() const;
-
+	// Lower values get updated first, Higher later
 	void SetUpdatePriority(int p);
 	int GetUpdatePriority() const;
 

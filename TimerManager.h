@@ -12,35 +12,35 @@ public:
 
 	~TimerManager();
 
-	void Kill(int TimerHandle);
+	void Kill(uint32_t TimerHandle);
 
-	void Play(int TimerHandle);
-	void Pause(int TimerHandle);
-	void Stop(int TimerHandle);
+	void Play(uint32_t TimerHandle);
+	void Pause(uint32_t TimerHandle);
+	void Stop(uint32_t TimerHandle);
 
-	void SetTimerEnd(int TimerHandle, float Duration);
-	void ResetTimer(int TimerHandle, float NewDuration = -1.0f);
+	void SetTimerEnd(uint32_t TimerHandle, float Duration);
+	void ResetTimer(uint32_t TimerHandle, float NewDuration = -1.0f);
 
-	void SetOnStart(int TimerHandle, const std::function<void()>& call);
-	void SetOnComplete(int TimerHandle, const std::function<void()>& call);
-	void SetOnUpdate(int TimerHandle, const std::function<void()>& call);
+	void SetOnStart(uint32_t TimerHandle, const std::function<void()>& call);
+	void SetOnComplete(uint32_t TimerHandle, const std::function<void()>& call);
+	void SetOnUpdate(uint32_t TimerHandle, const std::function<void()>& call);
 
-	void ClearOnStart(int TimerHandle);
-	void ClearOnUpdate(int TimerHandle);
-	void ClearOnComplete(int TimerHandle);
-	void SetKillOnComplete(int TimerHandle, bool ShouldKillOnComplete);
+	void ClearOnStart(uint32_t TimerHandle);
+	void ClearOnUpdate(uint32_t TimerHandle);
+	void ClearOnComplete(uint32_t TimerHandle);
+	void SetKillOnComplete(uint32_t TimerHandle, bool ShouldKillOnComplete);
 
-	bool IsTimerRunning(int TimerHandle);
-	float GetTimeSinceSpawn(int TimerHandle);
-	float GetValueDone(int TimerHandle);
+	bool IsTimerRunning(uint32_t TimerHandle);
+	float GetTimeSinceSpawn(uint32_t TimerHandle);
+	float GetValueDone(uint32_t TimerHandle);
 
 private:
-	Timer* FindTimer(int TimerHandle);
+	Timer* FindTimer(uint32_t TimerHandle);
 
-	static int LastTimerHandle;
+	static uint32_t LastTimerHandle;
 
 public:
-	int GetNewTimer();
+	uint32_t GetNewTimer();
 	void UpdateTimers(float DeltaTime);
 
 private:

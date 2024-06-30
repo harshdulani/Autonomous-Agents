@@ -69,7 +69,7 @@ private:
 	std::function<void()> OnComplete = nullptr;
 	std::function<void()> OnUpdate = nullptr;
 
-	int Handle = -1;
+	uint32_t Handle = 0;
 
 	//calculated in milliseconds
 	float LifeTime = 0;

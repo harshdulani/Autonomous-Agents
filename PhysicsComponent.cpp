@@ -5,9 +5,16 @@
 
 sf::Vector2f PhysicsComponent::GetVelocity() const { return Velocity; }
 
+sf::Vector2f PhysicsComponent::GetAcceleration() const { return Acceleration; }
+
 float PhysicsComponent::GetAngularVelocity() const { return AngularVelocity; }
 
-void PhysicsComponent::SetVelocity(sf::Vector2f InVel)
+void PhysicsComponent::AddForce(const sf::Vector2f& Force)
+{
+	Acceleration += Force;
+}
+
+void PhysicsComponent::SetVelocity(const sf::Vector2f& InVel)
 {
 	Velocity = InVel;
 }
@@ -25,6 +32,9 @@ void PhysicsComponent::SetAngularVelocity(float InVel)
 
 void PhysicsComponent::Update(float DeltaTime)
 {
+	Acceleration += Velocity;
+	Acceleration *= 0.f;
+	
 	auto Entity = GetOwningEntity().lock();
 	if (!Entity)
 		return;

@@ -25,10 +25,10 @@ public:
 	void SetTotalLives(int count);
 	int GetTotalLives() const { return TotalLives; }
 	
+	PhysicsComponent* GetPhysicsComponent() const;
+	
 protected:
 	TimerManager* GetTimerManager() const;
-
-	PhysicsComponent* GetPhysicsComponent() const;
 	
 	//Reset all ship values
 	void Reset();
@@ -47,7 +47,7 @@ protected:
 	int LivesRemaining;
 	int TotalLives = 1;
 
-	int CollisionTimerHandle = -1;
+	uint32_t CollisionTimerHandle = 0;
 	bool bCollisionCooldown = false;
 
 private:
