@@ -9,25 +9,27 @@
 #include <utility>
 #include "ShootingComponent.h"
 //#include "ScreenShaker.h"
-//#include "GroupAttackingPolicy.h"
+#include "GroupAttackingPolicy.h"
 #include "System.h"
-//#include "ParticleSystemManager.h"
-//#include "ParticleSystem.h"
+#include "ParticleSystem/ParticleSystemManager.h"
+#include "ParticleSystem/ParticleSystem.h"
 #include "FSMManager.h"
 #include "FSM.h"
 #include "AutoShoot_WaitAndShootState.h"
 #include "AutoShoot_SuspendedState.h"
 #include "Enemy_ChaseState.h"
 #include "Enemy_RevolveState.h"
-#include "GroupAttackingPolicy.h"
 #include "PlayerShip.h"
+#include "TimerManager.h"
 
 EnemyShip::EnemyShip()
 {
 	fsmMgr = System::GetInstance()->GetFSMManager();
 	groupAttack_ = System::GetInstance()->GetGame().GetGroupAttackingPolicy();
 
-	SetOrigin(15.f, 15.f);
+	lowHealthColor_ = {255, 69, 69, 55};
+	maxHealthColor_ = {153, 255, 0, 55};
+	
 	auto weakDraw = CreateDrawable<MultiTriShape>();
 	if (auto Draw = weakDraw.lock())
 	{
@@ -41,7 +43,9 @@ EnemyShip::EnemyShip()
 		};
 		Draw->SetTris(Verts, {255, 204, 69});
 		Draw->setScale(1.f, 1.f);
+		Draw->setPosition(-7.5f, -7.5f);
 	}
+	SetScale(1.f);
 }
 
 void EnemyShip::Update(const float deltaTime)
@@ -128,30 +132,28 @@ void EnemyShip::InitObstacleAvoidance(float avoidanceRadius, float collisionRadi
 
 void EnemyShip::InitThrusterParticles()
 {
-	/*
 	//Particle system
 	thruster = System::GetInstance()->GetParticleSystemManager()->CreateNewParticleSystem(this);
 	std::shared_ptr<ParticleSystem> p = thruster.lock();
 
-	p->SetLocalPosition(XMFLOAT3(10.f, 2.f, 0.f));
-	p->SetLocalAngle(XMConvertToRadians(180.f));
+	p->SetLocalPosition({ 2.5f, 2.5f});
+	p->SetLocalRotation(180.f);
 
 	p->SetLooping(true)
 		.SetDuration(0.5f)
 
-		.SetEmissionShape(LogicalShape::HLineSamplingFunction, 16)
+		.SetEmissionShape(LogicalParticleShape::HLineSamplingFunction, 8)
 		.SetEmissionMode(EmissionMode::Random)
 		.SetEmitterRotationMode(TransformSpace::Local)
 		.SetEmissionVelocityMode(EmissionVelocityMode::Normal)
-		.SetEmitterScaling(20.f)
-		.SetEmitterRate(64.f)
+		.SetEmitterScaling(6.f)
+		.SetEmitterRate(32.f)
 		.SetEmissionSpeed(100.f)
 
-		.SetParticleShape(LogicalShape::VLineSamplingFunction, 2)
+		.SetParticleShape(LogicalParticleShape::VLineSamplingFunction, 2)
 		.SetParticleScale(5.f)
-		.SetParticleLifeTime(0.5f, 0.15f)
-		.SetColorOverLifeTime(Helpers::GetColorFromRGB(255, 155, 0), 0);
-		*/
+		.SetParticleLifeTime(0.15f, 0.45f)
+		.SetColorOverLifeTime(sf::Color(255, 155, 0), sf::Color::Black);
 }
 
 void EnemyShip::InitialiseHealthIndicator(const float radius)
@@ -159,9 +161,9 @@ void EnemyShip::InitialiseHealthIndicator(const float radius)
 	healthIndicator_ = CreateDrawable<sf::CircleShape>(radius);
 
 	auto health = healthIndicator_.lock();
-	health->setOrigin({2.5f, 2.5f});
+	health->setPosition({-10.f, -10.f});
 	health->setFillColor(sf::Color::Transparent);
-	health->setOutlineThickness(2.f);
+	health->setOutlineThickness(5.f);
 	
 	UpdateHealthIndicator();
 }
@@ -273,7 +275,7 @@ void EnemyShip::InitialiseAutoShootFSM()
 	strongFsm->Initialise();
 }
 
-sf::Vector2f EnemyShip::SeekTarget()
+sf::Vector2f EnemyShip::SeekTarget() const
 {
 	// Velocity
 	return SeekLocation(GetSeekLocation());
@@ -281,8 +283,8 @@ sf::Vector2f EnemyShip::SeekTarget()
 
 void EnemyShip::UpdateHealthIndicator()
 {
-	sf::Color currentHealthColor = Math::LerpColor({255, 69, 69},
-												   {153, 255, 0},					  
+	sf::Color currentHealthColor = Math::LerpColor(lowHealthColor_,
+												   maxHealthColor_,					  
 												   Math::RemapClamped(0.5f, 1.f, 0.f, 1.f, GetLivesLeft() / static_cast<float>(GetTotalLives())));
 
 	if (auto health = GetHealthIndicator().lock())
@@ -293,9 +295,9 @@ void EnemyShip::UpdateHealthIndicator()
 
 sf::Vector2f EnemyShip::AvoidObstacles()
 {
-	sf::Vector2f steerForce{};
+	sf::Vector2f steerForce;
 	int count = 0;
-	sf::Vector2f sum{};
+	sf::Vector2f sum;
 
 	for (int i = 0; i < obstacles_.size(); i++)
 	{

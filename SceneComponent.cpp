@@ -24,9 +24,9 @@ void SceneComponent::SetOrigin(float X, float Y)
 	setOrigin(X, Y);
 }
 
-sf::Vector2f SceneComponent::getWorldPosition() const { return AbsolutePosition; }
+sf::Vector2f SceneComponent::GetWorldPosition() const { return AbsolutePosition; }
 
-void SceneComponent::setWorldPosition(const sf::Vector2f& position)
+void SceneComponent::SetWorldPosition(const sf::Vector2f& position)
 {
 	if (auto parent = GetOwningEntity().lock())
 	{
@@ -39,39 +39,39 @@ void SceneComponent::setWorldPosition(const sf::Vector2f& position)
 	AbsolutePosition = position;
 }
 
-sf::Vector2f SceneComponent::getLocalPosition() const { return getPosition(); }
+sf::Vector2f SceneComponent::GetLocalPosition() const { return getPosition(); }
 
-void SceneComponent::setLocalPosition(const sf::Vector2f& position)
+void SceneComponent::SetLocalPosition(const sf::Vector2f& position)
 {
 	setPosition(position);
 	RecalculatePosition();
 }
 
-float SceneComponent::getWorldRotation() const
+float SceneComponent::GetWorldRotation() const
 {
 	return GetOwningEntity().lock()->GetRotation() + getRotation();
 }
 
-void SceneComponent::setWorldRotation(float angle)
+void SceneComponent::SetWorldRotation(float angle)
 {
 	setRotation(angle - GetOwningEntity().lock()->GetRotation());
 }
 
-float SceneComponent::getLocalRotation() const { return getRotation(); }
+float SceneComponent::GetLocalRotation() const { return getRotation(); }
 
-void SceneComponent::setLocalRotation(float angle)
+void SceneComponent::SetLocalRotation(float angle)
 {
 	setRotation(angle);
 }
 
-sf::Vector2f SceneComponent::getLocalScale() const { return getScale(); }
+sf::Vector2f SceneComponent::GetLocalScale() const { return getScale(); }
 
-void SceneComponent::setLocalScale(sf::Vector2f value)
+void SceneComponent::SetLocalScale(sf::Vector2f value)
 {
 	setScale(value);
 }
 
-sf::Vector2f SceneComponent::getWorldScale() const
+sf::Vector2f SceneComponent::GetWorldScale() const
 {
 	auto GameEntity = GetOwningEntity().lock();
 	if (!GameEntity)
@@ -81,10 +81,10 @@ sf::Vector2f SceneComponent::getWorldScale() const
 
 sf::Vector2f SceneComponent::GetForwardVector() const
 {
-	return Math::GetForwardVector(Math::DegToRads(getWorldRotation()));
+	return Math::GetForwardVector(Math::DegToRads(GetWorldRotation()));
 }
 
 sf::Vector2f SceneComponent::GetRightVector() const
 {
-	return Math::GetRightVector(Math::DegToRads(getWorldRotation()));
+	return Math::GetRightVector(Math::DegToRads(GetWorldRotation()));
 }

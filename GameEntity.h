@@ -1,12 +1,11 @@
 ﻿#pragma once
 #include <memory>
 #include <vector>
-#include <cassert>
-#include <SFML/Graphics/Transformable.hpp>
 #include "Object.h"
 #include "System.h"
 #include "ObjectManager.h"
 #include "Component.h"
+#include <SFML/Graphics/Transformable.hpp>
 
 class Collider;
 
@@ -28,24 +27,23 @@ public:
 	~GameEntity() override;
 	virtual void Update(float DeltaTime);
 	virtual void Render(sf::RenderWindow& Window) const;
-	virtual void OnCollision(std::weak_ptr<GameEntity> other);
 	void Kill() override;
 
 	void SetActive(bool bStatus);
 	bool GetActive() const;
-	bool HasColliders() const;
 
 protected:
 	GameEntity() = default;
 
 private:
-	bool bHasColliders = false;
 	bool bActive = true;
 // End core
 
 // Components & Drawables
 public:
+	virtual void OnCollision(std::weak_ptr<GameEntity> other);
 	void CreateCollider(float Radius);
+	bool HasColliders() const;
 
 	std::vector<std::weak_ptr<Component>>* GetComponentList();
 	
@@ -79,6 +77,8 @@ private:
 	
 	std::vector<std::weak_ptr<Component>> Components;
 	std::vector<std::shared_ptr<sf::Drawable>> Drawables;
+
+	bool bHasColliders = false;
 // End Components & Drawables
 
 // Render and Update Priority
@@ -117,6 +117,7 @@ public:
 	void SetPosition(const sf::Vector2f& NewPos);
 	void SetRotation(float NewAngle);
 	void SetScale(const sf::Vector2f& NewScale);
+	void SetScale(float NewScale);
 	
 	sf::Vector2f GetForwardVector() const;
 	sf::Vector2f GetRightVector() const;

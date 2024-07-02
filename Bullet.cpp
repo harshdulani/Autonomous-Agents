@@ -39,7 +39,7 @@ void Bullet::InitialiseStraightBullet(sf::Vector2f Direction, bool bSingleShot)
 	else// if (myMode_ == BulletFiringMode::Triple)
 	{
 		auto Spike = InitialiseSpikeShape(sf::Color(240, 90, 175));
-		SetScale({0.25f, 0.25f});
+		SetScale(0.25f);
 	}
 
 	//Lifetime

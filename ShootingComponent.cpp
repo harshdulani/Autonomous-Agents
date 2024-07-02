@@ -46,7 +46,7 @@ void ShootingComponent::Render(sf::RenderWindow& Window, sf::RenderStates States
 		return;
 	
 	auto DirVector = GetForwardVector();
-	auto Pos = getWorldPosition();
+	auto Pos = GetWorldPosition();
 
 	auto va = sf::VertexArray(sf::Lines, 4);
 	auto Color = sf::Color(255, 255, 255, 105);

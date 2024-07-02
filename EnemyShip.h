@@ -42,14 +42,14 @@ public:
 	bool IsAttacking() const;
 
 protected:
-	sf::Vector2f SeekTarget();
+	sf::Vector2f SeekTarget() const;
 
 	std::weak_ptr<sf::CircleShape> GetHealthIndicator() const { return healthIndicator_; }
 	void UpdateHealthIndicator();
 	
 	void SetChaseFSMHandle(uint32_t val) { fsmHandle_chaseFSM = val; }
 
-	//std::weak_ptr<ParticleSystem> thruster;
+	std::weak_ptr<ParticleSystem> thruster;
 
 private:
 	sf::Vector2f AvoidObstacles();
@@ -72,4 +72,6 @@ private:
 
 	std::weak_ptr<GameEntity> target_;
 	std::vector<std::weak_ptr<GameEntity>> obstacles_;
+	sf::Color lowHealthColor_;
+	sf::Color maxHealthColor_;
 };

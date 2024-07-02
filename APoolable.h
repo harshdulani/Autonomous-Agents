@@ -7,7 +7,7 @@ class APoolable
 	template<typename T>
 	friend class ObjectPool;
 public:
-	virtual bool operator==(const APoolable& lhs);
+	virtual bool operator==(const APoolable& rhs);
 
 protected:
 	APoolable() = default;

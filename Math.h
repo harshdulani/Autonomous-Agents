@@ -6,8 +6,9 @@
 class Math
 {
 public:
-	static const float PI;
-	static const float TWO_PI;
+	static constexpr float PI = 3.141592654f;
+	static constexpr float TWO_PI = PI * 2.f;
+	
 	static float WrapModulo(float value, float max);
 	static float WrapModulo(float value, float min, float max);
 
@@ -26,11 +27,14 @@ public:
 	static sf::Vector2f LimitVector(sf::Vector2f vec, float limit);
 	
 	static sf::Vector2f ZeroVector();
+	static sf::Vector2f OneVector();
 	static sf::Vector2f UpVector();    
 	static sf::Vector2f RightVector();
 	// End Vector2f helpers
-	
+
+	// Max-Inclusive
 	static int GetRandInt(int Min, int Max);	
+	// Max-Inclusive
 	static float GetRandFloat(float Min, float Max);
 
 	template<typename T> static T LerpUnclamped(T from, T to, float t);

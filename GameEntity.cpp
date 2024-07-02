@@ -3,12 +3,7 @@
 #include "Math.h"
 #include "Collider.h"
 #include "System.h"
-
-// Core
-GameEntity::~GameEntity()
-{
-	DestroyAllDrawables();
-}
+#include "ParticleSystem/ParticleSystem.h"
 
 void GameEntity::Update(float DeltaTime)
 {
@@ -16,6 +11,33 @@ void GameEntity::Update(float DeltaTime)
 
 void GameEntity::Render(sf::RenderWindow& Window) const
 {
+	if(Components.empty())
+		return;
+	
+	sf::VertexArray lines;
+	lines.setPrimitiveType(sf::Lines);
+	auto myPos = GetPosition();
+	auto Col = sf::Color(255, 255, 255, 55);
+	auto myVert = sf::Vertex(myPos, Col);
+	for (const auto& weakCmp : Components)
+	{
+		if (auto cmp = weakCmp.lock())
+		{
+			if(const auto scene = std::dynamic_pointer_cast<sf::Transformable>(cmp))
+			{
+				lines.append(myVert);
+				lines.append({{(scene->getTransform() * GetTransform()).transformPoint(scene->getPosition())}, Col});
+			}
+		}
+	}
+	
+	Window.draw(lines);
+}
+
+// Core
+GameEntity::~GameEntity()
+{
+	DestroyAllDrawables();
 }
 
 void GameEntity::OnCollision(std::weak_ptr<GameEntity> other)
@@ -158,6 +180,11 @@ void GameEntity::SetRotation(float NewAngle)
 void GameEntity::SetScale(const sf::Vector2f& NewScale)
 {
 	setScale(NewScale);
+}
+
+void GameEntity::SetScale(float NewScale)
+{
+	setScale(Math::OneVector() * NewScale);
 }
 
 bool GameEntity::GetAndClearDirtyPosition()

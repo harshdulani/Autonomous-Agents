@@ -18,12 +18,12 @@ namespace sf
 struct UpdatePriorityComparator
 {
 public:
-	bool operator() (std::weak_ptr<GameEntity> x, std::weak_ptr<GameEntity> y) const;
+	bool operator() (const std::weak_ptr<GameEntity>& x, const std::weak_ptr<GameEntity>& y) const;
 };
 struct RenderPriorityComparator
 {
 public:
-	bool operator() (std::weak_ptr<GameEntity> x, std::weak_ptr<GameEntity> y) const;
+	bool operator() (const std::weak_ptr<GameEntity>& x, const std::weak_ptr<GameEntity>& y) const;
 };
 
 class ObjectManager
@@ -37,7 +37,7 @@ public:
 	void RenderAllObjects(sf::RenderWindow& Window) const;
 	
 	void CleanUpOldObjects();
-	void DestroyObject(Object* Obj);
+	void DestroyObject(const Object* Obj);
 
 	void SetWindowVals(float X, float Y);
 	
@@ -56,7 +56,7 @@ private:
 	void ResolveUpdateDirty();
 	void ResolveRenderDirty();
 	
-	void AddToObjectList(std::shared_ptr<Object> NewObject);
+	void AddToObjectList(const std::shared_ptr<Object>& NewObject);
 
 	static void SetObjectIndex(const std::shared_ptr<Object>& Shared, int Index);
 	/// Removes object from the index and fills the gap by bringing an object from the end of the container
@@ -133,7 +133,7 @@ template<typename T> std::weak_ptr<T> ObjectManager::CreateComponent(GameEntity*
 	
 	if(auto scene = std::dynamic_pointer_cast<SceneComponent>(casted))
 	{
-		scene->setWorldPosition(entity->GetPosition());
+		scene->SetWorldPosition(entity->GetPosition());
 	}
 	return WeakCmp;
 }

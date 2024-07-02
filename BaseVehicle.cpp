@@ -5,6 +5,7 @@
 #include "Collider.h"
 #include <memory>
 #include <vector>
+#include "Math.h"
 #include "PhysicsComponent.h"
 
 BaseVehicle::BaseVehicle()
@@ -72,10 +73,10 @@ void BaseVehicle::Reset()
 {
 	if(auto Physics = PhysicsC.lock())
 	{
-		Physics->SetVelocity({});
+		Physics->SetVelocity(Math::ZeroVector());
 	}
 
-	SetPosition({});
+	SetPosition(Math::ZeroVector());
 	SetRotation(0.f);
 	// bullet mode set to standard
 }

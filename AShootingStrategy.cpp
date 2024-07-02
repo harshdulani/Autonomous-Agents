@@ -12,7 +12,7 @@ std::weak_ptr<Bullet> AShootingStrategy::SpawnBullet(sf::Vector2f Position)
 bool StandardShootingStrategy::TryShoot(SceneComponent& Muzzle, bool bPlayer)
 {
 	sf::Vector2f ForwardVector = Muzzle.GetForwardVector();
-	sf::Vector2f shipPos = Muzzle.getWorldPosition();
+	sf::Vector2f shipPos = Muzzle.GetWorldPosition();
 	sf::Vector2f position = shipPos + ForwardVector * 10.f;
 
 	bool success = true;
@@ -29,7 +29,7 @@ bool StandardShootingStrategy::TryShoot(SceneComponent& Muzzle, bool bPlayer)
 bool TripleShootingStrategy::TryShoot(SceneComponent& Muzzle, bool bPlayer)
 {
 	sf::Vector2f ForwardVector = Muzzle.GetForwardVector();
-	sf::Vector2f Position = Muzzle.getWorldPosition();
+	sf::Vector2f Position = Muzzle.GetWorldPosition();
 
 	sf::Vector2f RightVector = Muzzle.GetRightVector();
 
@@ -39,7 +39,7 @@ bool TripleShootingStrategy::TryShoot(SceneComponent& Muzzle, bool bPlayer)
 		b->InitialiseStraightBullet(ForwardVector, false);
 		b->CreateCollider(4.0f);
 		b->SetIsPlayerOwned(bPlayer);
-		b->SetRotation(Muzzle.getWorldRotation()); 
+		b->SetRotation(Muzzle.GetWorldRotation()); 
 	}
 	else { success = false; }
 	
@@ -48,7 +48,7 @@ bool TripleShootingStrategy::TryShoot(SceneComponent& Muzzle, bool bPlayer)
 		b->InitialiseStraightBullet(ForwardVector, false);
 		b->CreateCollider(4.0f);
 		b->SetIsPlayerOwned(bPlayer);
-		b->SetRotation(Muzzle.getWorldRotation()); 
+		b->SetRotation(Muzzle.GetWorldRotation()); 
 	}
 	else { success = false; }
 
@@ -57,7 +57,7 @@ bool TripleShootingStrategy::TryShoot(SceneComponent& Muzzle, bool bPlayer)
 		b->InitialiseStraightBullet(ForwardVector, false);
 		b->CreateCollider(4.0f);
 		b->SetIsPlayerOwned(bPlayer);
-		b->SetRotation(Muzzle.getWorldRotation()); 
+		b->SetRotation(Muzzle.GetWorldRotation()); 
 	}
 	else { success = false; }
 
@@ -73,7 +73,7 @@ SineShootingStrategy::SineShootingStrategy() :
 bool SineShootingStrategy::TryShoot(SceneComponent& Muzzle, bool bPlayer)
 {
 	sf::Vector2f direction = Muzzle.GetForwardVector();
-	sf::Vector2f shipPos = Muzzle.getWorldPosition();
+	sf::Vector2f shipPos = Muzzle.GetWorldPosition();
 	sf::Vector2f position = shipPos + direction * 10.f;
 	sf::Vector2f perpendicular = Muzzle.GetRightVector();
 	

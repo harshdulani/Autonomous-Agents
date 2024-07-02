@@ -1,7 +1,6 @@
 #include "Game.h"
 #include "Asteroid.h"
 #include "Background.h"
-#include "Collider.h"
 #include "EnemyShip.h"
 #include "GameHUD.h"
 #include "ImplicitGrid.h"
@@ -9,13 +8,13 @@
 #include "ObjectManager.h"
 #include "PlayerShip.h"
 #include "System.h"
+#include "GroupAttackingPolicy.h"
 
 //init static colors
 sf::Color Game::Red{255, 69, 69};
 sf::Color Game::Green{0, 204, 153};
 sf::Color Game::Blue{69, 204, 255};
 sf::Color Game::Yellow{255, 204, 69};
-
 
 void Game::InitLevel(int levelNum)
 {
@@ -38,7 +37,7 @@ void Game::InitLevel(int levelNum)
 
 void Game::CreateCollisionSystem()
 {
-	collisionGrid_ = System::GetInstance()->GetObjectMgr()->CreateGameEntity<ImplicitGrid>({});
+	collisionGrid_ = System::GetInstance()->GetObjectMgr()->CreateGameEntity<ImplicitGrid>(Math::ZeroVector());
 	if (auto Grid = collisionGrid_.lock())
 	{
 		Grid->InitGrid(
@@ -106,12 +105,7 @@ void Game::SpawnBots(int SpawnCount)
 
 			autobot->SetTarget(player_);
 			autobot->InitialisePerception(100.f);
-			auto weakCollider = autobot->GetComponentOfType<Collider>();
-			if (auto coll = weakCollider.lock())
-			{
-				coll->SetColliderVisible(false);
-			}
-			autobot->InitObstacleAvoidance(70.f, 25.f);
+			autobot->InitObstacleAvoidance(70.f, 20.f);
 			autobot->InitThrusterParticles();
 			autobot->InitialiseHealthIndicator(20.f);
 /*
@@ -139,7 +133,6 @@ void Game::SpawnPlayer()
 
 	if (std::shared_ptr<PlayerShip> player = player_.lock())
 	{
-		player->CreateCollider(15.0f);
 		player->InitialiseComponents();
 		if (oldLives == -1)
 		{
@@ -165,8 +158,8 @@ void Game::DeletePlayer()
 
 void Game::SpawnBackgrounds() const
 {
-	auto foreground = System::GetInstance()->GetObjectMgr()->CreateGameEntity<Background>({});
-	auto background =  System::GetInstance()->GetObjectMgr()->CreateGameEntity<Background>({});
+	auto foreground = System::GetInstance()->GetObjectMgr()->CreateGameEntity<Background>(Math::ZeroVector());
+	auto background =  System::GetInstance()->GetObjectMgr()->CreateGameEntity<Background>(Math::ZeroVector());
 
 	if (auto fg = foreground.lock())
 	{
@@ -186,7 +179,7 @@ void Game::SpawnBackgrounds() const
 
 void Game::SpawnHUD()
 {
-	auto gameHUD = System::GetInstance()->GetObjectMgr()->CreateGameEntity<GameHUD>({});
+	auto gameHUD = System::GetInstance()->GetObjectMgr()->CreateGameEntity<GameHUD>(Math::ZeroVector());
 	if (auto hud = gameHUD.lock())
 	{
 		hud->InitGameHUD();
@@ -224,30 +217,30 @@ void Game::SpawnAsteroidAt(sf::Vector2f position, int size)
 						   sf::Color::Cyan,
 						   angularVelocity, size);
 	}
-	asteroidCount_++;
+	AsteroidCount++;
 	totalAsteroids_++;
 }
 
 int Game::GetAsteroidsAliveCount() const
 {
-	return totalAsteroids_ - asteroidsDestroyed;
+	return totalAsteroids_ - asteroidsDestroyed_;
 }
 
 void Game::UpdateScore(const int oldSize)
 {
-	score += 5 * oldSize;
-	Event_ScoreUpdate.Invoke(score);
+	score_ += 5 * oldSize;
+	Event_ScoreUpdate.Invoke(score_);
 }
 
 void Game::ResetScore()
 {
-	score = 0;
+	score_ = 0;
 }
 
 void Game::SetAsteroidsDestroyed(int val)
 {
-	asteroidsDestroyed = val;
-	if (asteroidsDestroyed < 2 || hasSpawnedBots_)
+	asteroidsDestroyed_ = val;
+	if (asteroidsDestroyed_ < 2 || hasSpawnedBots_)
 	{
 		return;
 	}
@@ -259,16 +252,18 @@ void Game::SetAsteroidsDestroyed(int val)
 	}
 }
 
+int Game::GetAsteroidsDestroyed() const { return asteroidsDestroyed_; }
+
 bool Game::IsLevelComplete() const
 {
-	return (GetAsteroidsAliveCount() == 0 && explosionCount == 0);
+	return (GetAsteroidsAliveCount() == 0 && ExplosionCount == 0);
 }
 
 bool Game::IsGameOver() const
 {
 	if (std::shared_ptr<PlayerShip> player = player_.lock())
 	{
-		return (player->GetLivesLeft() <= 0 && explosionCount == 0);
+		return (player->GetLivesLeft() <= 0 && ExplosionCount == 0);
 	}
 	return true;
 }

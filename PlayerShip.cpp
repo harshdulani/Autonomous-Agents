@@ -4,10 +4,11 @@
 #include "Bullet.h"
 //#include "ScreenShaker.h"
 #include "Asteroid.h"
-//#include "ParticleSystem.h"
-//#include "ParticleSystemManager.h"
 #include "Debug.h"
 #include "ShootingComponent.h"
+#include "Collider.h"
+#include "ParticleSystem/ParticleSystem.h"
+#include "ParticleSystem/ParticleSystemManager.h"
 
 PlayerShip::~PlayerShip()
 {
@@ -28,38 +29,20 @@ void PlayerShip::InitialiseComponents()
 
 	System::GetInstance()->GetGame().Event_LivesUpdate.Invoke(GetLivesLeft());
 	
-	/*
-	//Particle system
-	auto particleSys = System::GetInstance()->GetParticleSystemManager()->CreateNewParticleSystem(this);
-	std::shared_ptr<ParticleSystem> p = particleSys.lock();
-
-	p->SetLocalPosition(XMFLOAT3(0.f, 0.f, 0.f));
-	p->SetLocalAngle(XMConvertToRadians(180.f));
-
-	p->SetLooping(true)
-		.SetDuration(0.5f)
-
-		.SetEmissionShape(LogicalShape::HLineSamplingFunction, 2)
-		.SetEmissionMode(EmissionMode::Random)
-		.SetEmitterRotationMode(TransformSpace::Local)
-		.SetEmissionVelocityMode(EmissionVelocityMode::Normal)
-		.SetEmitterScaling(1.f)
-		.SetEmitterRate(32.f)
-		.SetEmissionSpeed(150.f)
-
-		.SetParticleShape(LogicalShape::VLineSamplingFunction, 2)
-		.SetParticleScale(5.f)
-		.SetParticleLifeTime(0.15f, 0.45f)
-		.SetColorOverLifeTime(Helpers::GetColorFromRGB(255, 155, 0), 0);
-	*/
 	//Shooting
 	ShootingComp = AddComponent<ShootingComponent>();
 	auto Shooter = ShootingComp.lock();
 	Shooter->SetIsPlayer(true);
-	Shooter->setLocalPosition({0.f, -15.f});
+	Shooter->SetLocalPosition({0.f, -15.f});
+
+	CreateCollider(15.0f);
+	auto weakCollider = GetComponentOfType<Collider>();
+	if(auto collider = weakCollider.lock())
+	{
+		collider->SetColliderVisible(false);
+	}
 
 	// Appearance
-	SetOrigin(15.f, 15.f);	
 	auto MultiTris = CreateDrawable<MultiTriShape>();
 	if (auto shape = MultiTris.lock())
 	{
@@ -76,7 +59,32 @@ void PlayerShip::InitialiseComponents()
 		};
 		shape->SetTris(Tris, {69, 204, 255});
 		shape->setScale(1.f, 1.f);
+		shape->setPosition(-7.5f, -7.5f);
 	}
+	
+	//Particle system
+	auto particleSys = System::GetInstance()->GetParticleSystemManager()->CreateNewParticleSystem(this);
+	std::shared_ptr<ParticleSystem> p = particleSys.lock();
+
+	p->SetLocalPosition({0.f, 15.f});
+	p->SetLocalRotation(180.f);
+
+	p->SetLooping(true)
+		.SetDuration(0.25f)
+
+		.SetEmissionShape(LogicalParticleShape::HLineSamplingFunction, 2)
+		.SetEmissionMode(EmissionMode::Random)
+		.SetEmitterRotationMode(TransformSpace::Local)
+		.SetEmissionVelocityMode(EmissionVelocityMode::Normal)
+		.SetEmitterScaling(1.f)
+		.SetEmitterRate(32.f)
+		.SetEmissionSpeed(150.f)
+
+		.SetParticleShape(LogicalParticleShape::VLineSamplingFunction, 2)
+		.SetParticleScale(5.f)
+		.SetParticleLifeTime(0.15f, 0.45f)
+		.SetColorOverLifeTime(sf::Color(255, 155, 0), sf::Color::Black);
+	
 }
 
 void PlayerShip::OnCollision(std::weak_ptr<GameEntity> WeakOther)

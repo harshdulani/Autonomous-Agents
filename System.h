@@ -3,9 +3,8 @@
 #include <SFML/Window/VideoMode.hpp>
 #include "Event.h"
 #include "Game.h"
-#include "GroupAttackingPolicy.h"
-#include "TimerManager.h"
 
+class ParticleSystemManager;
 class FSMManager;
 
 namespace sf
@@ -15,6 +14,7 @@ namespace sf
 
 class GameEntity;
 class ObjectManager;
+class TimerManager;
 
 class System
 {
@@ -39,9 +39,9 @@ public:
 	ObjectManager* GetObjectMgr() const;
 	TimerManager* GetTimerManager() const;
 	FSMManager* GetFSMManager() const;
+	ParticleSystemManager* GetParticleSystemManager() const;
 	/*
 	ScreenShaker* GetScreenShaker() const;
-	ParticleSystemManager* GetParticleSystemManager() const;
 	*/
 	bool IsWindowOpen() const;
 	bool IsWindowClosePending() const;
@@ -52,14 +52,12 @@ public:
 private:
 	static System* Singleton;
 
-	Game GameInst;
-	sf::RenderWindow Window;
-	std::shared_ptr<ObjectManager> ObjectMgr;
-	std::shared_ptr<TimerManager> TimerMgr;
-	std::shared_ptr<FSMManager> FSMMgr;
-	/*
+	sf::RenderWindow window_;
+	Game gameInst_;
+	std::shared_ptr<ObjectManager> objectMgr_;
+	std::shared_ptr<TimerManager> timerMgr_;
+	std::shared_ptr<FSMManager> fsmMgr_;
 	std::shared_ptr<ParticleSystemManager> particleSysMgr_;
-	*/
 
 	bool bPendingWindowClose = false;
 

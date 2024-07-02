@@ -19,13 +19,13 @@ public:
 	static std::string GetNumberAsBitset(int32_t num);
 
 	template<typename T>
-	static const std::string& GetTypename(T object)
+	static std::string GetTypename(T object)
 	{
 		return typeid(object).name();
 	}
 	
 	template<typename T>
-	static const std::string& GetTypename()
+	static std::string GetTypename()
 	{
 		return typeid(T).name();
 	}

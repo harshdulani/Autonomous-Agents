@@ -461,12 +461,12 @@ void ImplicitGrid::GetEntityBounds(const std::shared_ptr<GameEntity>& entity, in
 	// Compute the extent of grid cells the bounding sphere of A overlaps.
 	// first calculate candidateEntity's presence in grid cells
 	auto collider = entity->GetComponentOfType<Collider>();
-	sf::Vector2f position {};
+	sf::Vector2f position;
 	float radius = 0.0f;
 	if (auto sharedCollider = collider.lock())
 	{
 		radius = sharedCollider->GetRadius();
-		position = sharedCollider->getWorldPosition();
+		position = sharedCollider->GetWorldPosition();
 	}
 	GetRadiusBounds(position.x, position.y, radius, x1, y1, x2, y2);
 }
@@ -492,7 +492,7 @@ void ImplicitGrid::GetRadiusBounds(const float posX, const float posY, const flo
 
 bool ImplicitGrid::AreColliding(const Collider& a, const Collider& b)
 {
-	return FVectorDistance(a.getWorldPosition(), b.getWorldPosition()) < (a.GetRadius() + b.GetRadius());
+	return FVectorDistance(a.GetWorldPosition(), b.GetWorldPosition()) < (a.GetRadius() + b.GetRadius());
 }
 
 std::weak_ptr<GameEntity> ImplicitGrid::GetEntityAtIndex(int index)

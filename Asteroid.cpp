@@ -6,6 +6,8 @@
 #include "PlayerShip.h"
 #include "Bullet.h"
 #include "Collider.h"
+#include "ParticleSystem/ParticleSystem.h"
+#include "ParticleSystem/ParticleSystemManager.h"
 
 void Asteroid::OnCollision(std::weak_ptr<GameEntity> other)
 {
@@ -91,6 +93,54 @@ void Asteroid::AsteroidHit()
 
 void Asteroid::SpawnExplosion(int oldSize)
 {
+	//System::GetInstance()->GetScreenShaker()->CreateImpulse(0.25f, oldSize * 1.0f, 100.0f);
+
+	auto particleSys = System::GetInstance()->GetParticleSystemManager()->CreateNewParticleSystem(this);
+	std::shared_ptr<ParticleSystem> p = particleSys.lock();
+
+	p->SetWorldPosition(GetPosition());
+
+	std::function<void()> onStart = []() -> void
+		{
+			System::GetInstance()->GetGame().ExplosionCount++;
+		};
+
+	std::function<void()> onEnd = [&]() -> void
+		{
+			// For level complete checking
+			System::GetInstance()->GetGame().SetAsteroidsDestroyed(System::GetInstance()->GetGame().GetAsteroidsDestroyed() + 1);
+			System::GetInstance()->GetGame().AsteroidCount--;
+			System::GetInstance()->GetGame().ExplosionCount--;
+
+			if (!IsPendingKill())
+			{
+				// object is here to be marked as pending kill to be destroyed in the next update loop
+				Kill();
+				return;
+
+				// it wont come here twice in the same frame 
+				// bc if it is already marked for death, then it wont be checked for collisions
+			}
+		};
+
+	float oldSizeF = static_cast<float>(oldSize);
+	
+	p->SetOnStart(onStart)
+		.SetOnComplete(onEnd);
+	
+	p->SetDuration(0.125f)
+		.SetParticleLifeTime(0.25f * oldSizeF, 0.5f * oldSizeF)
+
+		.SetEmissionShape(LogicalParticleShape::CircleSamplingFunction, 32)
+		.SetEmissionMode(EmissionMode::Random)
+		.SetEmitterScaling(3.f * oldSizeF)
+		.SetEmitterRate(0.f)
+		.AddEmitterBurst(0.f, 16)
+		.SetEmissionSpeed(50.f)
+
+		.SetParticleShape(LogicalParticleShape::CircleSamplingFunction, 32)
+		.SetScaleOverLifetime(1.5f * oldSizeF, 0.f)
+		.SetColorOverLifeTime(sf::Color(255, 255, 0), sf::Color::Black);
 }
 
 int Asteroid::GetSize() const { return size_; }

@@ -16,6 +16,7 @@ public:
 	// spawning smaller asteroids on asteroid hits
 	void SpawnAsteroidAt(sf::Vector2f position, int size);
 	void SetAsteroidsDestroyed(int val);
+	int GetAsteroidsDestroyed() const;
 
 	bool IsLevelComplete() const;
 	bool IsGameOver() const;
@@ -48,6 +49,10 @@ public:
 	Event<int> Event_ScoreUpdate;
 	Event<int> Event_LivesUpdate;
 
+	// For level complete checking
+	int AsteroidCount = 0;
+	int ExplosionCount = 0;
+	
 private:
 	std::weak_ptr<PlayerShip> player_;
 	std::weak_ptr<ImplicitGrid> collisionGrid_;
@@ -55,14 +60,11 @@ private:
 
 	bool hasSpawnedBots_ = false;
 
-	// For level complete checking
-	int asteroidCount_ = 0;
 	int totalAsteroids_ = 0;
-	int asteroidsDestroyed = 0;
+	int asteroidsDestroyed_ = 0;
 	
-	int score = 0;
+	int score_ = 0;
 	int levelNum_ = 0;
-	int explosionCount = 0;
 
 	// static colors
 	static sf::Color Red;

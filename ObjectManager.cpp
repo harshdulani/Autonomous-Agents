@@ -116,12 +116,12 @@ void ObjectManager::CleanUpOldObjects()
 	RenderEntities.clear();
 }
 
-void ObjectManager::DestroyObject(Object* Obj)
+void ObjectManager::DestroyObject(const Object* Obj)
 {
 	// delete entity from entity lists	
 	for (auto it = UpdateEntities.begin(); it != UpdateEntities.end(); ++it)
 	{
-		if ((*it).lock()->GetObjectIndex() == Obj->GetObjectIndex())
+		if (it->lock()->GetObjectIndex() == Obj->GetObjectIndex())
 		{
 			System::GetInstance()->Event_EntityDestroyed.Invoke(*it);
 			UpdateEntities.erase(it);
@@ -130,7 +130,7 @@ void ObjectManager::DestroyObject(Object* Obj)
 	}
 	for (auto it = RenderEntities.begin(); it != RenderEntities.end(); ++it)
 	{
-		if ((*it).lock()->GetObjectIndex() == Obj->GetObjectIndex())
+		if (it->lock()->GetObjectIndex() == Obj->GetObjectIndex())
 		{
 			RenderEntities.erase(it);
 			break;
@@ -175,7 +175,7 @@ void ObjectManager::ResolveRenderDirty()
 	}
 	for (auto it = RenderEntities.begin(); it != RenderEntities.end(); ++it)
 	{
-		if (auto entity = (*it).lock())
+		if (auto entity = it->lock())
 		{
 			if (!entity->IsPendingKill() && entity->IsRenderDirty())
 			{
@@ -197,7 +197,7 @@ void ObjectManager::ResolveUpdateDirty()
 	}
 	for (auto it = UpdateEntities.begin(); it != UpdateEntities.end(); ++it)
 	{
-		if (auto entity = (*it).lock())
+		if (auto entity = it->lock())
 		{
 			if (!entity->IsPendingKill() && entity->IsUpdateDirty())
 			{
@@ -222,7 +222,7 @@ std::weak_ptr<GameEntity> ObjectManager::GetWeakPtr(GameEntity* RawPtr)
 	return std::static_pointer_cast<GameEntity>(GetObjectByIndex(Obj->GetObjectIndex()).lock());
 }
 
-void ObjectManager::AddToObjectList(std::shared_ptr<Object> NewObject)
+void ObjectManager::AddToObjectList(const std::shared_ptr<Object>& NewObject)
 {
 	//add to vector
 	Objects.push_back(NewObject);
@@ -237,7 +237,8 @@ void ObjectManager::SetObjectIndex(const std::shared_ptr<Object>& Shared, int In
 
 void ObjectManager::RemoveObjectAtIndex(int Index)
 {
-	if (Index >= Objects.size() || Index < 0)
+	const int ObjectNum = static_cast<int>(Objects.size());
+	if (Index >= ObjectNum || Index < 0)
 	{
 		return;
 	}
@@ -246,7 +247,7 @@ void ObjectManager::RemoveObjectAtIndex(int Index)
 	Objects[Index].reset();
 	
 	// DEFRAGMENTATION of vector by filling in gaps
-	if (Index == Objects.size() - 1)
+	if (Index == ObjectNum - 1)
 	{
 		// there is no need to fill any gap if the object is at the end of the list
 		// just make sure that element is not accessed anymore
@@ -255,7 +256,7 @@ void ObjectManager::RemoveObjectAtIndex(int Index)
 	}
 
 	// move pointer to last object stored in list to the new emptied index
-	std::iter_swap((Objects.begin() + Index), (Objects.begin() + Objects.size() - 1));
+	std::iter_swap((Objects.begin() + Index), (Objects.begin() + ObjectNum - 1));
 	Objects.pop_back();
 
 	std::shared_ptr<Object> object = Objects.at(Index);
@@ -283,7 +284,7 @@ void ObjectManager::WrapEntity(GameEntity* Entity) const
 	}
 }
 
-bool ObjectManager::CanCreateObject() const { return Objects.size() < MaxObjects; }
+bool ObjectManager::CanCreateObject() const { return static_cast<int>(Objects.size()) < MaxObjects; }
 
 void ObjectManager::SetWindowVals(float X, float Y)
 {
@@ -291,14 +292,14 @@ void ObjectManager::SetWindowVals(float X, float Y)
 	WindowHeight = Y;
 }
 
-bool UpdatePriorityComparator::operator()(std::weak_ptr<GameEntity> x,
-										  std::weak_ptr<GameEntity> y) const
+bool UpdatePriorityComparator::operator()(const std::weak_ptr<GameEntity>& x,
+										  const std::weak_ptr<GameEntity>& y) const
 {
 	return x.lock()->GetUpdatePriority() < y.lock()->GetUpdatePriority();
 }
 
-bool RenderPriorityComparator::operator()(std::weak_ptr<GameEntity> x,
-										  std::weak_ptr<GameEntity> y) const
+bool RenderPriorityComparator::operator()(const std::weak_ptr<GameEntity>& x,
+										  const std::weak_ptr<GameEntity>& y) const
 {
 	return x.lock()->GetRenderPriority() < y.lock()->GetRenderPriority();
 

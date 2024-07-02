@@ -2,13 +2,17 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include "Math.h"
 
+void Collider::Update(float DeltaTime)
+{
+}
+
 void Collider::Render(sf::RenderWindow& Window, sf::RenderStates States)
 {
 	PrimitiveComponent::Render(Window, States);
 	if (!bVisualizeCollider)
 		return;
 
-	States.transform = GetTransform().translate(getWorldPosition());
+	States.transform = GetTransform().translate(GetWorldPosition());
 	Window.draw(Circle, States);
 }
 

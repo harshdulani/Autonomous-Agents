@@ -3,6 +3,7 @@
 #include "Math.h"
 #include "PlayerShip.h"
 #include "Asteroid.h"
+#include "Collider.h"
 
 Bot::Bot()
 {
@@ -14,7 +15,12 @@ void Bot::InitialisePerception(float perceptionRadius)
 	perceptionRadius_ = perceptionRadius;
 	separationRadius_ = perceptionRadius_ * 0.5f;
 
-	CreateCollider(perceptionRadius_);
+	CreateCollider(perceptionRadius);
+	auto weakCollider = GetComponentOfType<Collider>();
+	if (auto coll = weakCollider.lock())
+	{
+		coll->SetColliderVisible(false);
+	}
 }
 
 void Bot::Update(const float deltaTime)

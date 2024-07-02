@@ -90,7 +90,7 @@ bool AutoShoot_WaitAndShootState::TryTakeShot()
 	{
 		auto angle = Math::RadsToDegs(atan2f(lookVector.y, lookVector.x)) + 90.f;
 		
-		shooter->setWorldRotation(angle);
+		shooter->SetWorldRotation(angle);
 
 		shooter->ShootBullet();
 		return true;

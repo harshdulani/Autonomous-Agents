@@ -6,6 +6,7 @@
 class Collider : public PrimitiveComponent
 {
 public:
+	void Update(float DeltaTime) override;
 	void Render(sf::RenderWindow& Window, sf::RenderStates States) override;
 	bool IsValidCollider() const;
 
@@ -18,6 +19,7 @@ public:
 private:
 	void RegenCircle();
 
+private:
 	sf::VertexArray Circle;
 	
 	bool bVisualizeCollider = false;

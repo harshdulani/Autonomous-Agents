@@ -3,8 +3,6 @@
 #include <SFML/System/Vector2.hpp>
 
 std::random_device Math::Rnd;
-const float Math::PI = 3.141592654f;
-const float Math::TWO_PI = PI * 2.0f;
 
 int Math::GetRandInt(int Min, int Max)
 {
@@ -62,6 +60,7 @@ float Math::RadsToDegs(const float rads)
 }
 
 sf::Vector2f Math::ZeroVector() { return {}; }
+sf::Vector2f Math::OneVector() { return {1.f, 1.f}; }
 sf::Vector2f Math::UpVector() { return {0.f, 1.f}; }
 sf::Vector2f Math::RightVector() { return {1.f, 0.f}; }
 
