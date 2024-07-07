@@ -23,7 +23,7 @@ public:
 	int GetLivesLeft() const;
 	
 	void SetTotalLives(int count);
-	int GetTotalLives() const { return TotalLives; }
+	int GetTotalLives() const { return totalLives_; }
 	
 	PhysicsComponent* GetPhysicsComponent() const;
 	
@@ -36,7 +36,7 @@ protected:
 	// Returns if ship survived after losing a life
 	virtual bool LoseALife();
 	
-	bool GetIsInCollisionCooldown() const { return bCollisionCooldown; }
+	bool GetIsInCollisionCooldown() const { return bCollisionCooldown_; }
 	
 	void SetAllCollidersStatus(bool bEnabled);
 	void ResetCollisionCooldown();
@@ -44,14 +44,14 @@ protected:
 	std::weak_ptr<ShootingComponent> ShootingComp;
 
 	// lives
-	int LivesRemaining;
-	int TotalLives = 1;
+	int livesRemaining_;
+	int totalLives_ = 1;
 
-	uint32_t CollisionTimerHandle = 0;
-	bool bCollisionCooldown = false;
+	uint32_t collisionTimerHandle_ = 0;
+	bool bCollisionCooldown_ = false;
 
 private:
-	std::weak_ptr<PhysicsComponent> PhysicsC;
+	std::weak_ptr<PhysicsComponent> physicsC_;
 	
-	TimerManager* TimerManager;	
+	TimerManager* timerManager_;	
 };

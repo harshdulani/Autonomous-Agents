@@ -88,3 +88,10 @@ sf::Vector2f SceneComponent::GetRightVector() const
 {
 	return Math::GetRightVector(Math::DegToRads(GetWorldRotation()));
 }
+
+bool SceneComponent::GetDenyUpdate() const { return bDenyUpdate_; }
+
+void SceneComponent::SetDenyUpdate(bool bStatus)
+{
+	bDenyUpdate_ = bStatus;
+}

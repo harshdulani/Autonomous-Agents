@@ -31,7 +31,7 @@ public:
 	sf::Vector2f GetSeekLocation() const { return seekLocation_; }
 	void SetSeekLocation(const sf::Vector2f& val) { seekLocation_ = val; }
 
-	std::weak_ptr<ShootingComponent> GetShootingComponent() { return shootingComponent; }
+	std::weak_ptr<ShootingComponent> GetShootingComponent() { return shootingComponent_; }
 	std::weak_ptr<FSM> GetAutoShootFSM() const;
 	std::weak_ptr<FSM> GetChaseFSM() const;
 
@@ -47,19 +47,19 @@ protected:
 	std::weak_ptr<sf::CircleShape> GetHealthIndicator() const { return healthIndicator_; }
 	void UpdateHealthIndicator();
 	
-	void SetChaseFSMHandle(uint32_t val) { fsmHandle_chaseFSM = val; }
+	void SetChaseFSMHandle(uint32_t val) { fsmHandle_ChaseFsm_ = val; }
 
 	std::weak_ptr<ParticleSystem> thruster;
 
 private:
 	sf::Vector2f AvoidObstacles();
 	std::weak_ptr<GroupAttackingPolicy> groupAttack_;
-	std::weak_ptr<ShootingComponent> shootingComponent;
+	std::weak_ptr<ShootingComponent> shootingComponent_;
 	
 	//FSMs
-	FSMManager* fsmMgr;
-	uint32_t fsmHandle_chaseFSM = 0;
-	uint32_t fsmHandle_autoShootFSM_ = 0;
+	FSMManager* fsmMgr_;
+	uint32_t fsmHandle_ChaseFsm_ = 0;
+	uint32_t fsmHandle_AutoShootFsm_ = 0;
 
 	//collision avoidance
 	float collisionRadius_ = -1.f;

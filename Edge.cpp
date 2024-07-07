@@ -3,20 +3,20 @@
 
 std::weak_ptr<Node> Edge::GetSrcNode() const
 {
-	return srcNode;
+	return srcNode_;
 }
 
 std::weak_ptr<Node> Edge::GetDestNode() const
 {
-	return destNode;
+	return destNode_;
 }
 
 void Edge::SetSrcNode(std::weak_ptr<Node> node)
 {
-	srcNode = std::move(node);
+	srcNode_ = std::move(node);
 }
 
 void Edge::SetDestNode(std::weak_ptr<Node> node)
 {
-	destNode = std::move(node);
+	destNode_ = std::move(node);
 }

@@ -55,16 +55,16 @@ public:
 		{
 			AddElements(30);
 		}
-		std::vector<std::weak_ptr<T>>::iterator it = std::find_if(pool_.begin(),
-							pool_.end(),
-							[](std::weak_ptr<T> item) -> bool
-							{
-								if (auto obj = std::dynamic_pointer_cast<APoolable>(item.lock()))
-								{
-									return !obj->isInUse;
-								}
-								return false;
-							});
+		typename std::vector<std::weak_ptr<T>>::iterator it = std::find_if(pool_.begin(),
+																		   pool_.end(),
+																		   [](std::weak_ptr<T> item) -> bool
+																			   {
+																				   if (auto obj = std::dynamic_pointer_cast<APoolable>(item.lock()))
+																				   {
+																					   return !obj->bInUse_;
+																				   }
+																				   return false;
+																			   });
 
 		auto obj = std::dynamic_pointer_cast<APoolable>((*it).lock());
 		obj->InitPoolable();

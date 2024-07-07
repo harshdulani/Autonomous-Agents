@@ -14,7 +14,7 @@ public:
 private:
 	int GetObjectIndex() const;
 	void SetObjectIndex(int Index);
-	bool bPendingKill = false;
+	bool bPendingKill_ = false;
 
-	int ObjectIndex = -1;
+	int objectIndex_ = -1;
 };

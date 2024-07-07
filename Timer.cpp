@@ -4,32 +4,32 @@
 
 bool Timer::GetIsTimerRunning() const
 {
-	return bTimerRunning;
+	return bTimerRunning_;
 }
 
 void Timer::Play()
 {
-	bTimerRunning = true;
+	bTimerRunning_ = true;
 }
 
 void Timer::Stop()
 {
-	TimeElapsed = 0.f;
-	bTimerRunning = false;
+	timeElapsed_ = 0.f;
+	bTimerRunning_ = false;
 }
 
 void Timer::Pause()
 {
-	bTimerRunning = false;
+	bTimerRunning_ = false;
 }
 
 void Timer::UpdateTimer(const float deltaTime)
 {
-	if (!bTimerRunning)
+	if (!bTimerRunning_)
 	{
 		return;
 	}
-	if (TimeElapsed == 0.f)
+	if (timeElapsed_ == 0.f)
 	{
 		if (onStart_)
 		{
@@ -37,10 +37,10 @@ void Timer::UpdateTimer(const float deltaTime)
 		}
 	}
 
-	TimeElapsed += deltaTime;
-	if (OnUpdate)
+	timeElapsed_ += deltaTime;
+	if (onUpdate_)
 	{
-		OnUpdate();
+		onUpdate_();
 	}
 
 	if (!IsTimerComplete())
@@ -49,9 +49,9 @@ void Timer::UpdateTimer(const float deltaTime)
 	}
 	// pause timer at the end so no more playback here. will still call the OnComplete
 	Pause();
-	if (OnComplete)
+	if (onComplete_)
 	{
-		OnComplete();
+		onComplete_();
 	}
 
 	if (!bKillOnComplete)
@@ -67,26 +67,26 @@ bool Timer::operator==(const Timer& rhs) const { return this == &rhs; }
 
 bool Timer::IsTimerComplete() const
 {
-	return TimeElapsed > LifeTime;
+	return timeElapsed_ > lifeTime_;
 }
 
 void Timer::InitPoolable()
 {
 	SetIsInUse(true);
-	LifeTime = 0;
-	TimeElapsed = 0;
-	Handle = -1;
+	lifeTime_ = 0;
+	timeElapsed_ = 0;
+	handle_ = -1;
 	bKillOnComplete = true;
-	bTimerRunning = true;
-	OnComplete = nullptr;
+	bTimerRunning_ = true;
+	onComplete_ = nullptr;
 }
 
 void Timer::ResetTimer(float newDuration)
 {
-	bTimerRunning = true;
+	bTimerRunning_ = true;
 	if (newDuration < 0)
 	{
-		SetTimerEnd(LifeTime);
+		SetTimerEnd(lifeTime_);
 		return;
 	}
 
@@ -95,7 +95,7 @@ void Timer::ResetTimer(float newDuration)
 
 void Timer::Kill()
 {
-	bTimerRunning = false;
+	bTimerRunning_ = false;
 }
 
 void Timer::SetOnStart(const std::function<void()>& Call)
@@ -105,12 +105,12 @@ void Timer::SetOnStart(const std::function<void()>& Call)
 
 void Timer::SetOnComplete(const std::function<void()>& Call)
 {
-	OnComplete = Call;
+	onComplete_ = Call;
 }
 
 void Timer::SetOnUpdate(const std::function<void()>& Call)
 {
-	OnUpdate = Call;
+	onUpdate_ = Call;
 }
 
 void Timer::ClearOnStart()
@@ -120,16 +120,16 @@ void Timer::ClearOnStart()
 
 void Timer::ClearOnUpdate()
 {
-	OnUpdate = { };
+	onUpdate_ = { };
 }
 
 void Timer::ClearOnComplete()
 {
-	OnComplete = { };
+	onComplete_ = { };
 }
 
 void Timer::SetTimerEnd(float duration)
 {
-	LifeTime = duration;
-	TimeElapsed = 0.f;
+	lifeTime_ = duration;
+	timeElapsed_ = 0.f;
 }

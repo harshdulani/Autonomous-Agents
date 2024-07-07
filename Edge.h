@@ -15,6 +15,6 @@ public:
 	void SetDestNode(std::weak_ptr<Node> node);
 
 private:
-	std::weak_ptr<Node> srcNode;
-	std::weak_ptr<Node> destNode;
+	std::weak_ptr<Node> srcNode_;
+	std::weak_ptr<Node> destNode_;
 };

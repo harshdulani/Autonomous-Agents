@@ -25,7 +25,7 @@ private:
 	void CleanUpOldBots();
 	void StartGlobalAttacking();
 	
-	TimerManager* GetTimerMgr() { return timerMgr_; }
+	TimerManager* GetTimerMgr() const { return timerMgr_; }
 	TimerManager* timerMgr_ = nullptr;
 
 	float shootInterval_ = 2.f;

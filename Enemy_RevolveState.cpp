@@ -6,7 +6,7 @@
 
 void Enemy_RevolveState::UpdateState(const float deltaTime)
 {
-	auto ownerShip = owner.lock();
+	auto ownerShip = owner_.lock();
 	if (!ownerShip || ownerShip->GetTarget().expired())
 	{
 		return;
@@ -34,7 +34,7 @@ void Enemy_RevolveState::UpdateState(const float deltaTime)
 
 void Enemy_RevolveState::InitialiseState(const float minDistance, const float pathRadius, const float deltaAngle)
 {
-	owner = std::dynamic_pointer_cast<EnemyShip>(entity.lock());
+	owner_ = std::dynamic_pointer_cast<EnemyShip>(entity_.lock());
 	minDist_ = minDistance;
 	pathRadius_ = pathRadius;
 	deltaAngle_ = deltaAngle;

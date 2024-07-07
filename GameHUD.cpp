@@ -3,8 +3,8 @@
 
 GameHUD::~GameHUD()
 {
-	System::GetInstance()->GetGame().Event_ScoreUpdate.Unsubscribe(eventHandle_ScoreUpdate);
-	System::GetInstance()->GetGame().Event_LivesUpdate.Unsubscribe(eventHandle_LivesUpdate);
+	System::GetInstance()->GetGame().Event_ScoreUpdate.Unsubscribe(eventHandle_ScoreUpdate_);
+	System::GetInstance()->GetGame().Event_LivesUpdate.Unsubscribe(eventHandle_LivesUpdate_);
 }
 
 void GameHUD::InitGameHUD()
@@ -44,7 +44,7 @@ void GameHUD::OnScoreUpdate(int newScore)
 	{
 		scoreText->setString("Score: " + std::to_string(newScore));
 		// todo: don't hard code!
-		if (score <= 99 && newScore > 99)
+		if (score_ <= 99 && newScore > 99)
 		{
 			RefreshTextBounds_Score(scoreText);
 		}

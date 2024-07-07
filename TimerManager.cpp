@@ -6,17 +6,17 @@ TimerManager::TimerManager() = default;
 
 TimerManager::~TimerManager()
 {
-	TimerList.clear();
+	timerList_.clear();
 }
 
-uint32_t TimerManager::LastTimerHandle = 1;
+uint32_t TimerManager::lastTimerHandle_ = 1;
 
 void TimerManager::Kill(uint32_t TimerHandle)
 {
 	if (auto timer = FindTimer(TimerHandle))
 	{
 		timer->Kill();
-		TimerList.remove(*timer);
+		timerList_.remove(*timer);
 	}
 }
 
@@ -146,9 +146,9 @@ float TimerManager::GetValueDone(uint32_t TimerHandle)
 
 Timer* TimerManager::FindTimer(uint32_t TimerHandle)
 {
-	for (auto& timer : TimerList)
+	for (auto& timer : timerList_)
 	{
-		if (timer.Handle == TimerHandle)
+		if (timer.handle_ == TimerHandle)
 			return &timer;
 	}
 	return nullptr;
@@ -157,22 +157,22 @@ Timer* TimerManager::FindTimer(uint32_t TimerHandle)
 uint32_t TimerManager::GetNewTimer()
 {
 	Timer newTimer;
-	newTimer.Handle = LastTimerHandle;
+	newTimer.handle_ = lastTimerHandle_;
 
-	TimerList.push_back(newTimer);
+	timerList_.push_back(newTimer);
 
-	return LastTimerHandle++;
+	return lastTimerHandle_++;
 }
 
 void TimerManager::UpdateTimers(const float DeltaTime)
 {
-	if (TimerList.empty())
+	if (timerList_.empty())
 	{
 		return;
 	}
 
 	//reverse for
-	for (auto it = TimerList.rbegin(); it != TimerList.rend(); ++it)
+	for (auto it = timerList_.rbegin(); it != timerList_.rend(); ++it)
 	{
 		(it)->UpdateTimer(DeltaTime);
 	}

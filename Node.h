@@ -18,5 +18,5 @@ public:
 	const std::vector<std::weak_ptr<Edge>>& GetEdges() const;
 
 private:
-	std::vector<std::weak_ptr<Edge>> edges;
+	std::vector<std::weak_ptr<Edge>> edges_;
 };

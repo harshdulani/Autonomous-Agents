@@ -78,15 +78,15 @@ private:
 	std::multiset<std::weak_ptr<GameEntity>, UpdatePriorityComparator> UpdateEntities;
 	std::multiset<std::weak_ptr<GameEntity>, RenderPriorityComparator> RenderEntities;
 		
-	int MaxObjects = 10000;
+	int maxObjects_ = 10000;
 	
-	float WindowWidth = 0;
-	float WindowHeight = 0;
+	float windowWidth_ = 0;
+	float windowHeight_ = 0;
 
-	bool bResolveRenderDirty = false;
-	bool bResolveUpdateDirty = false;
+	bool bResolveRenderDirty_ = false;
+	bool bResolveUpdateDirty_ = false;
 	
-	uint32_t eventHandle_levelEnd_ = 0;
+	uint32_t eventHandle_LevelEnd_ = 0;
 };
 
 template<typename T> std::weak_ptr<T> ObjectManager::CreateObject()

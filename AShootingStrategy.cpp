@@ -65,8 +65,8 @@ bool TripleShootingStrategy::TryShoot(SceneComponent& Muzzle, bool bPlayer)
 }
 
 SineShootingStrategy::SineShootingStrategy() :
-	WaveAmplitude(0.f),
-	WaveFrequency(0.f)
+	waveAmplitude_(0.f),
+	waveFrequency_(0.f)
 {
 }
 
@@ -80,14 +80,14 @@ bool SineShootingStrategy::TryShoot(SceneComponent& Muzzle, bool bPlayer)
 	bool success = true;
 	if (auto b = SpawnBullet(position + perpendicular * 7.5f).lock())
 	{
-		b->InitialiseSineWaveBullet(direction, perpendicular, -WaveAmplitude, WaveFrequency);
+		b->InitialiseSineWaveBullet(direction, perpendicular, -waveAmplitude_, waveFrequency_);
 		b->CreateCollider(3.0f);
 		b->SetIsPlayerOwned(bPlayer);
 	}
 	else { success = false; }
 	if (auto b = SpawnBullet(position - perpendicular * 7.5f).lock())
 	{
-		b->InitialiseSineWaveBullet(direction, perpendicular, WaveAmplitude, WaveFrequency);
+		b->InitialiseSineWaveBullet(direction, perpendicular, waveAmplitude_, waveFrequency_);
 		b->CreateCollider(3.0f);
 		b->SetIsPlayerOwned(bPlayer);
 	}
@@ -97,6 +97,6 @@ bool SineShootingStrategy::TryShoot(SceneComponent& Muzzle, bool bPlayer)
 
 void SineShootingStrategy::SetSineWaveProperties(float Amplitude, float Frequency)
 {
-	WaveAmplitude = Amplitude;
-	WaveFrequency = Frequency;
+	waveAmplitude_ = Amplitude;
+	waveFrequency_ = Frequency;
 }

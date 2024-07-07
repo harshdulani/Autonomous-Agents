@@ -33,8 +33,8 @@ private:
 	void SetControlInput();
 
 private:
-	float AccelerationControl = 0.f;
-	float RotationControl = 0.f;
+	float accelerationControl_ = 0.f;
+	float rotationControl_ = 0.f;
 
-	float NosMultiplier = 2.f;
+	float nosMultiplier_ = 2.f;
 };

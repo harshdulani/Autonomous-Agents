@@ -5,7 +5,7 @@
 
 void FSM::SetEntity(std::weak_ptr<GameEntity> owningEntity)
 {
-	entity = std::move(owningEntity);
+	entity_ = std::move(owningEntity);
 }
 
 int FSM::GetHandle() const { return myHandle_; }

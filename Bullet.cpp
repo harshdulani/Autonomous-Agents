@@ -7,19 +7,19 @@
 
 Bullet::Bullet()
 {
-	TimerManager = System::GetInstance()->GetTimerManager();
-	LifeTimerHandle = TimerManager->GetNewTimer();
+	timerManager_ = System::GetInstance()->GetTimerManager();
+	lifeTimerHandle_ = timerManager_->GetNewTimer();
 }
 
 Bullet::~Bullet()
 {
-	TimerManager->Kill(LifeTimerHandle);
-	TimerManager = nullptr;
+	timerManager_->Kill(lifeTimerHandle_);
+	timerManager_ = nullptr;
 }
 
 void Bullet::InitialiseStraightBullet(sf::Vector2f Direction, bool bSingleShot)
 {
-	BulletFiringMode = bSingleShot ? BulletFiringMode::Standard : BulletFiringMode::Triple;
+	bulletFiringMode_ = bSingleShot ? BulletFiringMode::Standard : BulletFiringMode::Triple;
 	const float BULLET_SPEED = 200.0f;
 
 	auto PhysicsComp = AddComponent<PhysicsComponent>();
@@ -29,9 +29,9 @@ void Bullet::InitialiseStraightBullet(sf::Vector2f Direction, bool bSingleShot)
 		Physics->SetVelocity(Direction * BULLET_SPEED);
 	}
 
-	SetRotation(atan2f(Velocity.y, Velocity.x));
+	SetRotation(atan2f(velocity_.y, velocity_.x));
 
-	if (BulletFiringMode == BulletFiringMode::Standard)
+	if (bulletFiringMode_ == BulletFiringMode::Standard)
 	{
 		auto Square = InitSquareShape(5.f);
 		Square.lock()->setFillColor(sf::Color(240, 200, 10)); // yellow
@@ -43,15 +43,15 @@ void Bullet::InitialiseStraightBullet(sf::Vector2f Direction, bool bSingleShot)
 	}
 
 	//Lifetime
-	TimerManager->SetTimerEnd(LifeTimerHandle,
-							  BulletFiringMode == BulletFiringMode::Standard ? 1.0f : 0.65f);
+	timerManager_->SetTimerEnd(lifeTimerHandle_,
+							  bulletFiringMode_ == BulletFiringMode::Standard ? 1.0f : 0.65f);
 	// mark bullet to be killed after duration
-	TimerManager->SetOnComplete(LifeTimerHandle, [&]() { Kill(); });
+	timerManager_->SetOnComplete(lifeTimerHandle_, [&]() { Kill(); });
 }
 
 void Bullet::InitialiseSineWaveBullet(sf::Vector2f Direction, sf::Vector2f Perpend, float WaveAmpl, float WaveFreq)
 {
-	BulletFiringMode = BulletFiringMode::Sine;
+	bulletFiringMode_ = BulletFiringMode::Sine;
 	const float BULLET_SPEED = 400.0f;
 	
 	auto PhysicsComp = AddComponent<PhysicsComponent>();
@@ -61,27 +61,27 @@ void Bullet::InitialiseSineWaveBullet(sf::Vector2f Direction, sf::Vector2f Perpe
 		Physics->SetVelocity(Direction * BULLET_SPEED);
 	}
 
-	SetRotation(atan2f(Velocity.y, Velocity.x));
-	WaveAmplitude = WaveAmpl;
-	WaveFrequency = WaveFreq;
-	Perpendicular = Math::Normalize(Perpend);
+	SetRotation(atan2f(velocity_.y, velocity_.x));
+	waveAmplitude_ = WaveAmpl;
+	waveFrequency_ = WaveFreq;
+	perpendicular_ = Math::Normalize(Perpend);
 
 	//light pink
 	auto Circle = InitialiseCircleShape(3.f);
 	Circle.lock()->setFillColor(sf::Color(111, 255, 220));
 
-	TimerManager->SetTimerEnd(LifeTimerHandle, 0.925f);
+	timerManager_->SetTimerEnd(lifeTimerHandle_, 0.925f);
 	// mark bullet to be killed after duration
-	TimerManager->SetOnComplete(LifeTimerHandle, [&]() { Kill(); });
+	timerManager_->SetOnComplete(lifeTimerHandle_, [&]() { Kill(); });
 }
 
 void Bullet::Update(const float DeltaTime)
 {
-	if (BulletFiringMode == BulletFiringMode::Sine)
+	if (bulletFiringMode_ == BulletFiringMode::Sine)
 	{
 		//add Sine wave motion on bullet's right axis, along with forward
 		auto Position = GetPosition();
-		Position += Perpendicular * cosf(TimerManager->GetTimeSinceSpawn(LifeTimerHandle) * WaveFrequency) * WaveAmplitude * DeltaTime;
+		Position += perpendicular_ * cosf(timerManager_->GetTimeSinceSpawn(lifeTimerHandle_) * waveFrequency_) * waveAmplitude_ * DeltaTime;
 		SetPosition(Position);
 	}
 }

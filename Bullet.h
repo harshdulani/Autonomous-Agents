@@ -26,31 +26,33 @@ public:
 
 	void OnCollision(std::weak_ptr<GameEntity> other) override;
 
-	bool GetIsPlayerOwned() const { return bPlayerOwned; }
-	void SetIsPlayerOwned(bool val) { bPlayerOwned = val; }
+	bool GetIsPlayerOwned() const { return bPlayerOwned_; }
+	void SetIsPlayerOwned(bool val) { bPlayerOwned_ = val; }
 
 private:
-	sf::Vector2f Velocity;
+	// appearance
+	std::weak_ptr<sf::RectangleShape> InitSquareShape(float Size);
+	std::weak_ptr<MultiTriShape> InitialiseSpikeShape(sf::Color RenderColor);
+	std::weak_ptr<sf::CircleShape> InitialiseCircleShape(float Radius);
+
+public:
+private:
+	sf::Vector2f velocity_;
 
 	enum class BulletFiringMode
 	{
 		Standard, Triple, Sine
 	};
-	BulletFiringMode BulletFiringMode = BulletFiringMode::Standard;
-	sf::Vector2f Perpendicular;
+	BulletFiringMode bulletFiringMode_ = BulletFiringMode::Standard;
+	sf::Vector2f perpendicular_;
 
-	bool bPlayerOwned = true;
+	bool bPlayerOwned_ = true;
 
 	//lifetime
-	TimerManager* TimerManager;
-	uint32_t LifeTimerHandle = 0;
+	TimerManager* timerManager_;
+	uint32_t lifeTimerHandle_ = 0;
 
 	//sine wave attack
-	float WaveAmplitude = 0.f;
-	float WaveFrequency = 0.f;
-
-	// appearance
-	std::weak_ptr<sf::RectangleShape> InitSquareShape(float Size);
-	std::weak_ptr<MultiTriShape> InitialiseSpikeShape(sf::Color RenderColor);
-	std::weak_ptr<sf::CircleShape> InitialiseCircleShape(float Radius);
+	float waveAmplitude_ = 0.f;
+	float waveFrequency_ = 0.f;
 };

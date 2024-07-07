@@ -30,7 +30,10 @@ ParticleSystemManager::~ParticleSystemManager()
 std::weak_ptr<ParticleSystem> ParticleSystemManager::CreateNewParticleSystem(GameEntity* owningEntity)
 {
 	auto pSys = owningEntity->AddComponent<ParticleSystem>();
-	
+	if (auto strongPSys = pSys.lock())
+	{
+		strongPSys->SetDenyUpdate(true);
+	}
 	activeSystems_.push_back(pSys);
 	return pSys;
 }

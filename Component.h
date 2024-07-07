@@ -20,6 +20,6 @@ protected:
 	Component() = default;
 	
 private:
-	std::weak_ptr<GameEntity> OwningEntity;
-	bool bEnabled = true;
+	std::weak_ptr<GameEntity> owningEntity_;
+	bool bEnabled_ = true;
 };

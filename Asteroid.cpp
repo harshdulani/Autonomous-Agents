@@ -6,6 +6,7 @@
 #include "PlayerShip.h"
 #include "Bullet.h"
 #include "Collider.h"
+#include "ScreenShaker.h"
 #include "ParticleSystem/ParticleSystem.h"
 #include "ParticleSystem/ParticleSystemManager.h"
 
@@ -93,7 +94,7 @@ void Asteroid::AsteroidHit()
 
 void Asteroid::SpawnExplosion(int oldSize)
 {
-	//System::GetInstance()->GetScreenShaker()->CreateImpulse(0.25f, oldSize * 1.0f, 100.0f);
+	System::GetInstance()->GetScreenShaker()->CreateImpulse(0.25f, oldSize * 1.0f, 100.0f);
 
 	auto particleSys = System::GetInstance()->GetParticleSystemManager()->CreateNewParticleSystem(this);
 	std::shared_ptr<ParticleSystem> p = particleSys.lock();

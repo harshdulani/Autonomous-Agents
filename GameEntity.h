@@ -36,7 +36,7 @@ protected:
 	GameEntity() = default;
 
 private:
-	bool bActive = true;
+	bool bActive_ = true;
 // End core
 
 // Components & Drawables
@@ -75,10 +75,10 @@ public:
 private:
 	template<typename T>	void DestroyComponentsOfTypeInternal_(bool onlyOne);
 	
-	std::vector<std::weak_ptr<Component>> Components;
-	std::vector<std::shared_ptr<sf::Drawable>> Drawables;
+	std::vector<std::weak_ptr<Component>> components_;
+	std::vector<std::shared_ptr<sf::Drawable>> drawables_;
 
-	bool bHasColliders = false;
+	bool bHasColliders_ = false;
 // End Components & Drawables
 
 // Render and Update Priority
@@ -96,10 +96,10 @@ private:
 	bool IsUpdateDirty() const;
 	void SetUpdateDirty(bool Cond);
 
-	int UpdatePriority = 0;
-	int RenderPriority = 0;
-	bool bRenderDirty = false;
-	bool bUpdateDirty = false;
+	int updatePriority_ = 0;
+	int renderPriority_ = 0;
+	bool bRenderDirty_ = false;
+	bool bUpdateDirty_ = false;
 
 // End Render and Update Priority
 
@@ -127,8 +127,8 @@ private:
 	bool GetAndClearDirtyAngle();
 
 private:
-	bool bPositionDirty = true;
-	bool bRotationDirty = true;
+	bool bPositionDirty_ = true;
+	bool bRotationDirty_ = true;
 // End Transform Wrapper
 };
 
@@ -138,7 +138,7 @@ std::weak_ptr<T> GameEntity::AddComponent()
 {
 	std::weak_ptr<T> WeakCmp = System::GetInstance()->GetObjectMgr()->CreateComponent<T>(this);
 
-	Components.push_back(WeakCmp);
+	components_.push_back(WeakCmp);
 	return WeakCmp;
 }
 
@@ -146,7 +146,7 @@ template<typename T> std::weak_ptr<T> GameEntity::GetComponentOfType()
 {
 	static_assert((std::is_base_of<Component, T>::value && "Type is not a component type"));
 
-	for (auto& Component : Components)
+	for (auto& Component : components_)
 	{
 		if (auto shared = Component.lock())
 		{
@@ -164,7 +164,7 @@ void GameEntity::GetComponentsOfType(std::vector<std::weak_ptr<T>>& outResult)
 {
 	static_assert((std::is_base_of<Component, T>::value && "Type is not a component type"));
 
-	for (auto& comp : Components)
+	for (auto& comp : components_)
 	{
 		if (auto shared = comp.lock())
 		{
@@ -187,7 +187,7 @@ inline void GameEntity::DestroyAllComponentsOfType()
 {
 	if (std::is_same<T, Collider>::value)
 	{
-		bHasColliders = false;
+		bHasColliders_ = false;
 	}
 	DestroyComponentsOfTypeInternal_<T>(false);
 }
@@ -198,18 +198,18 @@ inline void GameEntity::DestroyComponentsOfTypeInternal_(const bool onlyOne)
 	static_assert((std::is_base_of<Component, T>::value && "Type mismatch while destroying object"));
 
 	int i = 0;
-	for (auto& comp : Components)
+	for (auto& comp : components_)
 	{
 		auto component = comp.lock();
 		if (std::dynamic_pointer_cast<T>(component))
 		{
 			System::GetInstance()->GetObjectMgr()->DestroyObject(component.get());
-			Components.erase(Components.begin() + i);
+			components_.erase(components_.begin() + i);
 			if (onlyOne)
 			{
-				if (static_cast<int>(Components.size()) == 1 && std::is_same<T, Collider>::value)
+				if (static_cast<int>(components_.size()) == 1 && std::is_same<T, Collider>::value)
 				{
-					bHasColliders = false;
+					bHasColliders_ = false;
 				}
 				return;
 			}
@@ -222,7 +222,7 @@ template<typename T, typename ... Types> std::weak_ptr<T> GameEntity::CreateDraw
 {
 	static_assert((std::is_base_of<sf::Drawable, T>::value && "Type is not a drawable type"));
 	std::shared_ptr<T> Drawable = std::make_shared<T>(args...);
-	Drawables.push_back(Drawable);
+	drawables_.push_back(Drawable);
 	return Drawable;
 }
 
@@ -231,7 +231,7 @@ std::weak_ptr<T> GameEntity::GetDrawableOfType()
 {
 	static_assert((std::is_base_of<sf::Drawable, T>::value && "Type is not a drawable type"));
 
-	for (auto& Drawable : Drawables)
+	for (auto& Drawable : drawables_)
 	{
 		//if (auto shared = Component)
 		{

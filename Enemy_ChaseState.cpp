@@ -8,7 +8,7 @@
 
 void Enemy_ChaseState::UpdateState(const float deltaTime)
 {
-	auto ownerShip = owner.lock();
+	auto ownerShip = owner_.lock();
 	if (!ownerShip || ownerShip->GetTarget().expired())
 	{
 		return;
@@ -32,6 +32,6 @@ void Enemy_ChaseState::UpdateState(const float deltaTime)
 
 void Enemy_ChaseState::InitialiseState(const float minDistance)
 {
-	owner = std::dynamic_pointer_cast<EnemyShip>(entity.lock());
+	owner_ = std::dynamic_pointer_cast<EnemyShip>(entity_.lock());
 	minDist_ = minDistance;
 }

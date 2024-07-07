@@ -3,37 +3,37 @@
 #include "GameEntity.h"
 #include "Math.h"
 
-sf::Vector2f PhysicsComponent::GetVelocity() const { return Velocity; }
+sf::Vector2f PhysicsComponent::GetVelocity() const { return velocity_; }
 
-sf::Vector2f PhysicsComponent::GetAcceleration() const { return Acceleration; }
+sf::Vector2f PhysicsComponent::GetAcceleration() const { return acceleration_; }
 
-float PhysicsComponent::GetAngularVelocity() const { return AngularVelocity; }
+float PhysicsComponent::GetAngularVelocity() const { return angularVelocity_; }
 
 void PhysicsComponent::AddForce(const sf::Vector2f& Force)
 {
-	Acceleration += Force;
+	acceleration_ += Force;
 }
 
 void PhysicsComponent::SetVelocity(const sf::Vector2f& InVel)
 {
-	Velocity = InVel;
+	velocity_ = InVel;
 }
 
 void PhysicsComponent::SetVelocity(float X, float Y)
 {
-	Velocity.x = X;
-	Velocity.y = Y;
+	velocity_.x = X;
+	velocity_.y = Y;
 }
 
 void PhysicsComponent::SetAngularVelocity(float InVel)
 {
-	AngularVelocity = InVel;
+	angularVelocity_ = InVel;
 }
 
 void PhysicsComponent::Update(float DeltaTime)
 {
-	Acceleration += Velocity;
-	Acceleration *= 0.f;
+	acceleration_ += velocity_;
+	acceleration_ *= 0.f;
 	
 	auto Entity = GetOwningEntity().lock();
 	if (!Entity)
@@ -41,8 +41,8 @@ void PhysicsComponent::Update(float DeltaTime)
 	if (Entity->IsPendingKill())
 		return;
 
-	if(Math::GetVectorSqrMagnitude(Velocity) > 0)
-		Entity->SetPosition(Entity->GetPosition() + Velocity * DeltaTime);
-	if(AngularVelocity > 0 || AngularVelocity < 0)
-		Entity->SetRotation(Entity->GetRotation() + AngularVelocity * DeltaTime);
+	if(Math::GetVectorSqrMagnitude(velocity_) > 0)
+		Entity->SetPosition(Entity->GetPosition() + velocity_ * DeltaTime);
+	if(angularVelocity_ > 0 || angularVelocity_ < 0)
+		Entity->SetRotation(Entity->GetRotation() + angularVelocity_ * DeltaTime);
 }

@@ -17,5 +17,5 @@ private:
 	float pathRadius_ = 0.f;
 	float deltaAngle_ = 0.f;
 
-	std::weak_ptr<EnemyShip> owner;
+	std::weak_ptr<EnemyShip> owner_;
 };

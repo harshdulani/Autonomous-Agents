@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "StateNode.h"
+
 class TimerManager;
 
 class Base_WaitState : public StateNode
@@ -18,8 +19,8 @@ public:
 	virtual void OnTimerEnd() = 0;
 
 protected:
-	TimerManager* timerManager = nullptr;
+	TimerManager* timerManager_ = nullptr;
 
-	float waitDuration = -1.f;
-	uint32_t waitDurationTimerHandle = 0;
+	float waitDuration_ = -1.f;
+	uint32_t waitDurationTimerHandle_ = 0;
 };

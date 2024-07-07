@@ -20,8 +20,8 @@ private:
 	void RegenCircle();
 
 private:
-	sf::VertexArray Circle;
+	sf::VertexArray circle_;
 	
-	bool bVisualizeCollider = false;
-	float Radius = -1.f;
+	bool bVisualizeCollider_ = false;
+	float radius_ = -1.f;
 };

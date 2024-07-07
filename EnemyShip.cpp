@@ -8,7 +8,7 @@
 #include <cassert>
 #include <utility>
 #include "ShootingComponent.h"
-//#include "ScreenShaker.h"
+#include "ScreenShaker.h"
 #include "GroupAttackingPolicy.h"
 #include "System.h"
 #include "ParticleSystem/ParticleSystemManager.h"
@@ -24,7 +24,7 @@
 
 EnemyShip::EnemyShip()
 {
-	fsmMgr = System::GetInstance()->GetFSMManager();
+	fsmMgr_ = System::GetInstance()->GetFSMManager();
 	groupAttack_ = System::GetInstance()->GetGame().GetGroupAttackingPolicy();
 
 	lowHealthColor_ = {255, 69, 69, 55};
@@ -221,8 +221,8 @@ void EnemyShip::InitialiseChaseFSM(const float minDistance,
 void EnemyShip::InitialiseAutoShootFSM()
 {
 	// Shooting Component
-	shootingComponent = AddComponent<ShootingComponent>();
-	if (auto shooter = shootingComponent.lock())
+	shootingComponent_ = AddComponent<ShootingComponent>();
+	if (auto shooter = shootingComponent_.lock())
 	{
 		//shooter->setLocalPosition({0.f, -15.f});
 		shooter->SetIsPlayer(false);
@@ -234,7 +234,7 @@ void EnemyShip::InitialiseAutoShootFSM()
 	auto strongFsm = autoShootFSM.lock();
 	assert(strongFsm != nullptr && "Invalid FSM");
 
-	fsmHandle_autoShootFSM_ = strongFsm->GetHandle();
+	fsmHandle_AutoShootFsm_ = strongFsm->GetHandle();
 
 	//fsm construction
 	//parameters
@@ -345,28 +345,28 @@ void EnemyShip::BulletHit()
 	if (LoseALife())
 	{
 		// if ship survives collision/ losing a life
-		bCollisionCooldown = true;
-		GetTimerManager()->ResetTimer(CollisionTimerHandle);
+		bCollisionCooldown_ = true;
+		GetTimerManager()->ResetTimer(collisionTimerHandle_);
 		SetAllCollidersStatus(false);
 		UpdateHealthIndicator();
 
-		//System::GetInstance()->GetScreenShaker()->CreateImpulse(0.35f, 5.0f, 25.0f);
+		System::GetInstance()->GetScreenShaker()->CreateImpulse(0.35f, 5.0f, 25.0f);
 		return;
 	}
 
 	// if ship doesn't have any lives remaining
-	//System::GetInstance()->GetScreenShaker()->CreateImpulse(0.5f, 5.0f, 25.0f);
+	System::GetInstance()->GetScreenShaker()->CreateImpulse(0.5f, 5.0f, 25.0f);
 	Kill();
 }
 
 std::weak_ptr<FSM> EnemyShip::GetAutoShootFSM() const
 {
-	return fsmMgr->GetFSM(fsmHandle_autoShootFSM_);
+	return fsmMgr_->GetFSM(fsmHandle_AutoShootFsm_);
 }
 
 std::weak_ptr<FSM> EnemyShip::GetChaseFSM() const
 {
-	return fsmMgr->GetFSM(fsmHandle_chaseFSM);
+	return fsmMgr_->GetFSM(fsmHandle_ChaseFsm_);
 }
 
 void EnemyShip::AttackComplete()

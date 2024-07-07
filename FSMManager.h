@@ -25,7 +25,7 @@ private:
 	
 	static uint32_t lastFSMHandle_;
 
-	uint32_t eventHandle_levelEnd_ = 0;
+	uint32_t eventHandle_LevelEnd_ = 0;
 
 	std::vector<std::weak_ptr<FSM>> fsmList_;
 };

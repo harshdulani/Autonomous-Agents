@@ -31,6 +31,8 @@ public:
 	sf::Vector2f GetForwardVector() const;
 	sf::Vector2f GetRightVector() const;
 
+	bool GetDenyUpdate() const;
+	void SetDenyUpdate(bool bStatus);
 protected:
 	SceneComponent() = default;
 
@@ -39,4 +41,6 @@ private:
 
 	// absolute transform
 	sf::Vector2f AbsolutePosition;
+
+	bool bDenyUpdate_ = false;
 };

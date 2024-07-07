@@ -11,7 +11,7 @@ void GameEntity::Update(float DeltaTime)
 
 void GameEntity::Render(sf::RenderWindow& Window) const
 {
-	if(Components.empty())
+	if(components_.empty())
 		return;
 	
 	sf::VertexArray lines;
@@ -19,7 +19,7 @@ void GameEntity::Render(sf::RenderWindow& Window) const
 	auto myPos = GetPosition();
 	auto Col = sf::Color(255, 255, 255, 55);
 	auto myVert = sf::Vertex(myPos, Col);
-	for (const auto& weakCmp : Components)
+	for (const auto& weakCmp : components_)
 	{
 		if (auto cmp = weakCmp.lock())
 		{
@@ -49,7 +49,7 @@ void GameEntity::Kill()
 	Object::Kill();
 
 	// mark all components as kill
-	for (const auto& WeakComp : Components)
+	for (const auto& WeakComp : components_)
 	{
 		if (const auto Comp = WeakComp.lock())
 			Comp->Kill();
@@ -58,12 +58,12 @@ void GameEntity::Kill()
 
 void GameEntity::SetActive(bool bStatus)
 {
-	bActive = bStatus;
+	bActive_ = bStatus;
 }
 
-bool GameEntity::GetActive() const { return bActive; }
+bool GameEntity::GetActive() const { return bActive_; }
 
-bool GameEntity::HasColliders() const { return bHasColliders; }
+bool GameEntity::HasColliders() const { return bHasColliders_; }
 
 // End Core
 
@@ -72,22 +72,22 @@ void GameEntity::CreateCollider(float Radius)
 {
 	auto WeakCollider = AddComponent<Collider>();
 	WeakCollider.lock()->SetRadius(Radius);
-	bHasColliders = true;
+	bHasColliders_ = true;
 }
 
 std::vector<std::weak_ptr<Component>>* GameEntity::GetComponentList()
 {
-	return &Components;
+	return &components_;
 }
 
 void GameEntity::DestroyAllDrawables()
 {
 	int i = 0;
-	for (auto& Drawable : Drawables)
+	for (auto& Drawable : drawables_)
 	{
 		if (Drawable.get())
 		{
-			Drawables.erase(Drawables.begin() + i);
+			drawables_.erase(drawables_.begin() + i);
 		}
 		i++;
 	}
@@ -100,11 +100,11 @@ void GameEntity::DestroyDrawable(const std::weak_ptr<sf::Drawable>& Drawable)
 	if (!SharedDrawable)
 		return;
 
-	for (auto& DrawableItem : Drawables)
+	for (auto& DrawableItem : drawables_)
 	{
 		if (DrawableItem == SharedDrawable)
 		{
-			Drawables.erase(Drawables.begin() + i);
+			drawables_.erase(drawables_.begin() + i);
 			return;
 		}
 		i++;
@@ -121,30 +121,30 @@ std::weak_ptr<GameEntity> GameEntity::GetWeakSelf()
 // Render and Update Priority
 void GameEntity::SetRenderPriority(int p)
 {
-	RenderPriority = p;
+	renderPriority_ = p;
 }
 
-int GameEntity::GetRenderPriority() const { return RenderPriority; }
+int GameEntity::GetRenderPriority() const { return renderPriority_; }
 
 void GameEntity::SetUpdatePriority(int p)
 {
-	UpdatePriority = p;
+	updatePriority_ = p;
 }
 
-int GameEntity::GetUpdatePriority() const { return UpdatePriority; }
+int GameEntity::GetUpdatePriority() const { return updatePriority_; }
 
-bool GameEntity::IsRenderDirty() const { return bRenderDirty; }
+bool GameEntity::IsRenderDirty() const { return bRenderDirty_; }
 
 void GameEntity::SetRenderDirty(bool Cond)
 {
-	bRenderDirty = Cond;
+	bRenderDirty_ = Cond;
 }
 
-bool GameEntity::IsUpdateDirty() const { return bUpdateDirty; }
+bool GameEntity::IsUpdateDirty() const { return bUpdateDirty_; }
 
 void GameEntity::SetUpdateDirty(bool Cond)
 {
-	bUpdateDirty = Cond;
+	bUpdateDirty_ = Cond;
 }
 // End Render and Update Priority
 
@@ -168,13 +168,13 @@ sf::Vector2f GameEntity::GetScale() const { return getScale(); }
 void GameEntity::SetPosition(const sf::Vector2f& NewPos)
 {
 	setPosition(NewPos);
-	bPositionDirty = true;
+	bPositionDirty_ = true;
 }
 
 void GameEntity::SetRotation(float NewAngle)
 {
 	setRotation(NewAngle);
-	bRotationDirty = true;
+	bRotationDirty_ = true;
 }
 
 void GameEntity::SetScale(const sf::Vector2f& NewScale)
@@ -189,19 +189,19 @@ void GameEntity::SetScale(float NewScale)
 
 bool GameEntity::GetAndClearDirtyPosition()
 {
-	if (!bPositionDirty)
+	if (!bPositionDirty_)
 		return false;
 
-	bPositionDirty = false;
+	bPositionDirty_ = false;
 	return true;
 }
 
 bool GameEntity::GetAndClearDirtyAngle()
 {
-	if (!bRotationDirty)
+	if (!bRotationDirty_)
 		return false;
 
-	bRotationDirty = false;
+	bRotationDirty_ = false;
 	return true;
 }
 

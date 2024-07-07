@@ -7,10 +7,10 @@ bool APoolable::operator==(const APoolable& rhs)
 
 bool APoolable::GetIsInUse() const
 {
-	return isInUse;
+	return bInUse_;
 }
 
 void APoolable::SetIsInUse(bool status)
 {
-	isInUse = status;
+	bInUse_ = status;
 }

@@ -44,6 +44,6 @@ public:
 	float GetCooldownTime() const override { return 0.25f; }
 
 private:
-	float WaveAmplitude;
-	float WaveFrequency;
+	float waveAmplitude_;
+	float waveFrequency_;
 };

@@ -2,30 +2,34 @@
 #include "FSMManager.h"
 #include "Game.h"
 #include "ObjectManager.h"
+#include "ScreenShaker.h"
 #include "TimerManager.h"
 #include "ParticleSystem/ParticleSystemManager.h"
 
 // initializing static variables
-System* System::Singleton = nullptr;
+System* System::singleton_ = nullptr;
 
 System::System()
 {
 	Initialize();
 }
 
-System* System::GetInstance() { return Singleton; }
+System* System::GetInstance() { return singleton_; }
 
 void System::Initialize()
 {
-	if (!Singleton)
+	if (!singleton_)
 	{
-		Singleton = this;
+		singleton_ = this;
 	}
 
-	VideoMode.height = static_cast<unsigned int>(WindowHeight);
-	VideoMode.width = static_cast<unsigned int>(WindowWidth);
-	window_.create(VideoMode, "Asteroids SFML", sf::Style::Titlebar | sf::Style::Close);
-	window_.setFramerateLimit(60);
+	videoMode_.height = static_cast<unsigned int>(windowHeight_);
+	videoMode_.width = static_cast<unsigned int>(windowWidth_);
+	window_.create(videoMode_, "Asteroids SFML", sf::Style::Titlebar | sf::Style::Close);
+	//window_.setFramerateLimit(60);
+	// create a view with its center and size
+	camera_ = std::make_shared<sf::View>(sf::Vector2f(windowWidth_ * 0.5f, windowHeight_ * 0.5f),
+										 sf::Vector2f(windowWidth_, windowHeight_));
 
 	objectMgr_ = std::make_shared<ObjectManager>();
 	objectMgr_->SetWindowVals(GetWindowWidth(), GetWindowHeight());
@@ -33,10 +37,12 @@ void System::Initialize()
 	fsmMgr_ = std::make_shared<FSMManager>();
 	particleSysMgr_ = std::make_shared<ParticleSystemManager>();
 
-	gameInst_.InitLevel(currentLevel);
+	gameInst_.InitLevel(currentLevel_);
+	screenShaker_ = std::make_shared<ScreenShaker>();
+	screenShaker_->SetViewCam(camera_);
 	Event_LevelStart.Invoke();
 
-	if (currentLevel == 1)
+	if (currentLevel_ == 1)
 		gameInst_.ResetScore();
 }
 
@@ -48,11 +54,11 @@ void System::PollWindowEvents()
 		switch (Event.type)
 		{
 			case sf::Event::Closed:
-				bPendingWindowClose = true;
+				bPendingWindowClose_ = true;
 				break;
 			case sf::Event::KeyPressed:
 				if (Event.key.code == sf::Keyboard::Escape)
-					bPendingWindowClose = true;
+					bPendingWindowClose_ = true;
 				break;
 			default: ;
 		}
@@ -67,12 +73,14 @@ void System::Update(float DeltaTime)
 	objectMgr_->UpdateAllObjects(DeltaTime);
 	fsmMgr_->UpdateFSMs(DeltaTime);
 	particleSysMgr_->UpdateAllParticleSystems(DeltaTime);
+	screenShaker_->UpdateScreenShakes(DeltaTime);
 }
 
 void System::Render()
 {
 	window_.clear();
 
+	window_.setView(*camera_);
 	objectMgr_->RenderAllObjects(window_);
 
 	window_.display();
@@ -81,11 +89,10 @@ void System::Render()
 void System::Terminate()
 {
 	objectMgr_.reset();
+	screenShaker_.reset();
 	timerMgr_.reset();
 	fsmMgr_.reset();
-	/*
 	particleSysMgr_.reset();
-	*/
 }
 
 void System::CloseWindow()
@@ -99,10 +106,12 @@ FSMManager* System::GetFSMManager() const { return fsmMgr_.get(); }
 
 ParticleSystemManager* System::GetParticleSystemManager() const { return particleSysMgr_.get(); }
 
+ScreenShaker* System::GetScreenShaker() const { return screenShaker_.get(); }
+
 Game& System::GetGame() { return gameInst_; }
 
 bool System::IsWindowOpen() const { return window_.isOpen(); }
-bool System::IsWindowClosePending() const { return bPendingWindowClose; }
+bool System::IsWindowClosePending() const { return bPendingWindowClose_; }
 
-float System::GetWindowWidth() const { return WindowWidth; }
-float System::GetWindowHeight() const { return WindowHeight; }
+float System::GetWindowWidth() const { return windowWidth_; }
+float System::GetWindowHeight() const { return windowHeight_; }

@@ -4,6 +4,7 @@
 #include "Event.h"
 #include "Game.h"
 
+class ScreenShaker;
 class ParticleSystemManager;
 class FSMManager;
 
@@ -40,9 +41,8 @@ public:
 	TimerManager* GetTimerManager() const;
 	FSMManager* GetFSMManager() const;
 	ParticleSystemManager* GetParticleSystemManager() const;
-	/*
 	ScreenShaker* GetScreenShaker() const;
-	*/
+	
 	bool IsWindowOpen() const;
 	bool IsWindowClosePending() const;
 	float GetWindowWidth() const;
@@ -50,21 +50,23 @@ public:
 	void CloseWindow();
 
 private:
-	static System* Singleton;
+	static System* singleton_;
 
 	sf::RenderWindow window_;
+	std::shared_ptr<sf::View> camera_;
 	Game gameInst_;
 	std::shared_ptr<ObjectManager> objectMgr_;
 	std::shared_ptr<TimerManager> timerMgr_;
 	std::shared_ptr<FSMManager> fsmMgr_;
 	std::shared_ptr<ParticleSystemManager> particleSysMgr_;
+	std::shared_ptr<ScreenShaker> screenShaker_;
 
-	bool bPendingWindowClose = false;
+	bool bPendingWindowClose_ = false;
 
 	// this is here bc we will be creating a fsm for the game states and they will change levels
-	int currentLevel = 1;
+	int currentLevel_ = 1;
 	
-	sf::VideoMode VideoMode;
-	float WindowWidth = 800.f;
-	float WindowHeight = 600.f;
+	sf::VideoMode videoMode_;
+	float windowWidth_ = 800.f;
+	float windowHeight_ = 600.f;
 };

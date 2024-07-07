@@ -9,48 +9,48 @@ void Collider::Update(float DeltaTime)
 void Collider::Render(sf::RenderWindow& Window, sf::RenderStates States)
 {
 	PrimitiveComponent::Render(Window, States);
-	if (!bVisualizeCollider)
+	if (!bVisualizeCollider_)
 		return;
 
 	States.transform = GetTransform().translate(GetWorldPosition());
-	Window.draw(Circle, States);
+	Window.draw(circle_, States);
 }
 
 bool Collider::IsValidCollider() const
 {
-	return IsEnabled() && !IsPendingKill() && Radius > 0.0f;
+	return IsEnabled() && !IsPendingKill() && radius_ > 0.0f;
 }
 
-float Collider::GetRadius() const { return Radius; }
+float Collider::GetRadius() const { return radius_; }
 void Collider::SetRadius(float r)
 {
 	bool bRegenCircle = false;
-	if (abs(Radius - r) > 0.1f)
+	if (abs(radius_ - r) > 0.1f)
 	{
 		bRegenCircle = true;
 	}
-	Radius = r;
+	radius_ = r;
 
 	if(bRegenCircle)
 		RegenCircle();
 }
 
-bool Collider::GetShowColliderVisible() const { return  bVisualizeCollider; }
+bool Collider::GetShowColliderVisible() const { return  bVisualizeCollider_; }
 
 void Collider::SetColliderVisible(bool bStatus)
 {
-	bVisualizeCollider = bStatus;
+	bVisualizeCollider_ = bStatus;
 }
 
 void Collider::RegenCircle()
 {
 	int VertCount = 36;
-	Circle = sf::VertexArray(sf::LineStrip, VertCount);
+	circle_ = sf::VertexArray(sf::LineStrip, VertCount);
 	sf::Color Color {0, 204, 153, 155};
 	for (int i = 0; i < 35; ++i)
 	{
 		float Xx = Math::TWO_PI * i / 36;
-		Circle[i] = sf::Vertex({cos(Xx) * Radius, sin(Xx) * Radius}, Color);
+		circle_[i] = sf::Vertex({cos(Xx) * radius_, sin(Xx) * radius_}, Color);
 	}
-	Circle[35] = Circle[0];
+	circle_[35] = circle_[0];
 }

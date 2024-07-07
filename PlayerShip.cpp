@@ -2,7 +2,7 @@
 #include "Math.h"
 #include "TimerManager.h"
 #include "Bullet.h"
-//#include "ScreenShaker.h"
+#include "ScreenShaker.h"
 #include "Asteroid.h"
 #include "Debug.h"
 #include "ShootingComponent.h"
@@ -12,8 +12,8 @@
 
 PlayerShip::~PlayerShip()
 {
-	GetTimerManager()->SetKillOnComplete(CollisionTimerHandle, true);
-	GetTimerManager()->ClearOnComplete(CollisionTimerHandle);
+	GetTimerManager()->SetKillOnComplete(collisionTimerHandle_, true);
+	GetTimerManager()->ClearOnComplete(collisionTimerHandle_);
 }
 
 void PlayerShip::Update(float DeltaTime)
@@ -110,46 +110,46 @@ void PlayerShip::OnCollision(std::weak_ptr<GameEntity> WeakOther)
 		if (LoseALife())
 		{
 			// if player survives collision/ losing a life
-			bCollisionCooldown = true;
-			GetTimerManager()->ResetTimer(CollisionTimerHandle);
+			bCollisionCooldown_ = true;
+			GetTimerManager()->ResetTimer(collisionTimerHandle_);
 			SetAllCollidersStatus(false);
 
-			System::GetInstance()->GetGame().Event_LivesUpdate.Invoke(LivesRemaining);
-			//System::GetInstance()->GetScreenShaker()->CreateImpulse(0.35f, 5.0f, 25.0f);
+			System::GetInstance()->GetGame().Event_LivesUpdate.Invoke(livesRemaining_);
+			System::GetInstance()->GetScreenShaker()->CreateImpulse(0.35f, 5.0f, 25.0f);
 			return;
 		}
 
 		// if player doesn't have any lives remaining
-		//System::GetInstance()->GetScreenShaker()->CreateImpulse(0.5f, 5.0f, 25.0f);
+		System::GetInstance()->GetScreenShaker()->CreateImpulse(0.5f, 5.0f, 25.0f);
 		Kill();
 	}
 }
 
 void PlayerShip::SetControlInput()
 {
-	AccelerationControl = 0.0f;
+	accelerationControl_ = 0.0f;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		AccelerationControl = 1.0f;
+		accelerationControl_ = 1.0f;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		AccelerationControl = -1.0f;
+		accelerationControl_ = -1.0f;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
 	{
-		AccelerationControl *= NosMultiplier;
+		accelerationControl_ *= nosMultiplier_;
 	}
 
-	RotationControl = 0.0f;
+	rotationControl_ = 0.0f;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		RotationControl = 1.0f;
+		rotationControl_ = 1.0f;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		RotationControl = -1.0f;
+		rotationControl_ = -1.0f;
 	}
 }
 
@@ -161,7 +161,7 @@ void PlayerShip::UpdateTransform(const float DeltaTime)
 
 	//Rotation
 	auto angle = Math::WrapModulo(GetRotation() + 
-								   RotationControl * RateOfRotation * DeltaTime,
+								   rotationControl_ * RateOfRotation * DeltaTime,
 								   360.f);
 	SetRotation(angle);
 
@@ -171,7 +171,7 @@ void PlayerShip::UpdateTransform(const float DeltaTime)
 	if (!Physics)
 		return;
 	//Movement
-	sf::Vector2f idealVelocity = NewForward * (AccelerationControl * MaxSpeed);
+	sf::Vector2f idealVelocity = NewForward * (accelerationControl_ * MaxSpeed);
 	sf::Vector2f newVelocity = Math::LerpVector(Physics->GetVelocity(), idealVelocity, TweenVelocity);
 	Physics->SetVelocity(newVelocity);
 }
@@ -189,5 +189,5 @@ bool PlayerShip::IsCollisionAllowed() const
 
 void PlayerShip::SetLives(int Lives)
 {
-	LivesRemaining = Lives;
+	livesRemaining_ = Lives;
 }

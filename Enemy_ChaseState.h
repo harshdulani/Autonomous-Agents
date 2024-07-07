@@ -14,5 +14,5 @@ public:
 private:
 	float minDist_ = 0.f;
 
-	std::weak_ptr<EnemyShip> owner;
+	std::weak_ptr<EnemyShip> owner_;
 };

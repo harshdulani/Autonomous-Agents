@@ -6,28 +6,28 @@
 
 ShootingComponent::ShootingComponent()
 {
-	CurrentShootingStrategy = &StandardShooting;
-	SineShooting.SetSineWaveProperties(180.f, 7.f);
+	currentShootingStrategy_ = &standardShooting_;
+	sineShooting_.SetSineWaveProperties(180.f, 7.f);
 
-	TimerMgr = System::GetInstance()->GetTimerManager();
+	timerMgr_ = System::GetInstance()->GetTimerManager();
 
 	//when this timer dies, disable shoot cooldown
-	ShootTimerHandle = TimerMgr->GetNewTimer();
-	TimerMgr->SetTimerEnd(ShootTimerHandle, CurrentShootingStrategy->GetCooldownTime());
-	TimerMgr->SetOnComplete(ShootTimerHandle, std::bind(&ShootingComponent::ResetShootCooldown, this));
-	TimerMgr->SetKillOnComplete(ShootTimerHandle, false);
+	shootTimerHandle_ = timerMgr_->GetNewTimer();
+	timerMgr_->SetTimerEnd(shootTimerHandle_, currentShootingStrategy_->GetCooldownTime());
+	timerMgr_->SetOnComplete(shootTimerHandle_, std::bind(&ShootingComponent::ResetShootCooldown, this));
+	timerMgr_->SetKillOnComplete(shootTimerHandle_, false);
 }
 
 ShootingComponent::~ShootingComponent()
 {
-	TimerMgr->SetKillOnComplete(ShootTimerHandle, true);
-	TimerMgr->ClearOnComplete(ShootTimerHandle);
+	timerMgr_->SetKillOnComplete(shootTimerHandle_, true);
+	timerMgr_->ClearOnComplete(shootTimerHandle_);
 }
 
 void ShootingComponent::Update(const float DeltaTime)
 {
 	SwitchShootStrategy();
-	if (!bPlayer)
+	if (!bPlayer_)
 		return;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
@@ -42,7 +42,7 @@ void ShootingComponent::Render(sf::RenderWindow& Window, sf::RenderStates States
 {
 	PrimitiveComponent::Render(Window, States);
 
-	if (!bPlayer)
+	if (!bPlayer_)
 		return;
 	
 	auto DirVector = GetForwardVector();
@@ -64,39 +64,39 @@ void ShootingComponent::Render(sf::RenderWindow& Window, sf::RenderStates States
 
 void ShootingComponent::ShootBullet()
 {
-	if (CurrentShootingStrategy)
+	if (currentShootingStrategy_)
 	{
-		if (CurrentShootingStrategy->TryShoot(*this, bPlayer))
+		if (currentShootingStrategy_->TryShoot(*this, bPlayer_))
 		{
 			//if bullet fired successfully
-			bShootCooldown = true;
-			TimerMgr->ResetTimer(ShootTimerHandle);
+			bShootCooldown_ = true;
+			timerMgr_->ResetTimer(shootTimerHandle_);
 		}
 	}
 }
 
 void ShootingComponent::SwitchShootStrategy()
 {
-	if (!bPlayer)
+	if (!bPlayer_)
 	{
 		return;
 	}	
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) // 1 key
 	{
-		CurrentShootingStrategy = &StandardShooting;
-		TimerMgr->ResetTimer(ShootTimerHandle, CurrentShootingStrategy->GetCooldownTime());
+		currentShootingStrategy_ = &standardShooting_;
+		timerMgr_->ResetTimer(shootTimerHandle_, currentShootingStrategy_->GetCooldownTime());
 		return;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) // 2
 	{
-		CurrentShootingStrategy = &TripleShooting;
-		TimerMgr->ResetTimer(ShootTimerHandle, CurrentShootingStrategy->GetCooldownTime());
+		currentShootingStrategy_ = &tripleShooting_;
+		timerMgr_->ResetTimer(shootTimerHandle_, currentShootingStrategy_->GetCooldownTime());
 		return;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3)) // 3
 	{
-		CurrentShootingStrategy = &SineShooting;
-		TimerMgr->ResetTimer(ShootTimerHandle, CurrentShootingStrategy->GetCooldownTime());
+		currentShootingStrategy_ = &sineShooting_;
+		timerMgr_->ResetTimer(shootTimerHandle_, currentShootingStrategy_->GetCooldownTime());
 		return;
 	}
 }
@@ -104,15 +104,15 @@ void ShootingComponent::SwitchShootStrategy()
 bool ShootingComponent::CanShoot() const
 {
 	//bullet shoot cooldown/ interval
-	return !bShootCooldown;
+	return !bShootCooldown_;
 }
 
 void ShootingComponent::ResetShootCooldown()
 {
-	bShootCooldown = false;
+	bShootCooldown_ = false;
 }
 
 void ShootingComponent::SetIsPlayer(bool status)
 {
-	bPlayer = status;
+	bPlayer_ = status;
 }

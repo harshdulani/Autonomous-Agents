@@ -16,5 +16,5 @@ public:
 	virtual void OnExitState();
 
 protected:
-	std::weak_ptr<GameEntity> entity;
+	std::weak_ptr<GameEntity> entity_;
 };

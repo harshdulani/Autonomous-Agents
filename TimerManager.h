@@ -37,12 +37,12 @@ public:
 private:
 	Timer* FindTimer(uint32_t TimerHandle);
 
-	static uint32_t LastTimerHandle;
+	static uint32_t lastTimerHandle_;
 
 public:
 	uint32_t GetNewTimer();
 	void UpdateTimers(float DeltaTime);
 
 private:
-	std::list<Timer> TimerList;
+	std::list<Timer> timerList_;
 };

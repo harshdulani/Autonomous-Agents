@@ -55,8 +55,8 @@ private:
 	void ClearOnUpdate();
 	void ClearOnComplete();
 
-	float TimeSinceSpawn() const { return TimeElapsed; }
-	float GetValueDone() const { return TimeSinceSpawn() / LifeTime; }
+	float TimeSinceSpawn() const { return timeElapsed_; }
+	float GetValueDone() const { return TimeSinceSpawn() / lifeTime_; }
 	bool IsTimerComplete() const;
 
 	/// <summary>
@@ -66,16 +66,16 @@ private:
 	/// <summary>
 	/// Use to call the function to be called at the end of the timer
 	/// </summary>
-	std::function<void()> OnComplete = nullptr;
-	std::function<void()> OnUpdate = nullptr;
+	std::function<void()> onComplete_ = nullptr;
+	std::function<void()> onUpdate_ = nullptr;
 
-	uint32_t Handle = 0;
+	uint32_t handle_ = 0;
 
 	//calculated in milliseconds
-	float LifeTime = 0;
-	float TimeElapsed = 0;
+	float lifeTime_ = 0;
+	float timeElapsed_ = 0;
 
-	bool bTimerRunning = true;
+	bool bTimerRunning_ = true;
 protected:
 	void InitPoolable() override;
 

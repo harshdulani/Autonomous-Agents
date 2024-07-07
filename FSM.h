@@ -52,7 +52,7 @@ private:
 
 	std::map<std::string, FSMParameter> globalParameters;
 
-	std::weak_ptr<GameEntity> entity;
+	std::weak_ptr<GameEntity> entity_;
 	int myHandle_ = -1;
 };
 

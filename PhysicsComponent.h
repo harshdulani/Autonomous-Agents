@@ -19,8 +19,8 @@ public:
 	void Update(float DeltaTime) override;
 	
 private:	
-	sf::Vector2f Velocity;
-	sf::Vector2f Acceleration;
+	sf::Vector2f velocity_;
+	sf::Vector2f acceleration_;
 	
-	float AngularVelocity = 0.f;
+	float angularVelocity_ = 0.f;
 };

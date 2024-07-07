@@ -5,7 +5,7 @@
 
 void StateNode::SetGameEntity(std::weak_ptr<GameEntity> owningEntity)
 {
-	entity = std::move(owningEntity);
+	entity_ = std::move(owningEntity);
 }
 
 void StateNode::OnEnterState()

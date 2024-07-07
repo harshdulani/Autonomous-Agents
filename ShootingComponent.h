@@ -23,17 +23,17 @@ public:
 private:
 	void ResetShootCooldown();
 
-	AShootingStrategy* CurrentShootingStrategy = nullptr;
+	AShootingStrategy* currentShootingStrategy_ = nullptr;
 
-	StandardShootingStrategy StandardShooting;
-	TripleShootingStrategy TripleShooting;
-	SineShootingStrategy SineShooting;
+	StandardShootingStrategy standardShooting_;
+	TripleShootingStrategy tripleShooting_;
+	SineShootingStrategy sineShooting_;
 
-	bool bPlayer = false;
+	bool bPlayer_ = false;
 
-	TimerManager* TimerMgr = nullptr;
+	TimerManager* timerMgr_ = nullptr;
 
-	uint32_t ShootTimerHandle = 0;
-	bool bShootCooldown = false;
+	uint32_t shootTimerHandle_ = 0;
+	bool bShootCooldown_ = false;
 };
 

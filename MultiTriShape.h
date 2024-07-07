@@ -12,5 +12,5 @@ protected:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
-	std::vector<sf::VertexArray> Tris;
+	std::vector<sf::VertexArray> tris_;
 };

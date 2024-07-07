@@ -16,12 +16,12 @@ private:
 public:
 
 private:
-	uint32_t eventHandle_ScoreUpdate = 0;
-	uint32_t eventHandle_LivesUpdate = 0;
+	uint32_t eventHandle_ScoreUpdate_ = 0;
+	uint32_t eventHandle_LivesUpdate_ = 0;
 	
 	std::weak_ptr<sf::Text> scoreText_;
 	std::weak_ptr<sf::Text> livesText_;
 	sf::Font uiFont_;
 
-	int score = -1;
+	int score_ = -1;
 };

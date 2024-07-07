@@ -10,26 +10,26 @@
 
 BaseVehicle::BaseVehicle()
 {
-	LivesRemaining = TotalLives;
+	livesRemaining_ = totalLives_;
 
-	TimerManager = System::GetInstance()->GetTimerManager();
+	timerManager_ = System::GetInstance()->GetTimerManager();
 
-	CollisionTimerHandle = TimerManager->GetNewTimer();
-	GetTimerManager()->SetTimerEnd(CollisionTimerHandle, 1);
-	GetTimerManager()->SetOnComplete(CollisionTimerHandle, [this] { ResetCollisionCooldown(); });
-	GetTimerManager()->SetKillOnComplete(CollisionTimerHandle, false);
+	collisionTimerHandle_ = GetTimerManager()->GetNewTimer();
+	GetTimerManager()->SetTimerEnd(collisionTimerHandle_, 1);
+	GetTimerManager()->SetOnComplete(collisionTimerHandle_, [this] { ResetCollisionCooldown(); });
+	GetTimerManager()->SetKillOnComplete(collisionTimerHandle_, false);
 }
 
 BaseVehicle::~BaseVehicle()
 {
-	GetTimerManager()->SetKillOnComplete(CollisionTimerHandle, true);
-	GetTimerManager()->ClearOnComplete(CollisionTimerHandle);
+	GetTimerManager()->SetKillOnComplete(collisionTimerHandle_, true);
+	GetTimerManager()->ClearOnComplete(collisionTimerHandle_);
 }
 
 void BaseVehicle::InitVehicle()
 {
 	//Physics Component
-	PhysicsC = AddComponent<PhysicsComponent>();
+	physicsC_ = AddComponent<PhysicsComponent>();
 }
 
 void BaseVehicle::SetAllCollidersStatus(const bool bEnabled)
@@ -47,31 +47,31 @@ void BaseVehicle::SetAllCollidersStatus(const bool bEnabled)
 
 void BaseVehicle::ResetCollisionCooldown()
 {
-	bCollisionCooldown = false;
+	bCollisionCooldown_ = false;
 	SetAllCollidersStatus(true);
 }
 
 bool BaseVehicle::LoseALife()
 {
-	if (LivesRemaining == 0) return false;
+	if (livesRemaining_ == 0) return false;
 
-	--LivesRemaining;
+	--livesRemaining_;
 
-	return LivesRemaining > 0;
+	return livesRemaining_ > 0;
 }
 
-TimerManager* BaseVehicle::GetTimerManager() const { return TimerManager; }
+TimerManager* BaseVehicle::GetTimerManager() const { return timerManager_; }
 
-PhysicsComponent* BaseVehicle::GetPhysicsComponent() const { return PhysicsC.lock().get(); }
+PhysicsComponent* BaseVehicle::GetPhysicsComponent() const { return physicsC_.lock().get(); }
 
 void BaseVehicle::SetTotalLives(int count)
 {
-	TotalLives = count;
+	totalLives_ = count;
 }
 
 void BaseVehicle::Reset()
 {
-	if(auto Physics = PhysicsC.lock())
+	if(auto Physics = physicsC_.lock())
 	{
 		Physics->SetVelocity(Math::ZeroVector());
 	}
@@ -83,10 +83,10 @@ void BaseVehicle::Reset()
 
 void BaseVehicle::ResetLives()
 {
-	LivesRemaining = TotalLives;
+	livesRemaining_ = totalLives_;
 }
 
 int BaseVehicle::GetLivesLeft() const
 {
-	return LivesRemaining;
+	return livesRemaining_;
 }

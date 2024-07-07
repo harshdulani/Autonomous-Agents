@@ -19,5 +19,5 @@ protected:
 	void SetIsInUse(bool status);
 
 private:
-	bool isInUse = false;
+	bool bInUse_ = false;
 };

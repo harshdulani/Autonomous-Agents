@@ -2,10 +2,10 @@
 
 void Object::Kill()
 {
-	bPendingKill = true;
+	bPendingKill_ = true;
 }
 
-bool Object::IsPendingKill() const { return bPendingKill; }
+bool Object::IsPendingKill() const { return bPendingKill_; }
 
 // check memory addresses to confirm if they are the same instance or not
 bool Object::operator==(const Object& rhs) const
@@ -15,7 +15,7 @@ bool Object::operator==(const Object& rhs) const
 
 void Object::SetObjectIndex(int Index)
 {
-	ObjectIndex = Index;
+	objectIndex_ = Index;
 }
 
-int Object::GetObjectIndex() const { return ObjectIndex;}
+int Object::GetObjectIndex() const { return objectIndex_;}

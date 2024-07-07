@@ -11,16 +11,16 @@
 
 ObjectManager::ObjectManager()
 {
-	Objects.reserve(MaxObjects);
+	Objects.reserve(maxObjects_);
 	
-	eventHandle_levelEnd_ = System::GetInstance()->Event_LevelEnd.Subscribe(BindSubscriber(&ObjectManager::CleanUpOldObjects, this)); 
+	eventHandle_LevelEnd_ = System::GetInstance()->Event_LevelEnd.Subscribe(BindSubscriber(&ObjectManager::CleanUpOldObjects, this)); 
 }
 
 ObjectManager::~ObjectManager()
 {
 	Objects.clear();
 
-	System::GetInstance()->Event_LevelEnd.Unsubscribe(eventHandle_levelEnd_);
+	System::GetInstance()->Event_LevelEnd.Unsubscribe(eventHandle_LevelEnd_);
 }
 
 void ObjectManager::UpdateAllObjects(float DeltaTime)
@@ -93,7 +93,7 @@ void ObjectManager::RenderAllObjects(sf::RenderWindow& Window) const
 			states.transform = entityTransformed * comp->getTransform();
 			comp->Render(Window, states);
 		}
-		for (auto& Drawer : Entity->Drawables)
+		for (auto& Drawer : Entity->drawables_)
 		{
 			if (Drawer.use_count())
 			{
@@ -159,17 +159,17 @@ void ObjectManager::CollectGarbage()
 
 void ObjectManager::SetRenderDirty(bool status)
 {
-	bResolveRenderDirty = status;
+	bResolveRenderDirty_ = status;
 }
 
 void ObjectManager::SetUpdateDirty(bool status)
 {
-	bResolveUpdateDirty = status;
+	bResolveUpdateDirty_ = status;
 }
 
 void ObjectManager::ResolveRenderDirty()
 {
-	if (!bResolveRenderDirty)
+	if (!bResolveRenderDirty_)
 	{
 		return;
 	}
@@ -191,7 +191,7 @@ void ObjectManager::ResolveRenderDirty()
 
 void ObjectManager::ResolveUpdateDirty()
 {
-	if (!bResolveUpdateDirty)
+	if (!bResolveUpdateDirty_)
 	{
 		return;
 	}
@@ -275,21 +275,21 @@ std::weak_ptr<Object> ObjectManager::GetObjectByIndex(int Index)
 void ObjectManager::WrapEntity(GameEntity* Entity) const
 {
 	auto EntityPosition = Entity->getPosition();
-	if (EntityPosition.x > WindowWidth || EntityPosition.x < 0 ||
-		EntityPosition.y > WindowHeight || EntityPosition.y < 0)
+	if (EntityPosition.x > windowWidth_ || EntityPosition.x < 0 ||
+		EntityPosition.y > windowHeight_ || EntityPosition.y < 0)
 	{
-		EntityPosition.x = Math::WrapModulo(EntityPosition.x, 0, WindowWidth);
-		EntityPosition.y = Math::WrapModulo(EntityPosition.y, 0, WindowHeight);
+		EntityPosition.x = Math::WrapModulo(EntityPosition.x, 0, windowWidth_);
+		EntityPosition.y = Math::WrapModulo(EntityPosition.y, 0, windowHeight_);
 		Entity->setPosition(EntityPosition);
 	}
 }
 
-bool ObjectManager::CanCreateObject() const { return static_cast<int>(Objects.size()) < MaxObjects; }
+bool ObjectManager::CanCreateObject() const { return static_cast<int>(Objects.size()) < maxObjects_; }
 
 void ObjectManager::SetWindowVals(float X, float Y)
 {
-	WindowWidth = X;
-	WindowHeight = Y;
+	windowWidth_ = X;
+	windowHeight_ = Y;
 }
 
 bool UpdatePriorityComparator::operator()(const std::weak_ptr<GameEntity>& x,
