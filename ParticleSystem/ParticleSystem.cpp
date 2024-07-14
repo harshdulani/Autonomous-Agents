@@ -231,10 +231,10 @@ void ParticleSystem::InitialiseParticle(const std::weak_ptr<Particle>& particle)
 				break;
 		}		
 
-		float angle = atan2f(direction.y, direction.x) - Math::PI * 0.5f;
+		float angle = Math::RadsToDegs(atan2f(direction.y, direction.x)) + 90.f;
 
 		//@todo: this was just angle, maybe this should be set at the caller of this function where transform rotation space is selected
-		p->SetRotation(GetWorldRotation() + angle);
+		p->SetRotation((emitterRotationSpace_ == TransformSpace::World ? GetWorldRotation() : GetLocalRotation()) + angle);
 
 		sf::Vector2f velocity;
 		if (particleSpeedMin_ > 0.f)

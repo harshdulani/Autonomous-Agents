@@ -7,6 +7,7 @@
 #include "Debug.h"
 #include "ShootingComponent.h"
 #include "Collider.h"
+#include "Input/InputComponent.h"
 #include "ParticleSystem/ParticleSystem.h"
 #include "ParticleSystem/ParticleSystemManager.h"
 
@@ -20,7 +21,11 @@ void PlayerShip::Update(float DeltaTime)
 {
 	BaseVehicle::Update(DeltaTime);
 	UpdateTransform(DeltaTime);
-	SetControlInput();
+
+	// reset these values to have fresh ones assigned in the next frame
+	accelerationControl_ = 0.f;
+	rotationControl_ = 0.f;
+	bNos_ = false;
 }
 
 void PlayerShip::InitialiseComponents()
@@ -34,6 +39,11 @@ void PlayerShip::InitialiseComponents()
 	auto Shooter = ShootingComp.lock();
 	Shooter->SetIsPlayer(true);
 	Shooter->SetLocalPosition({0.f, -15.f});
+
+	//controls
+	inputComp_ = AddComponent<InputComponent>();
+	auto Input = inputComp_.lock();
+	SetupControlMappings();
 
 	CreateCollider(15.0f);
 	auto weakCollider = GetComponentOfType<Collider>();
@@ -125,34 +135,6 @@ void PlayerShip::OnCollision(std::weak_ptr<GameEntity> WeakOther)
 	}
 }
 
-void PlayerShip::SetControlInput()
-{
-	accelerationControl_ = 0.0f;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-	{
-		accelerationControl_ = 1.0f;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-	{
-		accelerationControl_ = -1.0f;
-	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-	{
-		accelerationControl_ *= nosMultiplier_;
-	}
-
-	rotationControl_ = 0.0f;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-	{
-		rotationControl_ = 1.0f;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-	{
-		rotationControl_ = -1.0f;
-	}
-}
-
 void PlayerShip::UpdateTransform(const float DeltaTime)
 {
 	constexpr float RateOfRotation = 360.f * 0.35f;
@@ -171,7 +153,7 @@ void PlayerShip::UpdateTransform(const float DeltaTime)
 	if (!Physics)
 		return;
 	//Movement
-	sf::Vector2f idealVelocity = NewForward * (accelerationControl_ * MaxSpeed);
+	sf::Vector2f idealVelocity = NewForward * (accelerationControl_ * (bNos_ ? activeNos_ : inactiveNos_) * MaxSpeed);
 	sf::Vector2f newVelocity = Math::LerpVector(Physics->GetVelocity(), idealVelocity, TweenVelocity);
 	Physics->SetVelocity(newVelocity);
 }
@@ -180,6 +162,80 @@ bool PlayerShip::LoseALife()
 {
 	System::GetInstance()->GetGame().Event_LivesUpdate.Invoke(GetLivesLeft());
 	return BaseVehicle::LoseALife();
+}
+
+void PlayerShip::SetupControlMappings()
+{
+	auto InputC = inputComp_.lock();
+	//acceleration
+	InputC->MapControlBinding(sf::Keyboard::Scancode::W,
+					  InputHandler::EButtonState::EBS_Held,
+					  [&]() -> void { accelerationControl_ = 1.f; });
+	InputC->MapControlBinding(sf::Keyboard::Scancode::Up,
+					  InputHandler::EButtonState::EBS_Held,
+					  [&]() -> void { accelerationControl_ = 1.f; });
+	InputC->MapControlBinding(sf::Keyboard::Scancode::S,
+					  InputHandler::EButtonState::EBS_Held,
+					  [&]() -> void { accelerationControl_ = -1.f; });
+	InputC->MapControlBinding(sf::Keyboard::Scancode::Down,
+					  InputHandler::EButtonState::EBS_Held,
+					  [&]() -> void { accelerationControl_ = -1.f; });
+	//rotation
+	InputC->MapControlBinding(sf::Keyboard::Scancode::A,
+					  InputHandler::EButtonState::EBS_Held,
+					  [&]() -> void { rotationControl_ = -1.f; });
+	InputC->MapControlBinding(sf::Keyboard::Scancode::Left,
+					  InputHandler::EButtonState::EBS_Held,
+					  [&]() -> void { rotationControl_ = -1.f; });
+	InputC->MapControlBinding(sf::Keyboard::Scancode::D,
+					  InputHandler::EButtonState::EBS_Held,
+					  [&]() -> void { rotationControl_ = 1.f; });
+	InputC->MapControlBinding(sf::Keyboard::Scancode::Right,
+					  InputHandler::EButtonState::EBS_Held,
+					  [&]() -> void { rotationControl_ = 1.f; });
+	// nos
+	InputC->MapControlBinding(sf::Keyboard::Scancode::LShift,
+					  InputHandler::EButtonState::EBS_Held,
+					  [&]() -> void { bNos_ = true; });
+
+	// shooting
+	InputC->MapControlBinding(sf::Mouse::Left,
+		InputHandler::EButtonState::EBS_Held,
+		[this](int, int)
+			{
+				if (const auto shooter = ShootingComp.lock())
+					shooter->TryShoot();
+			});
+	InputC->MapControlBinding(sf::Keyboard::Scancode::Space,
+		InputHandler::EButtonState::EBS_Held,
+		[this]()->void
+			{
+				if (const auto shooter = ShootingComp.lock())
+					shooter->TryShoot();
+			});
+
+	// shooting strats
+	InputC->MapControlBinding(sf::Keyboard::Scancode::Num1,
+							  InputHandler::EButtonState::EBS_Pressed,
+							  [this]() -> void
+								  {
+									  if (const auto shooter = ShootingComp.lock())
+										  shooter->SwitchShootStrategy(1);
+								  });
+	InputC->MapControlBinding(sf::Keyboard::Scancode::Num2,
+							  InputHandler::EButtonState::EBS_Pressed,
+							  [this]() -> void
+								  {
+									  if (const auto shooter = ShootingComp.lock())
+										  shooter->SwitchShootStrategy(2);
+								  });
+	InputC->MapControlBinding(sf::Keyboard::Scancode::Num3,
+							  InputHandler::EButtonState::EBS_Pressed,
+							  [this]() -> void
+								  {
+									  if (const auto shooter = ShootingComp.lock())
+										  shooter->SwitchShootStrategy(3);
+								  });
 }
 
 bool PlayerShip::IsCollisionAllowed() const

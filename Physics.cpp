@@ -29,8 +29,8 @@ std::weak_ptr<GameEntity> Physics::Raycast(const sf::Vector2f& start, const sf::
 		float x = Math::LerpClamped(startX, endX, (float)j / (float)i);
 		float y = Math::LerpClamped(startY, endY, (float)j / (float)i);
 
-		float cellX = Math::InverseLerpUnclamped(0, grid->gridWidth_, x);
-		float cellY = Math::InverseLerpUnclamped(0, grid->gridHeight_, y);
+		int cellX = Math::InverseLerpUnclamped(0, grid->gridWidth_, x);
+		int cellY = Math::InverseLerpUnclamped(0, grid->gridHeight_, y);
 
 		cellX *= grid->gridCellCountX_;
 		cellY *= grid->gridCellCountY_;
@@ -41,12 +41,12 @@ std::weak_ptr<GameEntity> Physics::Raycast(const sf::Vector2f& start, const sf::
 			//crossed bounds searching
 			break;
 		}
-		sf::Vector2f nu = { static_cast<float>((int) cellX), static_cast<float>((int) cellY) };
+		sf::Vector2f nu = { static_cast<float>(cellX), static_cast<float>(cellY) };
 
 		if (static_cast<int>(traversed.size()) > 0)
 		{
 			auto& item = traversed[traversed.size() - 1];
-			if (nu.x == item.x && nu.y == item.y)
+			if (Math::IsAlmostEqualTo(nu, item))
 			{
 				continue;
 			}
@@ -92,8 +92,8 @@ void Physics::RaycastAll(const sf::Vector2f& start, const sf::Vector2f& end, con
 		float x = Math::LerpClamped(startX, endX, (float)j / (float)i);
 		float y = Math::LerpClamped(startY, endY, (float)j / (float)i);
 
-		float cellX = Math::InverseLerpUnclamped(0, grid->gridWidth_, x);
-		float cellY = Math::InverseLerpUnclamped(0, grid->gridHeight_, y);
+		float cellX = Math::InverseLerpUnclamped(0.f, static_cast<float>(grid->gridWidth_), x);
+		float cellY = Math::InverseLerpUnclamped(0.f, static_cast<float>(grid->gridHeight_), y);
 
 		cellX *= grid->gridCellCountX_;
 		cellY *= grid->gridCellCountY_;
@@ -109,7 +109,7 @@ void Physics::RaycastAll(const sf::Vector2f& start, const sf::Vector2f& end, con
 		if ((int)traversed.size() > 0)
 		{
 			auto& item = traversed[traversed.size() - 1];
-			if (nu.x == item.x && nu.y == item.y)
+			if (Math::IsAlmostEqualTo(nu, item))
 			{
 				continue;
 			}

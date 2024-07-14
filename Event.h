@@ -7,7 +7,7 @@ template<typename... Args>
 class Event
 {
 public:
-	void Invoke(Args... args)
+	void Invoke(Args... args) const
 	{
 		if (subscribers_.empty())
 		{

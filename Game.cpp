@@ -9,6 +9,7 @@
 #include "PlayerShip.h"
 #include "System.h"
 #include "GroupAttackingPolicy.h"
+#include "Portal/Portal.h"
 
 //init static colors
 sf::Color Game::Red{255, 69, 69};
@@ -29,6 +30,7 @@ void Game::InitLevel(int levelNum)
 	SpawnPlayer();
 	SpawnAsteroids(levelNum);
 	SpawnBots(3);
+	SpawnPortals();
 
 	SpawnBackgrounds();
 	
@@ -45,6 +47,7 @@ void Game::CreateCollisionSystem()
 			static_cast<int>(System::GetInstance()->GetWindowHeight()));
 		Grid->SetRenderPriority(-101);
 
+		Grid->SetupDebugControls();
 		Grid->SetDebugGridVisibility(false);
 		Grid->SetDebugTextVisibility(false);
 	}
@@ -106,7 +109,7 @@ void Game::SpawnBots(int SpawnCount)
 			autobot->SetTarget(player_);
 			autobot->InitialisePerception(100.f);
 			autobot->InitObstacleAvoidance(70.f, 20.f);
-			autobot->InitThrusterParticles();
+			//autobot->InitThrusterParticles();
 			autobot->InitialiseHealthIndicator(20.f);
 /*
 			if (auto kamikaze = std::dynamic_pointer_cast<KamikazeShip>(autobot))
@@ -154,6 +157,33 @@ void Game::DeletePlayer()
 		player->Kill();
 	}
 	player_.reset();
+}
+
+void Game::SpawnPortals()
+{
+	std::weak_ptr<Portal> orangePortal = System::GetInstance()->GetObjectMgr()->CreateGameEntity<Portal>(CreateRandomPosition());
+	std::weak_ptr<Portal> bluePortal = System::GetInstance()->GetObjectMgr()->CreateGameEntity<Portal>(CreateRandomPosition());
+
+	constexpr float portalRadius = 10.0f * 3;
+
+	if (auto orange = orangePortal.lock())
+	{
+		orange->SetPortalRadius(portalRadius);
+		orange->CreateCollider(portalRadius);
+		orange->SetLinkedPortal(bluePortal);
+
+		orange->InitialiseFSM();
+		orange->AddVisuals();
+	}
+	if (auto blue = bluePortal.lock())
+	{
+		blue->SetPortalRadius(portalRadius);
+		blue->CreateCollider(portalRadius);
+		blue->SetLinkedPortal(orangePortal);
+
+		blue->InitialiseFSM();
+		blue->AddVisuals();
+	}
 }
 
 void Game::SpawnBackgrounds() const

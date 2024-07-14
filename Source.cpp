@@ -7,8 +7,6 @@ int main()
 	sf::Clock DeltaClock;
 	while (SystemInst.IsWindowOpen())
 	{
-		//Check if window has been closed/ etc.
-		SystemInst.PollWindowEvents();
 		if(SystemInst.IsWindowClosePending())
 		{
 			SystemInst.Terminate();

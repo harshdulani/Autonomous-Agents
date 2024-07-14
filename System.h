@@ -3,6 +3,7 @@
 #include <SFML/Window/VideoMode.hpp>
 #include "Event.h"
 #include "Game.h"
+#include "Input/InputHandler.h"
 
 class ScreenShaker;
 class ParticleSystemManager;
@@ -21,6 +22,7 @@ class System
 {
 public:
 	System();
+	~System();
 	
 	Event<> Event_LevelStart;
 	Event<> Event_LevelEnd;
@@ -31,12 +33,12 @@ public:
 	static System* GetInstance();
 
 	void Initialize();
-	void PollWindowEvents();	
 	void Update(float DeltaTime);
 	void Render();
 	void Terminate();
 
 	Game& GetGame();
+	InputHandler& GetInputHandler();
 	ObjectManager* GetObjectMgr() const;
 	TimerManager* GetTimerManager() const;
 	FSMManager* GetFSMManager() const;
@@ -47,6 +49,8 @@ public:
 	bool IsWindowClosePending() const;
 	float GetWindowWidth() const;
 	float GetWindowHeight() const;
+
+	void CloseWindowDeferred();
 	void CloseWindow();
 
 private:
@@ -55,6 +59,7 @@ private:
 	sf::RenderWindow window_;
 	std::shared_ptr<sf::View> camera_;
 	Game gameInst_;
+	InputHandler inputHandler_;
 	std::shared_ptr<ObjectManager> objectMgr_;
 	std::shared_ptr<TimerManager> timerMgr_;
 	std::shared_ptr<FSMManager> fsmMgr_;

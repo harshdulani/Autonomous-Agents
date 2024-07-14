@@ -5,7 +5,7 @@
 #include <memory>
 #include "Debug.h"
 #include <algorithm>
-
+#include "Input/InputComponent.h"
 #include "Math.h"
 
 ImplicitGrid::~ImplicitGrid()
@@ -58,8 +58,6 @@ void ImplicitGrid::Update(const float deltaTime)
 {
 	collisionPairsCount_ = 0;
 
-	CheckDebugInput();
-
 	UpdatePositions();
 	for (int i = 0; i < entities_.size(); i++)
 	{
@@ -69,6 +67,35 @@ void ImplicitGrid::Update(const float deltaTime)
 	{
 		UpdateCollisionPairCount();
 	}
+}
+
+void ImplicitGrid::SetupDebugControls()
+{
+	inputC = AddComponent<InputComponent>();
+	auto input = inputC.lock();
+
+	//grid size adjustment
+	input->MapControlBinding(sf::Keyboard::Scancode::Numpad2,
+							 InputHandler::EButtonState::EBS_Pressed,
+							 [&]() -> void { SetGridCellSizeY(GetGridCellSizeY() - gridSizeChanger_); });
+	input->MapControlBinding(sf::Keyboard::Scancode::Numpad8,
+							 InputHandler::EButtonState::EBS_Pressed,
+							 [&]() -> void { SetGridCellSizeY(GetGridCellSizeY() + gridSizeChanger_); });
+	input->MapControlBinding(sf::Keyboard::Scancode::Numpad4,
+							 InputHandler::EButtonState::EBS_Pressed,
+							 [&]() -> void { SetGridCellSizeX(GetGridCellSizeX() - gridSizeChanger_); });
+	input->MapControlBinding(sf::Keyboard::Scancode::Numpad6,
+							 InputHandler::EButtonState::EBS_Pressed,
+							 [&]() -> void { SetGridCellSizeX(GetGridCellSizeX() + gridSizeChanger_); });
+
+	// debug visibility
+	
+	input->MapControlBinding(sf::Keyboard::Scancode::Numpad0,
+							 InputHandler::EButtonState::EBS_Pressed,
+							 [&]() -> void { SetDebugTextVisibility(!bCollisionPairsVisibility_); });
+	input->MapControlBinding(sf::Keyboard::Scancode::NumpadDecimal,
+							 InputHandler::EButtonState::EBS_Pressed,
+							 [&]() -> void { SetDebugGridVisibility(!bDebugGridVisibility_); });
 }
 
 void ImplicitGrid::TestEntityAgainstGrid(int index)
@@ -313,20 +340,18 @@ void ImplicitGrid::GenerateDebugGrid()
 	{
 		grid->clear();
 
-		float gridWidthF = static_cast<float>(gridWidth_);
-		float gridHeightF = static_cast<float>(gridHeight_);
-		auto intervalX = gridWidthF / static_cast<float>(GetGridCellSizeX());
-		auto intervalY = gridHeightF / static_cast<float>(GetGridCellSizeY());
+		const float gridWidthF = static_cast<float>(gridWidth_);
+		const float gridHeightF = static_cast<float>(gridHeight_);
 	
 		for (int i = 1; i < gridCellCountX_; ++i)
 		{
-			grid->append(sf::Vertex(sf::Vector2f(intervalX * i, 0.f), renderColor_));
-			grid->append(sf::Vertex(sf::Vector2f(intervalX * i, gridHeightF), renderColor_));
+			grid->append(sf::Vertex(sf::Vector2f(static_cast<float>(GetGridCellSizeX() * i), 0.f), renderColor_));
+			grid->append(sf::Vertex(sf::Vector2f(static_cast<float>(GetGridCellSizeX() * i), gridHeightF), renderColor_));
 		}
 		for (int i = 1; i < gridCellCountY_; ++i)
 		{
-			grid->append(sf::Vertex(sf::Vector2f(0.f, intervalY * i), renderColor_));
-			grid->append(sf::Vertex(sf::Vector2f(gridWidthF, intervalY * i), renderColor_));
+			grid->append(sf::Vertex(sf::Vector2f(0.f, static_cast<float>(GetGridCellSizeY() * i)), renderColor_));
+			grid->append(sf::Vertex(sf::Vector2f(gridWidthF, static_cast<float>(GetGridCellSizeY() * i)), renderColor_));
 		}
 	}
 }
@@ -369,36 +394,6 @@ void ImplicitGrid::RefreshGrid()
 		debugGrid_ = CreateDrawable<sf::VertexArray>(sf::Lines, (gridCellCountX_ + gridCellCountY_) * 2);
 
 	GenerateDebugGrid();
-}
-
-void ImplicitGrid::CheckDebugInput()
-{
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad8))
-	{
-		SetGridCellSizeY(GetGridCellSizeY() + gridSizeChanger_);
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad2))
-	{
-		SetGridCellSizeY(GetGridCellSizeY() - gridSizeChanger_);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad6))
-	{
-		SetGridCellSizeX(GetGridCellSizeX() + gridSizeChanger_);
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad4))
-	{
-		SetGridCellSizeX(GetGridCellSizeX() - gridSizeChanger_);
-	}
-
-	// debug Grid visibility
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Period))
-	{
-		SetDebugGridVisibility(!bDebugGridVisibility_);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad0))
-	{
-		SetDebugTextVisibility(!bCollisionPairsVisibility_);
-	}
 }
 
 std::vector<std::weak_ptr<GameEntity>> ImplicitGrid::GetGridCellOccupiers(int x, int y)
@@ -511,6 +506,7 @@ int ImplicitGrid::GetBitIndex(const int32_t& mask)
 
 void ImplicitGrid::SetDebugGridVisibility(bool val)
 {
+	bDebugGridVisibility_ = val;
 	if (val)
 		GenerateDebugGrid();
 	else if (auto grid = debugGrid_.lock())
@@ -519,6 +515,7 @@ void ImplicitGrid::SetDebugGridVisibility(bool val)
 
 void ImplicitGrid::SetDebugTextVisibility(bool val)
 {
+	bCollisionPairsVisibility_ = val;
 	if (val)
 		UpdateCollisionPairCount();
 	else if (auto text = collisionPairsText_.lock())

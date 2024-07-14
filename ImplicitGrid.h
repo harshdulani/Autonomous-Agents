@@ -4,6 +4,8 @@
 #include <memory>
 #include <vector>
 
+class InputComponent;
+
 class ImplicitGrid final : public GameEntity
 {
 	friend class Physics;
@@ -11,7 +13,8 @@ public:
 	~ImplicitGrid() override;
 
 	void Update(float deltaTime) override;
-
+	
+	void SetupDebugControls();
 	void SetDebugGridVisibility(bool val);
 	void SetDebugTextVisibility(bool val);
 
@@ -20,15 +23,15 @@ public:
 	
 	int GetGridCellSizeX() const { return gridCellSizeX_; }
 	void SetGridCellSizeX(int val) 
-	{ 
-		gridCellSizeX_ = val;
+	{
+		gridCellSizeX_ = std::max(1, val); 
 		RefreshGrid();
 	}
 
 	int GetGridCellSizeY() const { return gridCellSizeY_; }
 	void SetGridCellSizeY(int val) 
-	{ 
-		gridCellSizeY_ = val; 
+	{
+		gridCellSizeY_ = std::max(1, val); 
 		RefreshGrid();
 	}
 
@@ -38,7 +41,6 @@ private:
 									const std::shared_ptr<GameEntity>& b);
 	
 	void RefreshGrid();
-	void CheckDebugInput();
 	
 	void ClearGrids();
 	void UpdatePositions();
@@ -72,6 +74,7 @@ private:
 
 	void UpdateCollisionPairCount();
 
+private:
 	std::vector<std::weak_ptr<GameEntity>> entities_;
 
 	// stores a collection of 31 objects (in a int32_t - 31 bits for data, 1 bit for sign)
@@ -89,8 +92,8 @@ private:
 	int gridHeight_ = 0;
 
 	//size of square cells in px
-	int gridCellSizeX_ = 15;
-	int gridCellSizeY_ = 15;
+	int gridCellSizeX_ = 64;
+	int gridCellSizeY_ = 64;
 
 	//use for sizing grid cells up and down
 	int gridSizeChanger_ = 1;
@@ -104,6 +107,8 @@ private:
 	bool bCollisionPairsVisibility_ = false;
 	int collisionPairsCount_ = 0;
 
+	std::weak_ptr<InputComponent> inputC;
+	
 	sf::Font font_;
 
 	// making these a weak ptr because we want to toggle these using numpad

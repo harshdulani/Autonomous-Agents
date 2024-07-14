@@ -14,6 +14,9 @@ public:
 
 	static float DegToRads(float degs);
 	static float RadsToDegs(float rads);
+
+	static bool IsAlmostZero(float val);
+	static bool IsAlmostEqualTo(float a, float b);
 	
 	// Vector2f helpers
 	static sf::Vector2f Normalize(const sf::Vector2f& in);
@@ -25,6 +28,8 @@ public:
 	static float GetVectorMagnitude(sf::Vector2f Vec);
 	static float GetVectorSqrMagnitude(sf::Vector2f Vec);
 	static sf::Vector2f LimitVector(sf::Vector2f vec, float limit);
+
+	static bool IsAlmostEqualTo(const sf::Vector2f& a, const sf::Vector2f& b);
 	
 	static sf::Vector2f ZeroVector();
 	static sf::Vector2f OneVector();

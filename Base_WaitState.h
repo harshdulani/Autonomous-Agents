@@ -21,6 +21,6 @@ public:
 protected:
 	TimerManager* timerManager_ = nullptr;
 
-	float waitDuration_ = -1.f;
-	uint32_t waitDurationTimerHandle_ = 0;
+	float waitDuration = -1.f;
+	uint32_t waitDurationTimerHandle = 0;
 };

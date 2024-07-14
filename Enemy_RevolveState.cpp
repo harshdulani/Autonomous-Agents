@@ -34,7 +34,7 @@ void Enemy_RevolveState::UpdateState(const float deltaTime)
 
 void Enemy_RevolveState::InitialiseState(const float minDistance, const float pathRadius, const float deltaAngle)
 {
-	owner_ = std::dynamic_pointer_cast<EnemyShip>(entity_.lock());
+	owner_ = std::dynamic_pointer_cast<EnemyShip>(entity.lock());
 	minDist_ = minDistance;
 	pathRadius_ = pathRadius;
 	deltaAngle_ = deltaAngle;

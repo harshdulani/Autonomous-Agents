@@ -14,6 +14,10 @@ System::System()
 	Initialize();
 }
 
+System::~System()
+{
+}
+
 System* System::GetInstance() { return singleton_; }
 
 void System::Initialize()
@@ -46,27 +50,10 @@ void System::Initialize()
 		gameInst_.ResetScore();
 }
 
-void System::PollWindowEvents()
-{
-	sf::Event Event;
-	while (window_.pollEvent(Event))
-	{
-		switch (Event.type)
-		{
-			case sf::Event::Closed:
-				bPendingWindowClose_ = true;
-				break;
-			case sf::Event::KeyPressed:
-				if (Event.key.code == sf::Keyboard::Escape)
-					bPendingWindowClose_ = true;
-				break;
-			default: ;
-		}
-	}
-}
-
 void System::Update(float DeltaTime)
 {
+	inputHandler_.PollEvents(window_);
+	
 	//@todo: add a game state machine here - boot, title, game, high score, end
 	timerMgr_->UpdateTimers(DeltaTime);
 
@@ -100,18 +87,22 @@ void System::CloseWindow()
 	window_.close();
 }
 
+Game& System::GetGame() { return gameInst_; }
+InputHandler& System::GetInputHandler() { return inputHandler_; }
 ObjectManager* System::GetObjectMgr() const { return objectMgr_.get(); }
 TimerManager* System::GetTimerManager() const { return timerMgr_.get(); }
 FSMManager* System::GetFSMManager() const { return fsmMgr_.get(); }
-
 ParticleSystemManager* System::GetParticleSystemManager() const { return particleSysMgr_.get(); }
-
 ScreenShaker* System::GetScreenShaker() const { return screenShaker_.get(); }
 
-Game& System::GetGame() { return gameInst_; }
-
 bool System::IsWindowOpen() const { return window_.isOpen(); }
+
 bool System::IsWindowClosePending() const { return bPendingWindowClose_; }
 
 float System::GetWindowWidth() const { return windowWidth_; }
 float System::GetWindowHeight() const { return windowHeight_; }
+
+void System::CloseWindowDeferred()
+{
+	bPendingWindowClose_ = true;
+}

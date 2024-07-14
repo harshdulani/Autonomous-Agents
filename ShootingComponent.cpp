@@ -24,18 +24,8 @@ ShootingComponent::~ShootingComponent()
 	timerMgr_->ClearOnComplete(shootTimerHandle_);
 }
 
-void ShootingComponent::Update(const float DeltaTime)
+void ShootingComponent::Update(float DeltaTime)
 {
-	SwitchShootStrategy();
-	if (!bPlayer_)
-		return;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Mouse::isButtonPressed(sf::Mouse::Left))
-	{
-		if (CanShoot())
-		{
-			ShootBullet();
-		}
-	}
 }
 
 void ShootingComponent::Render(sf::RenderWindow& Window, sf::RenderStates States)
@@ -62,6 +52,14 @@ void ShootingComponent::Render(sf::RenderWindow& Window, sf::RenderStates States
 	Window.draw(va);
 }
 
+void ShootingComponent::TryShoot()
+{
+	if (CanShoot())
+	{
+		ShootBullet();
+	}
+}
+
 void ShootingComponent::ShootBullet()
 {
 	if (currentShootingStrategy_)
@@ -75,29 +73,30 @@ void ShootingComponent::ShootBullet()
 	}
 }
 
-void ShootingComponent::SwitchShootStrategy()
+void ShootingComponent::SwitchShootStrategy(uint8_t shootingStrategy)
 {
-	if (!bPlayer_)
+	assert(shootingStrategy > 0 && shootingStrategy <= 3);
+	switch (shootingStrategy)
 	{
-		return;
-	}	
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) // 1 key
-	{
-		currentShootingStrategy_ = &standardShooting_;
-		timerMgr_->ResetTimer(shootTimerHandle_, currentShootingStrategy_->GetCooldownTime());
-		return;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) // 2
-	{
-		currentShootingStrategy_ = &tripleShooting_;
-		timerMgr_->ResetTimer(shootTimerHandle_, currentShootingStrategy_->GetCooldownTime());
-		return;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3)) // 3
-	{
-		currentShootingStrategy_ = &sineShooting_;
-		timerMgr_->ResetTimer(shootTimerHandle_, currentShootingStrategy_->GetCooldownTime());
-		return;
+		case 1:
+		{
+			currentShootingStrategy_ = &standardShooting_;
+			timerMgr_->ResetTimer(shootTimerHandle_, currentShootingStrategy_->GetCooldownTime());
+			return;
+		}
+		case 2:
+		{
+			currentShootingStrategy_ = &tripleShooting_;
+			timerMgr_->ResetTimer(shootTimerHandle_, currentShootingStrategy_->GetCooldownTime());
+			return;
+		}
+		case 3:
+		{
+			currentShootingStrategy_ = &sineShooting_;
+			timerMgr_->ResetTimer(shootTimerHandle_, currentShootingStrategy_->GetCooldownTime());
+			return;
+		}
+		default: ;
 	}
 }
 

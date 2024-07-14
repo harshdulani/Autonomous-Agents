@@ -11,13 +11,14 @@ class ShootingComponent : public PrimitiveComponent
 public:
 	ShootingComponent();
 	~ShootingComponent() override;
-	
+
 	void Update(float DeltaTime) override;
 	void Render(sf::RenderWindow& Window, sf::RenderStates States) override;
 
+	void TryShoot();
 	void SetIsPlayer(bool status);
 	void ShootBullet();
-	void SwitchShootStrategy();
+	void SwitchShootStrategy(uint8_t shootingStrategy);
 	bool CanShoot() const;
 
 private:

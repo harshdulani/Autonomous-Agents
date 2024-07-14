@@ -32,6 +32,6 @@ void Enemy_ChaseState::UpdateState(const float deltaTime)
 
 void Enemy_ChaseState::InitialiseState(const float minDistance)
 {
-	owner_ = std::dynamic_pointer_cast<EnemyShip>(entity_.lock());
+	owner_ = std::dynamic_pointer_cast<EnemyShip>(entity.lock());
 	minDist_ = minDistance;
 }

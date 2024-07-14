@@ -161,7 +161,7 @@ void EnemyShip::InitialiseHealthIndicator(const float radius)
 	healthIndicator_ = CreateDrawable<sf::CircleShape>(radius);
 
 	auto health = healthIndicator_.lock();
-	health->setPosition({-10.f, -10.f});
+	health->setPosition(-radius * 0.5f, -radius * 0.5f);
 	health->setFillColor(sf::Color::Transparent);
 	health->setOutlineThickness(5.f);
 	
@@ -310,12 +310,17 @@ sf::Vector2f EnemyShip::AvoidObstacles()
 		if (auto other = obstacles_[i].lock())
 		{
 			auto direction = GetPosition() - other->GetPosition();
-			float objectRadius = other->GetComponentOfType<Collider>().lock()->GetRadius();
+			float objectRadius = 0.f;
+			auto weakCollider = other->GetComponentOfType<Collider>();
+			bool bInvalidCollider = weakCollider.expired();
+			if (auto Coll = weakCollider.lock())
+				objectRadius = Coll->GetRadius();
 
 			// distance between obstacle collider boundary and player separation radius boundary
 			float distance = Math::GetVectorMagnitude(direction) - objectRadius;
 			if (other->IsPendingKill() ||
 				!other->GetActive() ||
+				bInvalidCollider ||
 				distance > obstacleAvoiderRadius_)
 			{
 				// remove refs to dead or faraway friends

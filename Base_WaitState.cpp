@@ -9,23 +9,23 @@ Base_WaitState::Base_WaitState()
 
 Base_WaitState::~Base_WaitState()
 {
-	timerManager_->SetKillOnComplete(waitDurationTimerHandle_, true);
-	timerManager_->ClearOnComplete(waitDurationTimerHandle_);
+	timerManager_->SetKillOnComplete(waitDurationTimerHandle, true);
+	timerManager_->ClearOnComplete(waitDurationTimerHandle);
 }
 
 void Base_WaitState::OnEnterState()
 {
-	if (waitDurationTimerHandle_ == 0)
+	if (waitDurationTimerHandle == 0)
 	{
-		waitDurationTimerHandle_ = timerManager_->GetNewTimer();
+		waitDurationTimerHandle = timerManager_->GetNewTimer();
 
-		timerManager_->SetTimerEnd(waitDurationTimerHandle_, waitDuration_);
-		timerManager_->SetKillOnComplete(waitDurationTimerHandle_, false);
-		timerManager_->SetOnComplete(waitDurationTimerHandle_, [this] { OnTimerEnd(); });
+		timerManager_->SetTimerEnd(waitDurationTimerHandle, waitDuration);
+		timerManager_->SetKillOnComplete(waitDurationTimerHandle, false);
+		timerManager_->SetOnComplete(waitDurationTimerHandle, [this] { OnTimerEnd(); });
 		return;
 	}
 
-	timerManager_->ResetTimer(waitDurationTimerHandle_);
+	timerManager_->ResetTimer(waitDurationTimerHandle);
 }
 
 void Base_WaitState::UpdateState(const float deltaTime)
@@ -35,15 +35,15 @@ void Base_WaitState::UpdateState(const float deltaTime)
 
 void Base_WaitState::SetStateDuration(const float duration)
 {
-	waitDuration_ = duration;
+	waitDuration = duration;
 	
-	if (waitDurationTimerHandle_ != -1)
+	if (waitDurationTimerHandle > 0)
 	{
-		timerManager_->SetTimerEnd(waitDurationTimerHandle_, duration);
+		timerManager_->SetTimerEnd(waitDurationTimerHandle, duration);
 	}
 }
 
 float Base_WaitState::GetStateDuration() const
 {
-	return waitDuration_;
+	return waitDuration;
 }

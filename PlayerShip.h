@@ -3,6 +3,7 @@
 #include "BaseVehicle.h"
 #include <memory>
 
+class InputComponent;
 class Graphics;
 class Keyboard;
 class Game;
@@ -30,11 +31,15 @@ protected:
 	bool LoseALife() override;
 	
 private:
-	void SetControlInput();
-
+	void SetupControlMappings();
+	
 private:
+	std::weak_ptr<InputComponent> inputComp_;
+	
 	float accelerationControl_ = 0.f;
 	float rotationControl_ = 0.f;
-
-	float nosMultiplier_ = 2.f;
+	bool bNos_ = false;
+	
+	float inactiveNos_ = 1.f;
+	float activeNos_ = 2.f;
 };

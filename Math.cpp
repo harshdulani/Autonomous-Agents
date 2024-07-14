@@ -59,6 +59,22 @@ float Math::RadsToDegs(const float rads)
 	return rads * (180.0f / PI);
 }
 
+bool Math::IsAlmostZero(float val)
+{
+	// change to epsi
+	return val < 0.001f;
+}
+
+bool Math::IsAlmostEqualTo(float a, float b)
+{
+	return IsAlmostZero(abs(a - b));
+}
+
+bool Math::IsAlmostEqualTo(const sf::Vector2f& a, const sf::Vector2f& b)
+{
+	return IsAlmostZero(abs(a.x - b.x)) && IsAlmostZero(abs(a.y - b.y));
+}
+
 sf::Vector2f Math::ZeroVector() { return {}; }
 sf::Vector2f Math::OneVector() { return {1.f, 1.f}; }
 sf::Vector2f Math::UpVector() { return {0.f, 1.f}; }

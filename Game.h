@@ -38,7 +38,9 @@ private:
 	int GetAsteroidsAliveCount() const;
 
 	void SpawnPlayer();
-	void DeletePlayer();	
+	void DeletePlayer();
+
+	void SpawnPortals();
 
 	void SpawnBackgrounds() const;
 	void SpawnHUD();
