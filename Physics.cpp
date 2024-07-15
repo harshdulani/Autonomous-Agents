@@ -84,7 +84,10 @@ void Physics::RaycastAll(const sf::Vector2f& start, const sf::Vector2f& end, con
 	float endX = end.x;
 	float endY = end.y;
 
-	int i = static_cast<int>(ceilf(Math::GetVectorMagnitude(start - end)));
+	float halfWidth = grid->gridWidth_;
+	float halfHeight = grid->gridHeight_;
+
+	int i = (int)ceilf(Math::GetVectorMagnitude(start - end));
 	int j = 0;
 	std::vector<sf::Vector2f> traversed;
 	while (j++ < i)
@@ -92,8 +95,8 @@ void Physics::RaycastAll(const sf::Vector2f& start, const sf::Vector2f& end, con
 		float x = Math::LerpClamped(startX, endX, (float)j / (float)i);
 		float y = Math::LerpClamped(startY, endY, (float)j / (float)i);
 
-		float cellX = Math::InverseLerpUnclamped(0.f, static_cast<float>(grid->gridWidth_), x);
-		float cellY = Math::InverseLerpUnclamped(0.f, static_cast<float>(grid->gridHeight_), y);
+		float cellX = Math::InverseLerpUnclamped(0.f, halfWidth, x);
+		float cellY = Math::InverseLerpUnclamped(0.f, halfHeight, y);
 
 		cellX *= grid->gridCellCountX_;
 		cellY *= grid->gridCellCountY_;

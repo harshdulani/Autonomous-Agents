@@ -469,15 +469,11 @@ void ImplicitGrid::GetEntityBounds(const std::shared_ptr<GameEntity>& entity, in
 void ImplicitGrid::GetRadiusBounds(const float posX, const float posY, const float radius,
 								   int& x1, int& y1, int& x2, int& y2) const
 {
-	float cellWidth = 1.0f / GetGridCellSizeX();
-	int adjustedX = (int)(posX + gridWidth_ / static_cast<float>(2));
-	int adjustedY = (int)(posY + gridHeight_ / static_cast<float>(2));
-
 	// purposely used c style casts based on functionality
-	x1 = (int)floorf((adjustedX - radius) * cellWidth);
-	x2 = (int)floorf((adjustedX + radius) * cellWidth);
-	y1 = (int)floorf((adjustedY - radius) * cellWidth);
-	y2 = (int)floorf((adjustedY + radius) * cellWidth);
+	x1 = (int)floorf((posX - radius) * invGridCellSizeX_);
+	x2 = (int)floorf((posX + radius) * invGridCellSizeX_);
+	y1 = (int)floorf((posY - radius) * invGridCellSizeY_);
+	y2 = (int)floorf((posY + radius) * invGridCellSizeY_);
 
 	x1 = Math::ClampValue(x1, 0, gridCellCountX_ - 1);
 	x2 = Math::ClampValue(x2, 0, gridCellCountX_ - 1);

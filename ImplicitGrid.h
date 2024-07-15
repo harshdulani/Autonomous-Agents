@@ -24,14 +24,16 @@ public:
 	int GetGridCellSizeX() const { return gridCellSizeX_; }
 	void SetGridCellSizeX(int val) 
 	{
-		gridCellSizeX_ = std::max(1, val); 
+		gridCellSizeX_ = std::max(1, val);
+		invGridCellSizeX_ = 1.f / static_cast<float>(gridCellSizeX_);
 		RefreshGrid();
 	}
 
 	int GetGridCellSizeY() const { return gridCellSizeY_; }
 	void SetGridCellSizeY(int val) 
 	{
-		gridCellSizeY_ = std::max(1, val); 
+		gridCellSizeY_ = std::max(1, val);
+		invGridCellSizeY_ = 1.f / static_cast<float>(gridCellSizeY_);
 		RefreshGrid();
 	}
 
@@ -94,6 +96,9 @@ private:
 	//size of square cells in px
 	int gridCellSizeX_ = 64;
 	int gridCellSizeY_ = 64;
+
+	float invGridCellSizeX_ = 0.f;
+	float invGridCellSizeY_ = 0.f;
 
 	//use for sizing grid cells up and down
 	int gridSizeChanger_ = 1;
