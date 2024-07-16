@@ -25,3 +25,12 @@ Projects/Autonomous-Agents/Autonomous-Agents.vcxproj
 Projects/Autonomous-Agents/Autonomous-Agents.vcxproj.filters
 Projects/Autonomous-Agents/Autonomous-Agents.vcxproj.user
 Projects/Autonomous-Agents/Makefile
+
+Projects/SFML/SFML-Audio.vcxproj
+Projects/SFML/SFML-Audio.vcxproj.filters
+Projects/SFML/SFML-Graphics.vcxproj
+Projects/SFML/SFML-Graphics.vcxproj.filters
+Projects/SFML/SFML-System.vcxproj
+Projects/SFML/SFML-System.vcxproj.filters
+Projects/SFML/SFML-Window.vcxproj
+Projects/SFML/SFML-Window.vcxproj.filters
