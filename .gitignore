@@ -1,0 +1,27 @@
+.cache/
+.idea/
+.vs/
+.vscode/
+build/
+cmake-build-*/
+CMakeUserPresets.json
+
+#Ignore folder called VS2022
+**/VS2022/
+#Ignore folder called Binaries
+**/Binaries/
+
+#Ignore all .vcxproj.user files and all visual studio generated files in any directory
+**/.vcxproj.user
+**/.vs/
+**/.vcxproj.filters
+**/.vcxproj
+**/.sln
+**/Makefile
+
+#specific
+Projects/Autonomous-Agents/Autonomous-Agents.sln
+Projects/Autonomous-Agents/Autonomous-Agents.vcxproj
+Projects/Autonomous-Agents/Autonomous-Agents.vcxproj.filters
+Projects/Autonomous-Agents/Autonomous-Agents.vcxproj.user
+Projects/Autonomous-Agents/Makefile
