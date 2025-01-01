@@ -1,0 +1,15 @@
+.cache/
+.idea/
+.vs/
+.vscode/
+build/
+cmake-build-*/
+CMakeUserPresets.json
+
+#Ignore all .vcxproj.user files and all visual studio generated files in any directory
+**/.vcxproj.user
+**/.vs/
+**/.vcxproj.filters
+**/.vcxproj
+**/.sln
+**/Makefile
