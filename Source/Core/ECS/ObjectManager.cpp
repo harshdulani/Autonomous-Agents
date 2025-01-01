@@ -64,8 +64,9 @@ void ObjectManager::UpdateAllObjects(float DeltaTime)
 	CollectGarbage();
 }
 
-void ObjectManager::RenderAllObjects(sf::RenderWindow& Window) const
-{	
+void ObjectManager::RenderAllObjects(sf::RenderWindow& Window)
+{
+	ResolveRenderDirty();
 	// draw entities
 	for (const auto& Item : RenderEntities)
 	{

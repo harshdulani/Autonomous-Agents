@@ -121,14 +121,22 @@ std::weak_ptr<GameEntity> GameEntity::GetWeakSelf()
 // Render and Update Priority
 void GameEntity::SetRenderPriority(int p)
 {
+	if (renderPriority_ == p)
+		return;
+		
 	renderPriority_ = p;
+	SetRenderDirty(true);
 }
 
 int GameEntity::GetRenderPriority() const { return renderPriority_; }
 
 void GameEntity::SetUpdatePriority(int p)
 {
+	if (updatePriority_ == p)
+		return;
+	
 	updatePriority_ = p;
+	SetUpdateDirty(true);
 }
 
 int GameEntity::GetUpdatePriority() const { return updatePriority_; }
