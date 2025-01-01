@@ -1,6 +1,25 @@
 # Asteroids
 ## Intro
-This is an Asteroids clone made using SFML 2.6.1. Unfortunately, when I started working on this project I didn't know how to use CMake, and I later converted it to use it. As a result, git thinks all my source code is deleted instead of moved - and the files all have wiped git histories. A previous commit should have the history though.
+This is an Asteroids clone made using SFML 2.6.1. I didn't focus on things like the menu, high score, etc but is otherwise feature rich.
+
+| Button | Binding |
+| ------ | ------- |
+| WSAD/ Arrows | Movement |
+| LMB/ Space | Shoot |
+| **Shooting Strategies**  | |
+| Numpad 1 | Standard Shooting |
+| Numpad 2 | Triple Shot |
+| Numpad 3 | Sine shot |
+| **Debug** | |
+| Numpad 0 | Toggle Collision Pair count visibility |
+| Numpad . | Toggle Implict Collision Grid visibility |
+| Numpad 2 | Decrease Collision Grid cell Size X |
+| Numpad 8 | Increase Collision Grid cell Size X |
+| Numpad 4 | Decrease Collision Grid cell Size Y |
+| Numpad 6 | Increase Collision Grid cell Size Y |
+
+## Note:
+Unfortunately, when I started working on this project I didn't know how to use CMake, and I later converted it to use it. As a result, git thinks all my source code is deleted instead of moved - and the files all have wiped git histories. A previous commit should have the history though.
 
 ## Features
 
@@ -29,11 +48,14 @@ This is an Asteroids clone made using SFML 2.6.1. Unfortunately, when I started 
 - Used for particles/ states and their lifetimes.
 - Restricted to pools holding weak pointers to pooled objects.
 - Make any object poolable by inheriting from APoolable.
+### Global **Input Event Messaging** System
+- Create Input bindings on **Button Pressed, Button Held, Button Released**.
+- Wrapper on top of SFML input event polling
 ### **Graph** based on linked lists 
 - Written to be scalable and ready to use with multiple prospect graph requirements (such as pathfinding).
-- Used it for implementing Finite State machine. `Core/Graph/FSM/FSM.h`
-- Used by Portal, Enemy Ship, Kamikaze Enemy Ship
-- Reusable BaseWaitState so you can add functionality at the start, end and tick of the timer on child states.
+- Used it for implementing **Finite State machine**. `Core/Graph/FSM/FSM.h`
+    - Used by Portal, Enemy Ship, Kamikaze Enemy Ship
+    - Reusable BaseWaitState so you can add functionality at the start, end and tick of the timer on child states.
 
 #####	Added a Stars background to game.
 - Random stars keep twinkling over time.
@@ -41,17 +63,16 @@ This is an Asteroids clone made using SFML 2.6.1. Unfortunately, when I started 
 ##### `UIManager` for HUD
 - Renders UI Objects only, made functionality to easily display Text but can be easily extended to render shapes etc.
 
-#### Misc
-- #####	Added a `Debug` class that helped to easily send commonly used information to the console.
-- ##### Impulse based `ScreenShaker`
-- ##### `Portal` entity used to teleport to and from.
-
 ## Design patterns
 - Game loop (lol)
-- Dirty Flag (deferred delete for `Core/ECS/Object.h` -> `Object::Kill()`)
+- Dirty Flag 
+	- Deferred delete for `Core/ECS/Object.h` -> `Object::Kill()`
+	- Component transform recalculation optimization (`Core/ECS/GameEntity.h` -> `GameEntity::bPositionDirty_`)
 - Observer (`Core/Event.h`)
 - Strategy (`Ships/AShootingStrategy.h`)
 - Object Pooling (`Core/Pooling/WeakPointerObjectPool.h`)
+- State Machine (`Graph/FSM/FSM.h`, `EnemyShip` has 2 FSMs, 1 for attacking and movement each, `Portal` for teleport cooldown)
+- Singleton (`System` is a singleton, which owns `FSMManager`, `ScreenShaker`, etc and gives weak pointers when requested.)
 
 ## How to run it:
 Just run GenerateAndBuild.bat, and you'll find the executable at `${build\Source\Core\Driver\Debug\Asteroids.exe}` 
