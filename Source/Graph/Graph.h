@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <vector>
 #include <memory>
@@ -95,7 +95,7 @@ std::shared_ptr<V> Graph<T, U>::GetNodeOfType()
 
 	for (auto& node : nodes)
 	{
-		if (auto n = std::dynamic_pointer_cast<V>(n))
+		if (auto n = std::dynamic_pointer_cast<V>(node))
 		{
 			return n;
 		}

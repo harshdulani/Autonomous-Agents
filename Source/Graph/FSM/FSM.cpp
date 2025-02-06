@@ -1,4 +1,4 @@
-﻿#include "FSM.h"
+#include "FSM.h"
 #include <algorithm>
 #include <utility>
 
@@ -33,7 +33,7 @@ void FSM::Update(float deltaTime)
 
 void FSM::MakeStringLowercase(std::string& target)
 {
-	std::transform(target.begin(), target.end(), target.begin(), std::tolower);
+	std::transform(target.begin(), target.end(), target.begin(), [](unsigned char c) { return std::tolower(c); });
 }
 
 void FSM::TryTransitions()
@@ -166,7 +166,7 @@ FSMParameter* FSM::FindParameterNamed(std::string name)
 	return &it->second;
 }
 
-FSMParameter* FSM::CreateParameterNamed(std::string name, FSMParameter& param)
+FSMParameter* FSM::CreateParameterNamed(std::string name, const FSMParameter& param)
 {
 	MakeStringLowercase(name);
 

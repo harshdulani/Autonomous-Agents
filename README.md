@@ -1,25 +1,33 @@
-# Asteroids
+# Asteroids Evolution
 ## Intro
-This is an Asteroids clone made using SFML 2.6.1. I didn't focus on things like the menu, high score, etc but is otherwise feature rich.
+Asteroids Evolution is a vertex drawn asteroids-style game, developed using SFML (Simple and Fast Multimedia Library), that showcases the creation of a robust gameplay framework inspired by Unreal Engine's architecture. Focus was placed on implementing advanced game algorithm implementations and exploring high-level game engine frameworks for educational purposes and learning SFML for fast prototyping in the future.
 
-| Button | Binding |
-| ------ | ------- |
-| WSAD/ Arrows | Movement |
-| LMB/ Space | Shoot |
-| **Shooting Strategies**  | |
-| Numpad 1 | Standard Shooting |
-| Numpad 2 | Triple Shot |
-| Numpad 3 | Sine shot |
-| **Debug** | |
-| Numpad 0 | Toggle Collision Pair count visibility |
-| Numpad . | Toggle Implict Collision Grid visibility |
-| Numpad 2 | Decrease Collision Grid cell Size X |
-| Numpad 8 | Increase Collision Grid cell Size X |
-| Numpad 4 | Decrease Collision Grid cell Size Y |
-| Numpad 6 | Increase Collision Grid cell Size Y |
+## How to run it & Requirements:
+**Required**: CMake 3.11+ for 'FetchContent' to pull SFML 2.6.1 from GitHub 
+(tested on CMake 3.30+)
+##### Windows:
+**Tested on:** Windows SDK 10.0.22621.0 + MSVC 19.41.34123.0
+Just run `BuildAndRun.bat`, and you'll find the executable at `\build\Source\Core\Driver\Debug\Asteroids.exe` or run these in cmd:
+```sh
+mkdir build
+cd build
+cmake ..
+cmake --build . #add "--config Release" here if you want to build for Release
+start \Source\Core\Driver\Debug\Asteroids.exe #also replace Debug with Release here if you do
+```
+##### macOS:
+**Tested on:** XCode 16.2 + AppleClang 16.0.0.16000026
+Just run ```BuildAndRun.command```, and you'll find the executable at `\build\Source\Core\Driver\Debug\Asteroids` 
+```sh
+mkdir build
+cd build
+cmake -G Xcode ..
+cmake --build . #add "--config Release" here if you want to build for Release
+.\Source\Core\Driver\Debug\Asteroids #also replace Debug with Release here if you do
+```
 
 ## Note:
-Unfortunately, when I started working on this project I didn't know how to use CMake, and I later converted it to use it. As a result, git thinks all my source code is deleted instead of moved - and the files all have wiped git histories. A previous commit should have the history though.
+Unfortunately, when I started working on this project I didn't know how to use CMake, and I later converted it to use CMake. 
 
 ## Features
 
@@ -73,17 +81,3 @@ Unfortunately, when I started working on this project I didn't know how to use C
 - Object Pooling (`Core/Pooling/WeakPointerObjectPool.h`)
 - State Machine (`Graph/FSM/FSM.h`, `EnemyShip` has 2 FSMs, 1 for attacking and movement each, `Portal` for teleport cooldown)
 - Singleton (`System` is a singleton, which owns `FSMManager`, `ScreenShaker`, etc and gives weak pointers when requested.)
-
-## How to run it:
-Just run GenerateAndBuild.bat, and you'll find the executable at `${build\Source\Core\Driver\Debug\Asteroids.exe}` 
-or :
-```sh
-mkdir build
-cd build
-cmake ..
-cmake --build .
-```
-
-## Note:
-the CMake version I used is 3.30-rc3, you may try your own version.
-Atleast CMake 3.11 (not tested) is required for "FetchContent" that I use to get sfml from github. Cheers!

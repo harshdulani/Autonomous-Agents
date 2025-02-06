@@ -1,4 +1,4 @@
-﻿#include "InputHandler.h"
+#include "InputHandler.h"
 #include <cassert>
 #include <SFML/Window/Event.hpp>
 #include "System.h"
@@ -81,6 +81,8 @@ void InputHandler::PollEvents(sf::RenderWindow& window)
 				}
 			}
 			break;
+            default:
+            break;
 		}
 	}
 	for (auto keyHeld : keysHeld_)

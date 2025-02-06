@@ -1,4 +1,4 @@
-﻿#include "System.h"
+#include "System.h"
 #include "Graph/FSM/FSMManager.h"
 #include "Game.h"
 #include "ObjectManager.h"
@@ -28,7 +28,7 @@ void System::Initialize()
 
 	videoMode_.height = static_cast<unsigned int>(windowHeight_);
 	videoMode_.width = static_cast<unsigned int>(windowWidth_);
-	window_.create(videoMode_, "Asteroids SFML", sf::Style::Titlebar | sf::Style::Close);
+	window_.create(videoMode_, "Asteroids SFML");
 	//window_.setFramerateLimit(60);
 	// create a view with its center and size
 	camera_ = std::make_shared<sf::View>(sf::Vector2f(windowWidth_ * 0.5f, windowHeight_ * 0.5f),
@@ -108,5 +108,5 @@ void System::CloseWindowDeferred()
 
 std::string System::GetAssetPath(const std::string& fileName)
 {
-	return std::string("../../../../Assets/") + fileName;
+	return std::string(ASSETS_DIR) + fileName;
 }

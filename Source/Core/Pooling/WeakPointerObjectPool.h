@@ -17,7 +17,7 @@ class WeakPointerObjectPool : public Object
 public:
 	WeakPointerObjectPool()
 	{
-		static_assert((std::is_base_of<APoolable, T>::value, "Type T does not derive from APoolable"));
+		static_assert(std::is_base_of<APoolable, T>::value, "Type T does not derive from APoolable");
 		eventHandle_levelEnd_ = System::GetInstance()->
 				Event_LevelEnd.Subscribe(BindSubscriber(&WeakPointerObjectPool::CleanUpOldObjects, this));
 	}

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <string>
 #include <memory>
 #include <map>
@@ -39,7 +39,7 @@ public:
 private:
 	FSMParameter* FindParameterNamed(std::string name);
 
-	FSMParameter* CreateParameterNamed(std::string name, FSMParameter& param);
+	FSMParameter* CreateParameterNamed(std::string name, const FSMParameter& param);
 
 	static void MakeStringLowercase(std::string& target);
 

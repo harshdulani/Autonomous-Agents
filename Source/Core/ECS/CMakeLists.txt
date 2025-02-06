@@ -9,8 +9,10 @@ set(ECSSources
 set(ECSHeaders
 	Component.h
 	GameEntity.h
+	GameEntity.inl
 	Object.h
 	ObjectManager.h
+	ObjectManager.inl
 	PrimitiveComponent.h
 	SceneComponent.h
 )
