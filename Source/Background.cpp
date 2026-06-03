@@ -17,6 +17,8 @@ void Background::Initialise(std::weak_ptr<PlayerShip> ship,
 
 	starCount_ = starCount;
 	stars_ = sf::VertexArray(sf::Points, starCount_);
+	twinklePhases_.resize(starCount_);
+	baseColors_.resize(starCount_);
 	for (int i = 0; i < starCount_; ++i)
 	{
 		stars_[i] = {{Maths::GetRandFloat(0, cameraWidth_),Maths::GetRandFloat(0, cameraHeight_)},
@@ -24,8 +26,12 @@ void Background::Initialise(std::weak_ptr<PlayerShip> ship,
 												{51, 153, 255},
 												Maths::GetRandFloat(0, 1.f))
 							};
+		baseColors_[i] = stars_[i].color;
+		if (Maths::GetRandFloat(0, 1.f) < 0.5f)
+			twinklePhases_[i] = Maths::GetRandFloat(0.f, 6.28318f);
+		else
+			twinklePhases_[i] = -1.f;
 	}
-	RefreshTwinkler();
 
 	SetRotation(0.f);
 	ship_ = std::move(ship);
@@ -33,15 +39,16 @@ void Background::Initialise(std::weak_ptr<PlayerShip> ship,
 
 void Background::Update(const float deltaTime)
 {
-	// twinkler
-	timeElapsed_ += deltaTime;
-	auto dimVal = abs(cosf(timeElapsed_));
-
-	for (auto& twinklingStar : twinklers_)
+	// twinkler - each star twinkles independently with its own phase offset
+	twinkleTime_ += deltaTime;
+	for (int i = 0; i < starCount_; ++i)
 	{
-		stars_[twinklingStar.first].color = Maths::LerpColor(sf::Color::Black, twinklingStar.second, dimVal);
+		if (twinklePhases_[i] >= 0.f)
+		{
+			float dimVal = fabs(cosf(twinkleTime_ + twinklePhases_[i]));
+			stars_[i].color = Maths::LerpColor(sf::Color::Black, baseColors_[i], dimVal);
+		}
 	}
-	TryRefreshTwinkler(dimVal);
 
 	if (auto ship = ship_.lock())
 	{
@@ -68,38 +75,4 @@ void Background::Render(sf::RenderWindow& Window) const
 	Window.draw(stars_);
 }
 
-void Background::TryRefreshTwinkler(float dimVal)
-{
-	if (!hasDimmed_ && dimVal > 0.01f)
-	{
-		return;
-	}
-	if (dimVal < 0.01f)
-	{
-		//reached min brightness
-		hasDimmed_ = true;
-		return;
-	}
-	if (dimVal < 0.9f)
-	{
-		// hasn't reached max brightness yet after dimming
-		return;
-	}
-	RefreshTwinkler();
-}
 
-void Background::RefreshTwinkler()
-{
-	hasDimmed_ = false;
-	for (const auto& item : twinklers_)
-	{
-		stars_[item.first].color = item.second;
-	}
-	twinklers_.clear();
-	int count = static_cast<int>(static_cast<float>(starCount_) * 0.5f);
-	for (int i = 0; i < count; i++)
-	{
-		int index = static_cast<int>(Maths::GetRandFloat(0.f, static_cast<float>(starCount_ - 1)));
-		twinklers_.emplace(index, stars_[index].color);
-	}
-}

@@ -2,7 +2,7 @@
 
 #include "GameEntity.h"
 
-#include <map>
+#include <vector>
 #include <memory>
 
 class PlayerShip;
@@ -20,10 +20,6 @@ public:
 	void Render(sf::RenderWindow& Window) const override;
 
 private:
-	//twinkler
-	void TryRefreshTwinkler(float dimVal);
-	void RefreshTwinkler();
-	
 	float cameraHeight_ = 0;
 	float cameraWidth_ = 0;
 
@@ -35,8 +31,8 @@ private:
 	int starCount_ = 0;
 	sf::VertexArray stars_;	
 
-	// only some stars twinkle, and after they each dim cycle, a new star is selected to twinkle
-	std::map<int, sf::Color> twinklers_;
-	float timeElapsed_ = 0;
-	bool hasDimmed_ = false;
+	// per-star twinkle data: phase offset (-1 = no twinkle), base color
+	std::vector<float> twinklePhases_;
+	std::vector<sf::Color> baseColors_;
+	float twinkleTime_ = 0;
 };
