@@ -10,11 +10,13 @@ class ImplicitGrid final : public GameEntity
 {
 	friend class Physics;
 	friend class ObjectManager;
+	friend class Game;
 public:
 	~ImplicitGrid() override;
 
 	void Update(float deltaTime) override;
 	
+private:
 	void SetupDebugControls();
 	void SetDebugGridVisibility(bool val);
 	void SetDebugTextVisibility(bool val);
@@ -38,7 +40,6 @@ public:
 		RefreshGrid();
 	}
 
-private:
 	void TestEntityAgainstGrid(int index);
 	void TestEntityPairForCollision(const std::shared_ptr<GameEntity>& a,
 									const std::shared_ptr<GameEntity>& b);

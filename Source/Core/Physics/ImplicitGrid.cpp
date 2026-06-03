@@ -352,6 +352,8 @@ void ImplicitGrid::RefreshGrid()
 {
 	gridCellCountX_ = gridWidth_ / GetGridCellSizeX();
 	gridCellCountY_ = gridHeight_ / GetGridCellSizeY();
+	invGridCellSizeX_ = 1.f / static_cast<float>(gridCellSizeX_);
+	invGridCellSizeY_ = 1.f / static_cast<float>(gridCellSizeY_);
 
 	auto rebalanceGridSize = [](std::vector<std::vector<uint32_t>>& collections, const int newSize) -> void
 	{
