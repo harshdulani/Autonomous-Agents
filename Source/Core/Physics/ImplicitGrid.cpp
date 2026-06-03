@@ -104,14 +104,17 @@ void ImplicitGrid::TestEntityAgainstGrid(int index)
 	GetEntityBounds(entity, x1, y1, x2, y2);
 
 	// Allocate temporary bit arrays for all objects and clear them
-	std::vector<int32_t> mergedRowBits(numOfObjectCollections_, 0);
-	std::vector<int32_t> mergedColumnBits(numOfObjectCollections_, 0);
+	// Note: snapshot the collection count to a local because collision
+	// callbacks below may spawn new entities and modify numOfObjectCollections_
+	const int numCollections = numOfObjectCollections_;
+	std::vector<int32_t> mergedRowBits(numCollections, 0);
+	std::vector<int32_t> mergedColumnBits(numCollections, 0);
 
-	// Compute the merged (bitwise-or’ed) bit array of all overlapped grid rows.
+	// Compute the merged (bitwise-or'ed) bit array of all overlapped grid rows.
 	// Ditto for all overlapped grid columns
 
 	// get all the objects present in the area where candidateEntity's calculated(^) presence is
-	for (int i = 0; i < numOfObjectCollections_; i++)
+	for (int i = 0; i < numCollections; i++)
 	{
 		for (int y = y1; y <= y2; y++)
 		{
@@ -127,7 +130,7 @@ void ImplicitGrid::TestEntityAgainstGrid(int index)
 
 	// Now go through the intersection of the merged bit arrays and collision test
 	// those objects having their corresponding bit set
-	for (int i = 0; i < numOfObjectCollections_; i++)
+	for (int i = 0; i < numCollections; i++)
 	{
 		//find out current cell objects by ANDing cells of same x & y (got per x cell data in prev loop)
 		//in all groups of 31/collectionSize_ objects (current loop)

@@ -25,6 +25,16 @@ cmake -G Xcode ..
 cmake --build . #add "--config Release" here if you want to build for Release
 .\Source\Core\Driver\Debug\Asteroids #also replace Debug with Release here if you do
 ```
+##### Ubuntu:
+**Tested on:**
+Just run `./BuildAndRun.sh`, and you'll find the executable at `build/Source/Core/Driver/Release/Asteroids`
+```sh
+mkdir build
+cd build
+cmake ..
+cmake --build . --config Release
+./Source/Core/Driver/Release/Asteroids
+```
 
 ## Note:
 Unfortunately, when I started working on this project I didn't know how to use CMake, and I later converted it to use CMake. 
