@@ -20,8 +20,8 @@ public:
 private:
 	void StartTryAttacking();
 
-	void OnEnemyShipCreated(std::weak_ptr<EnemyShip> enemyShip);
-	void OnEnemyShipDestroyed(std::weak_ptr<EnemyShip> enemyShip);
+	void OnEnemyShipCreated(const std::weak_ptr<EnemyShip>& enemyShip);
+	void OnEnemyShipDestroyed(const std::weak_ptr<EnemyShip>& enemyShip);
 	void CleanUpOldBots();
 	void StartGlobalAttacking();
 	

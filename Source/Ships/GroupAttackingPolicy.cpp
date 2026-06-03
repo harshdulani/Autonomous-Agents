@@ -52,6 +52,10 @@ void GroupAttackingPolicy::StartTryAttacking()
 		return;
 	}
 	auto attacker = shootQueue_[0].lock();
+	if (!attacker)
+	{
+		return;
+	}
 	attacker->SetAttacking(true);
 }
 
@@ -62,7 +66,7 @@ void GroupAttackingPolicy::AttackComplete()
 		return;
 	}
 	shootQueue_.push_back(shootQueue_[0]);
-	int size = ((int) shootQueue_.size()) - 2;
+	int size = static_cast<int>(shootQueue_.size()) - 2;
 	if (size > 0) // if we have more than one ship in the rest of the queue
 	{
 		std::shuffle(shootQueue_.begin(), shootQueue_.begin() + size, queueRandomiser_);
@@ -71,19 +75,20 @@ void GroupAttackingPolicy::AttackComplete()
 	GetTimerMgr()->ResetTimer(timerHandle_TryShootWait_);
 }
 
-void GroupAttackingPolicy::OnEnemyShipCreated(std::weak_ptr<EnemyShip> enemyShip)
+void GroupAttackingPolicy::OnEnemyShipCreated(const std::weak_ptr<EnemyShip>& enemyShip)
 {
 	if (auto ship = enemyShip.lock())
 	{
+		bool wasEmpty = shootQueue_.empty();
 		shootQueue_.push_back(ship);
-	}
-	if (shootQueue_.empty())
-	{
-		StartGlobalAttacking();
+		if (wasEmpty)
+		{
+			StartGlobalAttacking();
+		}
 	}
 }
 
-void GroupAttackingPolicy::OnEnemyShipDestroyed(std::weak_ptr<EnemyShip> enemyShip)
+void GroupAttackingPolicy::OnEnemyShipDestroyed(const std::weak_ptr<EnemyShip>& enemyShip)
 {
 	if (auto ship = enemyShip.lock())
 	{
@@ -91,19 +96,25 @@ void GroupAttackingPolicy::OnEnemyShipDestroyed(std::weak_ptr<EnemyShip> enemySh
 							   shootQueue_.end(),
 							   [&ship](const std::weak_ptr<EnemyShip>& item) -> bool
 							   {
-								   return ship == item.lock();
+								   auto locked = item.lock();
+								   return locked && locked == ship;
 							   });
 		if (it == shootQueue_.end())
 		{
 			return;
 		}
 		shootQueue_.erase(it);
+		if (shootQueue_.empty())
+		{
+			GetTimerMgr()->Pause(timerHandle_TryShootWait_);
+		}
 	}
 }
 
 void GroupAttackingPolicy::CleanUpOldBots()
 {
 	shootQueue_.clear();
+	GetTimerMgr()->Pause(timerHandle_TryShootWait_);
 }
 
 void GroupAttackingPolicy::StartGlobalAttacking()

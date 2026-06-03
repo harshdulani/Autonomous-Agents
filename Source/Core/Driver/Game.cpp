@@ -49,6 +49,10 @@ void Game::InitLevel()
 	
 	SpawnBots(3);
 	
+	for (auto Portal : System::GetInstance()->GetObjectMgr()->GetAllEntitiesOfType<Portal>())
+	{
+		Portal.lock()->Kill();
+	}
 	SpawnPortals();	
 	
 	Event_LevelStart.Invoke();
@@ -128,28 +132,14 @@ void Game::SpawnBots(int SpawnCount)
 
 		std::weak_ptr<EnemyShip> bot;
 		bot = System::GetInstance()->GetObjectMgr()->CreateGameEntity<EnemyShip>({x, y});
-/*
-		if (Math::GetRandFloat(0.f,1.f) > 0.5f)
-		{
-			bot = objectManager_->CreateGameEntity<KamikazeShip>(XMVectorSet(x, y, 0.0f, 0.0f));
-		}
-		else
-		{
-			bot = objectManager_->CreateGameEntity<EnemyShip>(XMVectorSet(x, y, 0.0f, 0.0f));
-		}
-*/
+
 		if (auto autobot = bot.lock())
 		{
 			autobot->SetTotalLives(2);
 			autobot->ResetLives();
 			autobot->SetTarget(player_);
 			autobot->Initialise();
-			/*
-				if (auto kamikaze = std::dynamic_pointer_cast<KamikazeShip>(autobot))
-				{
-					kamikaze->InitialiseExplosion(75.f, 3.f);
-				}
-			*/
+
 		}
 	}
 }

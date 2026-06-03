@@ -3,8 +3,11 @@
 .vs/
 .vscode/
 build/
+Build/
 cmake-build-*/
 CMakeUserPresets.json
+
+*.DotSettings.user
 
 #Ignore all .vcxproj.user files and all visual studio generated files in any directory
 **/.vcxproj.user

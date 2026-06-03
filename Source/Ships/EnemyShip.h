@@ -43,6 +43,8 @@ public:
 	bool IsAttacking() const;
 
 protected:
+	void SpawnExplosion(bool bDeath);
+	
 	sf::Vector2f SeekTarget() const;
 
 	std::weak_ptr<sf::CircleShape> GetHealthIndicator() const { return healthIndicator_; }
@@ -58,7 +60,6 @@ private:
 	std::weak_ptr<ShootingComponent> shootingComponent_;
 	
 	//FSMs
-	FSMManager* fsmMgr_;
 	uint32_t fsmHandle_ChaseFsm_ = 0;
 	uint32_t fsmHandle_AutoShootFsm_ = 0;
 

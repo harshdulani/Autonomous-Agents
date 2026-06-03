@@ -25,7 +25,6 @@
 
 EnemyShip::EnemyShip()
 {
-	fsmMgr_ = System::GetInstance()->GetFSMManager();
 	groupAttack_ = System::GetInstance()->GetGame().GetGroupAttackingPolicy();
 
 	lowHealthColor_ = {255, 69, 69, 55};
@@ -368,26 +367,30 @@ void EnemyShip::BulletHit()
 		GetTimerManager()->ResetTimer(collisionTimerHandle_);
 		SetAllCollidersStatus(false);
 		UpdateHealthIndicator();
-
-		System::GetInstance()->GetScreenShaker()->CreateImpulse(0.35f, 5.0f, 25.0f);
+		SpawnExplosion(false);
 		return;
 	}
 
 	// if ship doesn't have any lives remaining
-	System::GetInstance()->GetScreenShaker()->CreateImpulse(0.5f, 5.0f, 25.0f);
-	Kill();
+	SpawnExplosion(true);
 	System::GetInstance()->GetGame().Event_EnemyShipDestroyed.Invoke(
 		std::static_pointer_cast<EnemyShip>(System::GetInstance()->GetObjectMgr()->GetWeakPtr(this).lock()));
+	SetActive(false);
+	DestroyAllComponentsOfType<Collider>();
+	if (auto t = thruster.lock())
+	{
+		t->Stop();
+	}
 }
 
 std::weak_ptr<FSM> EnemyShip::GetAutoShootFSM() const
 {
-	return fsmMgr_->GetFSM(fsmHandle_AutoShootFsm_);
+	return System::GetInstance()->GetFSMManager()->GetFSM(fsmHandle_AutoShootFsm_);
 }
 
 std::weak_ptr<FSM> EnemyShip::GetChaseFSM() const
 {
-	return fsmMgr_->GetFSM(fsmHandle_ChaseFsm_);
+	return System::GetInstance()->GetFSMManager()->GetFSM(fsmHandle_ChaseFsm_);
 }
 
 void EnemyShip::AttackComplete()
@@ -407,6 +410,49 @@ bool EnemyShip::IsAttacking() const
 		return !shooter->GetBool("isSuspended");
 	}
 	return false;
+}
+
+void EnemyShip::SpawnExplosion(bool bDeath)
+{
+	float size = bDeath ? 5.f : 3.f;
+	System::GetInstance()->GetScreenShaker()->CreateImpulse(bDeath ? 0.5f : 0.35f, size, 25.0f);
+	auto particleSys = System::GetInstance()->GetParticleSystemManager()->CreateNewParticleSystem(this);
+	std::shared_ptr<ParticleSystem> p = particleSys.lock();
+
+	p->SetWorldPosition(GetPosition());
+
+	std::function<void()> onStart = []() -> void
+	{
+		System::GetInstance()->GetGame().ExplosionCount++;
+	};
+
+	std::function<void()> onEnd = [this, bDeath]() -> void
+	{
+		Game& game = System::GetInstance()->GetGame();
+		game.ExplosionCount--;
+		game.QueueNextLevel();
+		if (bDeath)
+		{
+			Kill();
+		}
+	};
+	
+	p->SetOnStart(onStart)
+	 .SetOnComplete(onEnd);
+	
+	p->SetDuration(0.125f)
+	 .SetParticleLifeTime(0.25f * size, 0.5f * size)
+
+	 .SetEmissionShape(LogicalParticleShape::CircleSamplingFunction, 32)
+	 .SetEmissionMode(EmissionMode::Random)
+	 .SetEmitterScaling(3.f * size)
+	 .SetEmitterRate(0.f)
+	 .AddEmitterBurst(0.f, 16)
+	 .SetEmissionSpeed(50.f)
+
+	 .SetParticleShape(LogicalParticleShape::CircleSamplingFunction, 32)
+	 .SetScaleOverLifetime(1.5f * size, 0.f)
+	 .SetColorOverLifeTime(sf::Color(255, 255, 0), sf::Color::Black);
 }
 
 void EnemyShip::SetAttacking(bool val)
