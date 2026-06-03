@@ -36,9 +36,9 @@ private:
 
 	void UnsubscribeAll();
 
-	static void CheckSystemEvents(const sf::Event& currentEvent);
+	static void PollSystemEvents(const sf::Event& currentEvent);
 
-private:
+public:
 	std::vector<sf::Keyboard::Scancode> keysHeld_;
 	// keyboard event subscribers by key
 	std::map<sf::Keyboard::Scancode, Event<>> keyPressSubs_;

@@ -13,10 +13,14 @@ uint32_t TimerManager::lastTimerHandle_ = 1;
 
 void TimerManager::Kill(uint32_t TimerHandle)
 {
-	if (auto timer = FindTimer(TimerHandle))
+	for (auto it = timerList_.begin(); it != timerList_.end(); ++it)
 	{
-		timer->Kill();
-		timerList_.remove(*timer);
+		if (it->handle_ == TimerHandle)
+		{
+			it->Kill();
+			timerList_.erase(it);
+			return;
+		}
 	}
 }
 

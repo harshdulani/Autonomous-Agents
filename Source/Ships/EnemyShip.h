@@ -12,6 +12,7 @@ class EnemyShip : public Bot
 public:
 	EnemyShip();
 
+	void Initialise();
 	void Update(float deltaTime) override;
 
 	void OnCollision(std::weak_ptr<GameEntity> other) override;

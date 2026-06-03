@@ -20,8 +20,8 @@ public:
 private:
 	void StartTryAttacking();
 
-	void OnEntityCreated(std::weak_ptr<GameEntity> entity);
-	void OnEntityDestroyed(std::weak_ptr<GameEntity> entity);
+	void OnEnemyShipCreated(std::weak_ptr<EnemyShip> enemyShip);
+	void OnEnemyShipDestroyed(std::weak_ptr<EnemyShip> enemyShip);
 	void CleanUpOldBots();
 	void StartGlobalAttacking();
 	
@@ -35,8 +35,8 @@ private:
 	std::default_random_engine queueRandomiser_;
 
 	uint32_t timerHandle_TryShootWait_ = 0;
-	uint32_t eventHandle_EntityCreated_ = 0;
-	uint32_t eventHandle_EntityDestroyed_ = 0;
-	//uint32_t eventHandle_LevelStart_ = 0;
+	uint32_t eventHandle_EnemyShipCreated_ = 0;
+	uint32_t eventHandle_EnemyShipDestroyed_ = 0;
+	uint32_t eventHandle_LevelStart_ = 0;
 	uint32_t eventHandle_LevelEnd_ = 0;
 };

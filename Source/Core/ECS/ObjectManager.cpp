@@ -8,19 +8,20 @@
 #include "PrimitiveComponent.h"
 #include "Event.h"
 #include "SceneComponent.h"
+#include "Physics/ImplicitGrid.h"
 
 ObjectManager::ObjectManager()
 {
 	Objects.reserve(maxObjects_);
 	
-	eventHandle_LevelEnd_ = System::GetInstance()->Event_LevelEnd.Subscribe(BindSubscriber(&ObjectManager::CleanUpOldObjects, this)); 
+	eventHandle_LevelEnd_ = System::GetInstance()->GetGame().Event_ShutdownGame.Subscribe(BindSubscriber(&ObjectManager::CleanUpOldObjects, this)); 
 }
 
 ObjectManager::~ObjectManager()
 {
 	Objects.clear();
 
-	System::GetInstance()->Event_LevelEnd.Unsubscribe(eventHandle_LevelEnd_);
+	System::GetInstance()->GetGame().Event_ShutdownGame.Unsubscribe(eventHandle_LevelEnd_);
 }
 
 void ObjectManager::UpdateAllObjects(float DeltaTime)
@@ -124,7 +125,8 @@ void ObjectManager::DestroyObject(const Object* Obj)
 	{
 		if (it->lock()->GetObjectIndex() == Obj->GetObjectIndex())
 		{
-			System::GetInstance()->Event_EntityDestroyed.Invoke(*it);
+			auto CollisionSys = System::GetInstance()->GetCollisionSystem().lock();
+			CollisionSys->OnEntityDestroyed(*it);
 			UpdateEntities.erase(it);
 			break;
 		}
@@ -271,6 +273,12 @@ void ObjectManager::RemoveObjectAtIndex(int Index)
 std::weak_ptr<Object> ObjectManager::GetObjectByIndex(int Index)
 {
 	return Objects[Index];
+}
+
+void ObjectManager::NotifyCollisionSystem(std::weak_ptr<GameEntity> entity)
+{
+	auto CollisionSys = System::GetInstance()->GetCollisionSystem().lock();
+	CollisionSys->OnEntityCreated(entity);
 }
 
 void ObjectManager::WrapEntity(GameEntity* Entity) const

@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <cstdint>
 #include "Graph/StateNode.h"
 
 class TimerManager;

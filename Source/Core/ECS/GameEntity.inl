@@ -67,10 +67,9 @@ inline void GameEntity::DestroyComponentsOfTypeInternal_(const bool onlyOne)
 {
     static_assert((std::is_base_of<Component, T>::value && "Type mismatch while destroying object"));
 
-    int i = 0;
-    for (auto& comp : components_)
+    for (int i = static_cast<int>(components_.size()) - 1; i >= 0; --i)
     {
-        auto component = comp.lock();
+        auto component = components_[i].lock();
         if (std::dynamic_pointer_cast<T>(component))
         {
             System::GetInstance()->GetObjectMgr()->DestroyObject(component.get());
@@ -84,7 +83,6 @@ inline void GameEntity::DestroyComponentsOfTypeInternal_(const bool onlyOne)
                 return;
             }
         }
-        i++;
     }
 }
 

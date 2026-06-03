@@ -16,7 +16,7 @@ void InputHandler::PollEvents(sf::RenderWindow& window)
 	sf::Event currentEvent;
 	while (window.pollEvent(currentEvent))
 	{
-		CheckSystemEvents(currentEvent);
+		PollSystemEvents(currentEvent);
 		switch (currentEvent.type)
 		{
 			case sf::Event::KeyPressed:
@@ -109,7 +109,7 @@ void InputHandler::PollEvents(sf::RenderWindow& window)
 	}
 }
 
-void InputHandler::CheckSystemEvents(const sf::Event& currentEvent)
+void InputHandler::PollSystemEvents(const sf::Event& currentEvent)
 {
 	switch (currentEvent.type)
 	{
@@ -188,7 +188,7 @@ uint32_t InputHandler::AddControlBinding(sf::Mouse::Button mouseButton,
 		return 0;
 
 	std::map<sf::Mouse::Button, Event<int, int>>::iterator it;
-	bool bFoundIterator = false;
+	//bool bFoundIterator = false;
 	switch (buttonState)
 	{
 		case EButtonState::EBS_Pressed:
@@ -200,7 +200,7 @@ uint32_t InputHandler::AddControlBinding(sf::Mouse::Button mouseButton,
 				if (pairIt.second)
 				{
 					it = pairIt.first;
-					bFoundIterator = true;
+					//bFoundIterator = true;
 				}
 			}
 		}
@@ -214,7 +214,7 @@ uint32_t InputHandler::AddControlBinding(sf::Mouse::Button mouseButton,
 				if (pairIt.second)
 				{
 					it = pairIt.first;
-					bFoundIterator = true;
+					//bFoundIterator = true;
 				}
 			}
 		}
@@ -228,7 +228,7 @@ uint32_t InputHandler::AddControlBinding(sf::Mouse::Button mouseButton,
 				if (pairIt.second)
 				{
 					it = pairIt.first;
-					bFoundIterator = true;
+					//bFoundIterator = true;
 				}
 			}
 		}
@@ -238,7 +238,7 @@ uint32_t InputHandler::AddControlBinding(sf::Mouse::Button mouseButton,
 	}
 
 	// couldn't find and/or create iterator
-	assert(bFoundIterator);
+	//assert(bFoundIterator);
 
 	return it->second.Subscribe(callback);
 }
@@ -255,6 +255,8 @@ void InputHandler::RemoveControlBinding(sf::Keyboard::Scancode scancode, EButton
 			if (it != keyPressSubs_.end())
 			{
 				it->second.Unsubscribe(id);
+				if (it->second.GetSubscriberCount() == 0)
+					keyPressSubs_.erase(it);
 			}
 		}
 		break;
@@ -264,6 +266,8 @@ void InputHandler::RemoveControlBinding(sf::Keyboard::Scancode scancode, EButton
 			if (it != keyHeldSubs_.end())
 			{
 				it->second.Unsubscribe(id);
+				if (it->second.GetSubscriberCount() == 0)
+					keyHeldSubs_.erase(it);
 			}
 		}
 		break;
@@ -273,6 +277,8 @@ void InputHandler::RemoveControlBinding(sf::Keyboard::Scancode scancode, EButton
 			if (it != keyReleasedSubs_.end())
 			{
 				it->second.Unsubscribe(id);
+				if (it->second.GetSubscriberCount() == 0)
+					keyReleasedSubs_.erase(it);
 			}
 		}
 		break;
@@ -291,6 +297,8 @@ void InputHandler::RemoveControlBinding(sf::Mouse::Button button, EButtonState b
 			if (it != mousePressSubs_.end())
 			{
 				it->second.Unsubscribe(id);
+				if (it->second.GetSubscriberCount() == 0)
+					mousePressSubs_.erase(it);
 			}
 		}
 		break;
@@ -300,6 +308,8 @@ void InputHandler::RemoveControlBinding(sf::Mouse::Button button, EButtonState b
 			if (it != mouseHeldSubs_.end())
 			{
 				it->second.Unsubscribe(id);
+				if (it->second.GetSubscriberCount() == 0)
+					mouseHeldSubs_.erase(it);
 			}
 		}
 		break;
@@ -309,6 +319,8 @@ void InputHandler::RemoveControlBinding(sf::Mouse::Button button, EButtonState b
 			if (it != mouseReleasedSubs_.end())
 			{
 				it->second.Unsubscribe(id);
+				if (it->second.GetSubscriberCount() == 0)
+					mouseReleasedSubs_.erase(it);
 			}
 		}
 		break;

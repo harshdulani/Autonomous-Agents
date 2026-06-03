@@ -17,24 +17,61 @@ sf::Color Game::Green{0, 204, 153};
 sf::Color Game::Blue{69, 204, 255};
 sf::Color Game::Yellow{255, 204, 69};
 
-void Game::InitLevel(int levelNum)
+Game::~Game()
+{
+	if (Event_ShutdownGame.GetSubscriberCount() > 0)
+		Event_ShutdownGame.Invoke();
+}
+
+void Game::InitGame()
+{
+	CreateCollisionSystem();
+	SpawnPlayer();
+	SpawnHUD();
+	
+	Event_EnemyShipCreated.Subscribe(BindSubscriber(&Game::OnEnemyShipCreated, this));
+	Event_EnemyShipDestroyed.Subscribe(BindSubscriber(&Game::OnEnemyShipDestroyed, this));
+	
+	groupAttackingPolicy_ = System::GetInstance()->GetObjectMgr()->CreateObject<GroupAttackingPolicy>();
+	SpawnBackgrounds();
+	
+	InitLevel();
+}
+
+void Game::InitLevel()
 {
 	SetAsteroidsDestroyed(0);
 	totalAsteroids_ = 0;
+	enemyCount_ = 0;
 	hasSpawnedBots_ = false;
-	levelNum_ = levelNum;
 	
-	CreateCollisionSystem();
-	groupAttackingPolicy_ = System::GetInstance()->GetObjectMgr()->CreateObject<GroupAttackingPolicy>();
-
-	SpawnPlayer();
-	SpawnAsteroids(levelNum);
+	SpawnAsteroids(currentLevel_);
+	
 	SpawnBots(3);
-	SpawnPortals();
-
-	SpawnBackgrounds();
 	
-	SpawnHUD();
+	SpawnPortals();	
+	
+	Event_LevelStart.Invoke();
+}
+
+void Game::ResetGame()
+{
+	for (auto Asteroid : System::GetInstance()->GetObjectMgr()->GetAllEntitiesOfType<Asteroid>())
+	{
+		Asteroid.lock()->Kill();
+	}	
+	for (auto Ship : System::GetInstance()->GetObjectMgr()->GetAllEntitiesOfType<EnemyShip>())
+	{
+		Ship.lock()->Kill();
+	}
+	for (auto Portal : System::GetInstance()->GetObjectMgr()->GetAllEntitiesOfType<Portal>())
+	{
+		Portal.lock()->Kill();
+	}
+	
+	SpawnPlayer();
+	currentLevel_ = 1;
+	ResetScore();
 }
 
 void Game::CreateCollisionSystem()
@@ -105,20 +142,14 @@ void Game::SpawnBots(int SpawnCount)
 		{
 			autobot->SetTotalLives(2);
 			autobot->ResetLives();
-
 			autobot->SetTarget(player_);
-			autobot->InitialisePerception(100.f);
-			autobot->InitObstacleAvoidance(70.f, 20.f);
-			//autobot->InitThrusterParticles();
-			autobot->InitialiseHealthIndicator(20.f);
-/*
-			if (auto kamikaze = std::dynamic_pointer_cast<KamikazeShip>(autobot))
-			{
-				kamikaze->InitialiseExplosion(75.f, 3.f);
-			}
-*/
-			autobot->InitialiseChaseFSM(200.f, 175.f);
-			autobot->InitialiseAutoShootFSM();
+			autobot->Initialise();
+			/*
+				if (auto kamikaze = std::dynamic_pointer_cast<KamikazeShip>(autobot))
+				{
+					kamikaze->InitialiseExplosion(75.f, 3.f);
+				}
+			*/
 		}
 	}
 }
@@ -256,6 +287,23 @@ int Game::GetAsteroidsAliveCount() const
 	return totalAsteroids_ - asteroidsDestroyed_;
 }
 
+int Game::GetEnemiesAliveCount() const
+{
+	return enemyCount_;
+}
+
+void Game::OnEnemyShipCreated(std::weak_ptr<EnemyShip> enemyShip)
+{
+	enemyCount_++;
+}
+
+void Game::OnEnemyShipDestroyed(std::weak_ptr<EnemyShip> enemyShip)
+{
+	enemyCount_--;
+	
+	//StartNextLevelIfDone();
+}
+
 void Game::UpdateScore(const int oldSize)
 {
 	score_ += 5 * oldSize;
@@ -275,7 +323,7 @@ void Game::SetAsteroidsDestroyed(int val)
 		return;
 	}
 	hasSpawnedBots_ = true;
-	int spawnCount = std::min(4, levelNum_ - 1);
+	int spawnCount = std::min(4, currentLevel_ - 1);
 	if (spawnCount > 0)
 	{
 		SpawnBots(spawnCount);
@@ -284,9 +332,22 @@ void Game::SetAsteroidsDestroyed(int val)
 
 int Game::GetAsteroidsDestroyed() const { return asteroidsDestroyed_; }
 
+void Game::StartNextLevelDeferred()
+{
+	currentLevel_++;
+	InitLevel();
+	bDefer = false;
+}
+
+void Game::QueueNextLevel()
+{
+	if (IsLevelComplete())
+		bDefer = true;
+}
+
 bool Game::IsLevelComplete() const
 {
-	return (GetAsteroidsAliveCount() == 0 && ExplosionCount == 0);
+	return (GetAsteroidsAliveCount() == 0 && GetEnemiesAliveCount() == 0);
 }
 
 bool Game::IsGameOver() const

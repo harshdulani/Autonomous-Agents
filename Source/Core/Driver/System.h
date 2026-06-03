@@ -24,12 +24,6 @@ public:
 	System();
 	~System();
 	
-	Event<> Event_LevelStart;
-	Event<> Event_LevelEnd;
-	
-	Event<std::weak_ptr<GameEntity>> Event_EntityCreated;
-	Event<std::weak_ptr<GameEntity>> Event_EntityDestroyed;
-	
 	static System* GetInstance();
 
 	void Initialize();
@@ -38,6 +32,7 @@ public:
 	void Terminate();
 
 	Game& GetGame();
+	std::weak_ptr<ImplicitGrid> GetCollisionSystem();
 	InputHandler& GetInputHandler();
 	ObjectManager* GetObjectMgr() const;
 	TimerManager* GetTimerManager() const;
@@ -69,10 +64,7 @@ private:
 	std::shared_ptr<ScreenShaker> screenShaker_;
 
 	bool bPendingWindowClose_ = false;
-
-	// this is here bc we will be creating a fsm for the game states and they will change levels
-	int currentLevel_ = 1;
-	
+		
 	sf::VideoMode videoMode_;
 	float windowWidth_ = 800.f;
 	float windowHeight_ = 600.f;

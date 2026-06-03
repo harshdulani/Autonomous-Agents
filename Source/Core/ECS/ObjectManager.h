@@ -1,5 +1,6 @@
 #pragma once
 #include <cassert>
+#include <cstdint>
 #include <memory>
 #include <set>
 #include <vector>
@@ -9,6 +10,7 @@
 
 class Game;
 class GameEntity;
+class ImplicitGrid;
 
 namespace sf
 {
@@ -29,25 +31,27 @@ public:
 class ObjectManager
 {
 	friend class GameEntity;
+	friend class System;
 public:
 	ObjectManager();
 	~ObjectManager();
 
-	void UpdateAllObjects(float DeltaTime);
-	void RenderAllObjects(sf::RenderWindow& Window);
-	
-	void CleanUpOldObjects();
-	void DestroyObject(const Object* Obj);
-
-	void SetWindowVals(float X, float Y);
-	
 	template<typename T>	std::weak_ptr<T> CreateObject();
 	
 	template<typename T>	std::weak_ptr<T> CreateGameEntity(const sf::Vector2f& Pos);
 
 	std::weak_ptr<GameEntity> GetWeakPtr(GameEntity* RawPtr);
 	
+	template<typename T>	std::vector<std::weak_ptr<GameEntity>> GetAllEntitiesOfType();
+	
 private:
+	void SetWindowVals(float X, float Y);
+	
+	void UpdateAllObjects(float DeltaTime);
+	void RenderAllObjects(sf::RenderWindow& Window);
+	
+	void CleanUpOldObjects();
+	void DestroyObject(const Object* Obj);
 	void CollectGarbage();
 
 	void SetRenderDirty(bool status);
@@ -63,6 +67,8 @@ private:
 	void RemoveObjectAtIndex(int Index);
 	std::weak_ptr<Object> GetObjectByIndex(int Index);
 	
+	void NotifyCollisionSystem(std::weak_ptr<GameEntity> entity);
+
 	void WrapEntity(GameEntity* Entity) const;
 
 	bool CanCreateObject() const;

@@ -15,16 +15,16 @@ ParticleSystemManager::ParticleSystemManager()
 	particlePool_.SetObjectCreationFunction(creation);
 
 	eventHandle_levelStart_ = System::GetInstance()->
-		Event_LevelStart.Subscribe(BindSubscriber(&ParticleSystemManager::RefreshParticlePool, this));
+		GetGame().Event_LevelStart.Subscribe(BindSubscriber(&ParticleSystemManager::RefreshParticlePool, this));
 
 	eventHandle_levelEnd_ = System::GetInstance()->
-		Event_LevelEnd.Subscribe(BindSubscriber(&ParticleSystemManager::CleanUpOldParticleSys, this));
+		GetGame().Event_ShutdownGame.Subscribe(BindSubscriber(&ParticleSystemManager::CleanUpOldParticleSys, this));
 }
 
 ParticleSystemManager::~ParticleSystemManager()
 {
-	System::GetInstance()->Event_LevelStart.Unsubscribe(eventHandle_levelStart_);
-	System::GetInstance()->Event_LevelEnd.Unsubscribe(eventHandle_levelEnd_);
+	System::GetInstance()->GetGame().Event_LevelStart.Unsubscribe(eventHandle_levelStart_);
+	System::GetInstance()->GetGame().Event_ShutdownGame.Unsubscribe(eventHandle_levelEnd_);
 }
 
 std::weak_ptr<ParticleSystem> ParticleSystemManager::CreateNewParticleSystem(GameEntity* owningEntity)

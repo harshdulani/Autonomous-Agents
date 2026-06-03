@@ -2,6 +2,7 @@
 
 #include <list>
 #include <functional>
+#include <cstdint>
 
 class Timer;
 

@@ -13,8 +13,8 @@
 
 PlayerShip::~PlayerShip()
 {
-	GetTimerManager()->SetKillOnComplete(collisionTimerHandle_, true);
-	GetTimerManager()->ClearOnComplete(collisionTimerHandle_);
+	if (auto tm = GetTimerManager())
+		tm->Kill(collisionTimerHandle_);
 }
 
 void PlayerShip::Update(float DeltaTime)

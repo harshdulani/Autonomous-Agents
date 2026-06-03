@@ -10,9 +10,7 @@
 
 ImplicitGrid::~ImplicitGrid()
 {
-	System::GetInstance()->Event_EntityCreated.Unsubscribe(eventHandle_EntityCreated_);
-	System::GetInstance()->Event_EntityDestroyed.Unsubscribe(eventHandle_EntityDestroyed_);
-	System::GetInstance()->Event_LevelEnd.Unsubscribe(eventHandle_LevelEnd_);
+	System::GetInstance()->GetGame().Event_ShutdownGame.Unsubscribe(eventHandle_LevelEnd_);
 }
 
 void ImplicitGrid::InitGrid(int Width, int Height)
@@ -28,14 +26,8 @@ void ImplicitGrid::InitGrid(int Width, int Height)
 	//default collection to maintain first 32 entities
 	Add32ObjectCollection();
 
-	eventHandle_EntityCreated_ = System::GetInstance()->
-		Event_EntityCreated.Subscribe(BindSubscriber(&ImplicitGrid::OnEntityCreated, this));
-
-	eventHandle_EntityDestroyed_ = System::GetInstance()->
-		Event_EntityDestroyed.Subscribe(BindSubscriber(&ImplicitGrid::OnEntityDestroyed, this));
-
-	eventHandle_LevelEnd_ = System::GetInstance()->
-		Event_LevelEnd.Subscribe(BindSubscriber(&ImplicitGrid::CleanUpOldObjects, this));
+	eventHandle_LevelEnd_ = System::GetInstance()->GetGame().
+		Event_ShutdownGame.Subscribe(BindSubscriber(&ImplicitGrid::CleanUpOldObjects, this));
 }
 
 void ImplicitGrid::InitDebugText()

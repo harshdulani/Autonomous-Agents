@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <map>
+#include <cstdint>
 
 template<typename... Args>
 class Event
@@ -34,6 +35,11 @@ public:
 		}
 
 		subscribers_.erase(id);
+	}
+
+	uint32_t GetSubscriberCount() const
+	{
+		return subscribers_.size();
 	}
 
 	void UnsubscribeAll()

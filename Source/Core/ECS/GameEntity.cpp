@@ -82,14 +82,12 @@ std::vector<std::weak_ptr<Component>>* GameEntity::GetComponentList()
 
 void GameEntity::DestroyAllDrawables()
 {
-	int i = 0;
-	for (auto& Drawable : drawables_)
+	for (int i = static_cast<int>(drawables_.size()) - 1; i >= 0; --i)
 	{
-		if (Drawable.get())
+		if (drawables_[i])
 		{
 			drawables_.erase(drawables_.begin() + i);
 		}
-		i++;
 	}
 }
 

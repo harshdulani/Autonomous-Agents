@@ -47,6 +47,19 @@ EnemyShip::EnemyShip()
 		Draw->setPosition(-7.5f, -7.5f);
 	}
 	SetScale(1.f);
+	
+}
+
+void EnemyShip::Initialise()
+{
+	System::GetInstance()->GetGame().Event_EnemyShipCreated.Invoke(std::static_pointer_cast<EnemyShip>(System::GetInstance()->GetObjectMgr()->GetWeakPtr(this).lock()));
+	
+	InitialisePerception(100.f);
+	InitObstacleAvoidance(70.f, 20.f);
+	InitThrusterParticles();
+	InitialiseHealthIndicator(20.f);	
+	InitialiseChaseFSM(200.f, 175.f);
+	InitialiseAutoShootFSM();
 }
 
 void EnemyShip::Update(const float deltaTime)
@@ -109,7 +122,7 @@ void EnemyShip::OnCollision(std::weak_ptr<GameEntity> other)
 				return;
 			}
 			BulletHit();
-			//destroy bullet		
+			//destroy bullet
 			bullet->Kill();
 		}
 	}
@@ -225,7 +238,7 @@ void EnemyShip::InitialiseAutoShootFSM()
 	shootingComponent_ = AddComponent<ShootingComponent>();
 	if (auto shooter = shootingComponent_.lock())
 	{
-		//shooter->setLocalPosition({0.f, -15.f});
+		shooter->SetLocalPosition({0.f, -15.f});
 		shooter->SetIsPlayer(false);
 	}
 
@@ -363,6 +376,8 @@ void EnemyShip::BulletHit()
 	// if ship doesn't have any lives remaining
 	System::GetInstance()->GetScreenShaker()->CreateImpulse(0.5f, 5.0f, 25.0f);
 	Kill();
+	System::GetInstance()->GetGame().Event_EnemyShipDestroyed.Invoke(
+		std::static_pointer_cast<EnemyShip>(System::GetInstance()->GetObjectMgr()->GetWeakPtr(this).lock()));
 }
 
 std::weak_ptr<FSM> EnemyShip::GetAutoShootFSM() const

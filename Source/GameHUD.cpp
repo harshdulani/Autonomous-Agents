@@ -1,4 +1,5 @@
 ﻿#include "GameHUD.h"
+#include <cmath>
 #include "Ships/PlayerShip.h"
 
 GameHUD::~GameHUD()

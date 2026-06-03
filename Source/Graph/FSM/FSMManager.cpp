@@ -8,13 +8,13 @@ uint32_t FSMManager::lastFSMHandle_ = 1;
 
 FSMManager::FSMManager()
 {
-	eventHandle_LevelEnd_ = System::GetInstance()->
-		Event_LevelEnd.Subscribe(BindSubscriber(&FSMManager::CleanUpOldFSMs, this));
+	eventHandle_LevelEnd_ = System::GetInstance()->GetGame().
+		Event_ShutdownGame.Subscribe(BindSubscriber(&FSMManager::CleanUpOldFSMs, this));
 }
 
 FSMManager::~FSMManager()
 {
-	System::GetInstance()->Event_LevelEnd.Unsubscribe(eventHandle_LevelEnd_);
+	System::GetInstance()->GetGame().Event_ShutdownGame.Unsubscribe(eventHandle_LevelEnd_);
 }
 
 void FSMManager::CleanUpOldFSMs()

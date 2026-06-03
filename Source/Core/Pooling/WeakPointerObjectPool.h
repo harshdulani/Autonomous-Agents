@@ -18,15 +18,15 @@ public:
 	WeakPointerObjectPool()
 	{
 		static_assert(std::is_base_of<APoolable, T>::value, "Type T does not derive from APoolable");
-		eventHandle_levelEnd_ = System::GetInstance()->
-				Event_LevelEnd.Subscribe(BindSubscriber(&WeakPointerObjectPool::CleanUpOldObjects, this));
+		eventHandle_levelEnd_ = System::GetInstance()->GetGame().
+				Event_ShutdownGame.Subscribe(BindSubscriber(&WeakPointerObjectPool::CleanUpOldObjects, this));
 	}
 
 	~WeakPointerObjectPool() override
 	{
 		CleanUpOldObjects();
 
-		System::GetInstance()->Event_LevelEnd.Unsubscribe(eventHandle_levelEnd_);
+		System::GetInstance()->GetGame().Event_ShutdownGame.Unsubscribe(eventHandle_levelEnd_);
 	}
 
 	void SetObjectCreationFunction(std::function<std::weak_ptr<T>()> function)

@@ -27,9 +27,26 @@ template<typename T> std::weak_ptr<T> ObjectManager::CreateGameEntity(const sf::
     UpdateEntities.insert(NewEntity);
     RenderEntities.insert(NewEntity);
 
-    System::GetInstance()->Event_EntityCreated.Invoke(NewEntity);
+    NotifyCollisionSystem(NewEntity);
     
     return std::weak_ptr<T>(NewEntity);
+}
+
+template <typename T>
+std::vector<std::weak_ptr<GameEntity>> ObjectManager::GetAllEntitiesOfType()
+{
+    static_assert((std::is_base_of<GameEntity, T>::value && "Specified type is not a GameEntity"));
+    
+    std::vector<std::weak_ptr<GameEntity>> Entities;
+    for (auto entity : UpdateEntities)
+    {
+        if (auto typedEntity = std::dynamic_pointer_cast<T>(entity.lock()))
+        {
+            Entities.push_back(std::static_pointer_cast<GameEntity>(typedEntity));
+        }
+    }
+    
+    return Entities;
 }
 
 template<typename T> std::weak_ptr<T> ObjectManager::CreateComponent(GameEntity* OwningEntity)

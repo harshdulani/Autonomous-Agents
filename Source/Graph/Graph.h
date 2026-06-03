@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <vector>
 #include <memory>
 #include <cassert>
@@ -76,8 +77,8 @@ inline std::weak_ptr<V> Graph<T, U>::CreateNode()
 template<typename T, typename U>
 inline std::weak_ptr<U> Graph<T, U>::CreateEdge(std::weak_ptr<T> src, std::weak_ptr<T> dest)
 {
-	edges.push_back(std::make_shared<U>());
-	std::shared_ptr<Edge> newEdge = edges.back();
+	auto newEdge = std::make_shared<U>(); 
+	edges.push_back(newEdge);
 
 	newEdge->SetSrcNode(std::static_pointer_cast<Node>(src.lock()));
 	newEdge->SetDestNode(std::static_pointer_cast<Node>(dest.lock()));

@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <cstdint>
 #include "AShootingStrategy.h"
 #include "PrimitiveComponent.h"
 
@@ -23,7 +24,7 @@ public:
 
 private:
 	void ResetShootCooldown();
-
+	
 	AShootingStrategy* currentShootingStrategy_ = nullptr;
 
 	StandardShootingStrategy standardShooting_;

@@ -1,4 +1,6 @@
 ﻿#include "InputComponent.h"
+
+#include "Debug.h"
 #include "System.h"
 
 InputComponent::~InputComponent()

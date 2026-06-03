@@ -21,16 +21,17 @@ GroupAttackingPolicy::GroupAttackingPolicy()
 	queueRandomiser_ = std::default_random_engine { };
 
 	// event listeners
-	eventHandle_EntityCreated_ = System::GetInstance()->
-		Event_EntityCreated.Subscribe(BindSubscriber(&GroupAttackingPolicy::OnEntityCreated, this));
+	eventHandle_EnemyShipCreated_ = System::GetInstance()->GetGame().Event_EnemyShipCreated
+		.Subscribe(BindSubscriber(&GroupAttackingPolicy::OnEnemyShipCreated, this));
 
-	eventHandle_EntityDestroyed_ = System::GetInstance()->
-		Event_EntityDestroyed.Subscribe(BindSubscriber(&GroupAttackingPolicy::OnEntityDestroyed, this));
+	eventHandle_EnemyShipDestroyed_ = System::GetInstance()->GetGame().Event_EnemyShipDestroyed
+		.Subscribe(BindSubscriber(&GroupAttackingPolicy::OnEnemyShipDestroyed, this));
 
-	//eventHandle_LevelStart_ = System::GetInstance()->Event_LevelStart.Subscribe(BindSubscriber(&GroupAttackingPolicy::StartGlobalAttacking, this));
+	eventHandle_LevelStart_ = System::GetInstance()->GetGame().Event_LevelStart
+		.Subscribe(BindSubscriber(&GroupAttackingPolicy::StartGlobalAttacking, this));
 
-	eventHandle_LevelEnd_ = System::GetInstance()->
-		Event_LevelEnd.Subscribe(BindSubscriber(&GroupAttackingPolicy::CleanUpOldBots, this));
+	eventHandle_LevelEnd_ = System::GetInstance()->GetGame().Event_ShutdownGame
+		.Subscribe(BindSubscriber(&GroupAttackingPolicy::CleanUpOldBots, this));
 }
 
 GroupAttackingPolicy::~GroupAttackingPolicy()
@@ -38,10 +39,10 @@ GroupAttackingPolicy::~GroupAttackingPolicy()
 	GetTimerMgr()->SetKillOnComplete(timerHandle_TryShootWait_, true);
 	GetTimerMgr()->ClearOnComplete(timerHandle_TryShootWait_);
 
-	System::GetInstance()->Event_EntityCreated.Unsubscribe(eventHandle_EntityCreated_);
-	System::GetInstance()->Event_EntityDestroyed.Unsubscribe(eventHandle_EntityDestroyed_);
-	//System::GetInstance()->Event_LevelStart.Unsubscribe(eventHandle_LevelStart_);
-	System::GetInstance()->Event_LevelEnd.Unsubscribe(eventHandle_LevelEnd_);
+	System::GetInstance()->GetGame().Event_EnemyShipCreated.Unsubscribe(eventHandle_EnemyShipCreated_);
+	System::GetInstance()->GetGame().Event_EnemyShipDestroyed.Unsubscribe(eventHandle_EnemyShipDestroyed_);
+	System::GetInstance()->GetGame().Event_LevelStart.Unsubscribe(eventHandle_LevelStart_);
+	System::GetInstance()->GetGame().Event_ShutdownGame.Unsubscribe(eventHandle_LevelEnd_);
 }
 
 void GroupAttackingPolicy::StartTryAttacking()
@@ -70,21 +71,21 @@ void GroupAttackingPolicy::AttackComplete()
 	GetTimerMgr()->ResetTimer(timerHandle_TryShootWait_);
 }
 
-void GroupAttackingPolicy::OnEntityCreated(std::weak_ptr<GameEntity> entity)
+void GroupAttackingPolicy::OnEnemyShipCreated(std::weak_ptr<EnemyShip> enemyShip)
 {
-	if (auto ship = std::dynamic_pointer_cast<EnemyShip>(entity.lock()))
+	if (auto ship = enemyShip.lock())
 	{
 		shootQueue_.push_back(ship);
 	}
-	if (!shootQueue_.empty())
+	if (shootQueue_.empty())
 	{
 		StartGlobalAttacking();
 	}
 }
 
-void GroupAttackingPolicy::OnEntityDestroyed(std::weak_ptr<GameEntity> entity)
+void GroupAttackingPolicy::OnEnemyShipDestroyed(std::weak_ptr<EnemyShip> enemyShip)
 {
-	if (auto ship = std::dynamic_pointer_cast<EnemyShip>(entity.lock()))
+	if (auto ship = enemyShip.lock())
 	{
 		auto it = std::find_if(shootQueue_.begin(),
 							   shootQueue_.end(),

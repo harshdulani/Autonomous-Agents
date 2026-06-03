@@ -40,22 +40,26 @@ void System::Initialize()
 	fsmMgr_ = std::make_shared<FSMManager>();
 	particleSysMgr_ = std::make_shared<ParticleSystemManager>();
 
-	gameInst_.InitLevel(currentLevel_);
+	gameInst_.InitGame();
 	screenShaker_ = std::make_shared<ScreenShaker>();
 	screenShaker_->SetViewCam(camera_);
-	Event_LevelStart.Invoke();
 
-	if (currentLevel_ == 1)
-		gameInst_.ResetScore();
+	gameInst_.ResetScore();
 }
 
 void System::Update(float DeltaTime)
 {
+	if (gameInst_.bDefer)
+	{
+		gameInst_.StartNextLevelDeferred();
+		return;
+	}
+	
 	inputHandler_.PollEvents(window_);
 	
 	//@todo: add a game state machine here - boot, title, game, high score, end
 	timerMgr_->UpdateTimers(DeltaTime);
-
+	
 	objectMgr_->UpdateAllObjects(DeltaTime);
 	fsmMgr_->UpdateFSMs(DeltaTime);
 	particleSysMgr_->UpdateAllParticleSystems(DeltaTime);
@@ -87,6 +91,7 @@ void System::CloseWindow()
 }
 
 Game& System::GetGame() { return gameInst_; }
+std::weak_ptr<ImplicitGrid> System::GetCollisionSystem() { return GetGame().GetCollisionSystem(); }
 InputHandler& System::GetInputHandler() { return inputHandler_; }
 ObjectManager* System::GetObjectMgr() const { return objectMgr_.get(); }
 TimerManager* System::GetTimerManager() const { return timerMgr_.get(); }

@@ -6,6 +6,8 @@
 #include "Component.h"
 #include <SFML/Graphics/Transformable.hpp>
 
+#include "Debug.h"
+
 class Collider;
 class ObjectManager;
 

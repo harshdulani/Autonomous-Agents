@@ -2,6 +2,7 @@
 
 #include "Pooling/APoolable.h"
 #include <functional>
+#include <cstdint>
 
 class Timer : public APoolable
 {

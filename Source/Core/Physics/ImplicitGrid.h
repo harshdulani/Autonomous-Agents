@@ -9,6 +9,7 @@ class InputComponent;
 class ImplicitGrid final : public GameEntity
 {
 	friend class Physics;
+	friend class ObjectManager;
 public:
 	~ImplicitGrid() override;
 

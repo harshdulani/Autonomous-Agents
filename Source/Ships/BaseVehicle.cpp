@@ -22,8 +22,8 @@ BaseVehicle::BaseVehicle()
 
 BaseVehicle::~BaseVehicle()
 {
-	GetTimerManager()->SetKillOnComplete(collisionTimerHandle_, true);
-	GetTimerManager()->ClearOnComplete(collisionTimerHandle_);
+	if (auto tm = GetTimerManager())
+		tm->Kill(collisionTimerHandle_);
 }
 
 void BaseVehicle::InitVehicle()

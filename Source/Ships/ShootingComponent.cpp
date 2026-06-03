@@ -20,8 +20,9 @@ ShootingComponent::ShootingComponent()
 
 ShootingComponent::~ShootingComponent()
 {
-	timerMgr_->SetKillOnComplete(shootTimerHandle_, true);
-	timerMgr_->ClearOnComplete(shootTimerHandle_);
+	if (timerMgr_)
+		timerMgr_->Kill(shootTimerHandle_);
+	currentShootingStrategy_ = nullptr;
 }
 
 void ShootingComponent::Update(float DeltaTime)

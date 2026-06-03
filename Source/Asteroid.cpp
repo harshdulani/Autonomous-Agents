@@ -108,10 +108,12 @@ void Asteroid::SpawnExplosion(int oldSize)
 
 	std::function<void()> onEnd = [&]() -> void
 		{
+			Game& game = System::GetInstance()->GetGame();
 			// For level complete checking
-			System::GetInstance()->GetGame().SetAsteroidsDestroyed(System::GetInstance()->GetGame().GetAsteroidsDestroyed() + 1);
-			System::GetInstance()->GetGame().AsteroidCount--;
-			System::GetInstance()->GetGame().ExplosionCount--;
+			game.SetAsteroidsDestroyed(game.GetAsteroidsDestroyed() + 1);
+			game.AsteroidCount--;
+			game.ExplosionCount--;
+			game.QueueNextLevel();
 
 			if (!IsPendingKill())
 			{
